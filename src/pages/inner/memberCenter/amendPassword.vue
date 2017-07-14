@@ -1,7 +1,7 @@
 <template>
 	<div>
-		<div id="addaccount_form">
-						<h1 id="addaccount_title">绑定手机号
+		<div id="addaccount_form" v-loading="loading" element-loading-text="拼命加载中">
+						<h1 id="addaccount_title">修改密码
               <span>
                 <a href="/index/memberCenter">
                   <i class="el-icon-close">
@@ -11,16 +11,16 @@
             </h1>
 					<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
 							<el-form-item label="原始密码" prop="oldPassword">
-								<el-input v-model="ruleForm.oldPassword" placeholder='请输入原密码'></el-input>
+								<el-input type="password" v-model="ruleForm.oldPassword" placeholder='请输入原密码'></el-input>
 							</el-form-item>
-							<el-form-item label="新密码" prop="newPassword">
-								<el-input v-model="ruleForm.newPassword" placeholder='密码为6-20位字符，可包含字母、数字、下划线'></el-input>
+							<el-form-item label="新密码" prop="pass">
+								<el-input type="password" v-model="ruleForm.pass" placeholder='密码为6-20位字符，可包含字母、数字、下划线'></el-input>
 							</el-form-item>
-							<el-form-item label="确认密码" prop="confimPassword">
-								<el-input type='password' v-model="ruleForm.confimPassword" placeholder='确认密码'></el-input>
+							<el-form-item label="确认密码" prop="checkPass">
+								<el-input type='password' v-model="ruleForm.checkPass" placeholder='确认密码'></el-input>
 							</el-form-item>
 							<el-form-item>
-								<el-button class='addaccount_button' type="primary" @click="submitForm('ruleForm')">立即绑定</el-button>
+								<el-button class='addaccount_button' type="primary" @click="modifyPass">立刻修改</el-button>
 								<el-button class='addaccount_button' @click="$router.push({path:'/index/memberCenter'})">取消</el-button>
 							</el-form-item>
 					</el-form>
@@ -118,32 +118,49 @@
 </style>
       
 <script>
+import request from 'superagent'
 export default {
   data () {
+    var validatePass = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请输入密码'))
+      } else {
+        if (this.ruleForm.checkPass !== '') {
+          this.$refs.ruleForm.validateField('checkPass')
+        }
+        callback()
+      }
+    }
+    var validateCheckPass = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请再次输入密码'))
+      } else if (value !== this.ruleForm.pass) {
+        callback(new Error('两次输入密码不一致!'))
+      } else {
+        callback()
+      }
+    }
     return {
+      loading: false,
       ruleForm: {
         oldPassword: '',
-        newPassword: '',
-        confimPassword: ''
+        pass: '',
+        checkPass: ''
       },
       rules: {
-        oldPassword: [
-          { required: true, message: '请输入原密码', trigger: 'blur' },
-          { min: 10, max: 20, message: '', trigger: 'blur' }
+        pass: [
+            { validator: validatePass, trigger: 'blur' }
         ],
-        newPassword: [
-          { required: true, message: '请输入新密码', trigger: 'blur' }
-        ],
-        confimPassword: [
-          { required: true, message: '两次输入的不相同', trigger: 'blur' }
+        checkPass: [
+          { validator: validateCheckPass, trigger: 'blur' }
         ]
       }
     }
   },
   methods: {
-    submitForm (formName) {
+    modifyPass () {
       var that = this
-      this.$refs[formName].validate((valid) => {
+      this.$refs.ruleForm.validate((valid) => {
         if (valid) {
           this.$confirm('确认修改吗?', '提示', {
             confirmButtonText: '确定',
@@ -151,19 +168,31 @@ export default {
             type: 'warning'
           })
         .then(() => {
-          this.$loading({customClass: 'loading_class', text: '正在为您处理中，请稍后...'})
+          that.loading = true
           setTimeout(() => {
-            that.$loading({customClass: 'loading_class'}).close()
-            that.$alert('处理成功！', 'Success', {
-              confirmButtonText: '确定',
-              callback: action => {
-                that.$router.push('/index/memberCenter')
-                that.$message({
-                  type: 'Success',
-                  message: '密码修改成功！'
-                })
-              }
-            })
+            request.post('http://192.168.3.52:7099/franchisee/userCenter/modifyPwd')
+              .send({franchiseeId: '123456', userId: 'admin', oldPwd: this.ruleForm.pass, newPwd: this.ruleForm.checkPass})
+              .end((err, res) => {
+                if (err) {
+                  console.log(err)
+                  that.loading = false
+                  that.$message.error('sorry,服务器请求超时，请稍候再试！')
+                  that.$router.push('./')
+                } else {
+                  var status = Number(JSON.parse(res.text).code)
+                  if (status !== 0) {
+                    that.loading = false
+                    this.$message.error('sorry,密码修改失败,请重新修改')
+                  } else {
+                    that.loading = false
+                    that.$message({
+                      message: '恭喜你，密码修改成功',
+                      type: 'success'
+                    })
+                    that.$router.push('./')
+                  }
+                }
+              })
           }, 1000)
         }).catch(() => {
           this.$message({

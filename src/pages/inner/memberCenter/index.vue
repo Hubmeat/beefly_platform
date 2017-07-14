@@ -8,7 +8,7 @@
 				<div class="homepage_info">
 					<h2>张菲</h2>
 					<p>zhangfei</p>
-					<h3>管理员</h3>
+					<!--<h3>管理员</h3>-->
 				</div>
 			</div>
 		</div>
@@ -27,7 +27,7 @@
 					</span>
 
 					<span>	
-						<button @click='verify_email'>修改邮箱</button>
+						<button @click='modifyEmail'>修改邮箱</button>
 					</span>
 				</li>
 				<li>
@@ -261,13 +261,14 @@
 export default {
   name: 'HomePage',
   methods: {
-    verify_email () {
+    modifyEmail () {
       this.$prompt('请输入邮箱', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
         inputErrorMessage: '邮箱格式不正确'
-      }).then(({ value }) => {
+      }).then(function ({ value }) {
+        console.log(value)
         this.$message({
           type: 'success',
           message: '你的邮箱是: ' + value

@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div id="addaccount_form">
+		<div id="addaccount_form" v-loading="loading" element-loading-text="拼命加载中">
 						<h1 id="addaccount_title">绑定邮箱
               <span>
                 <a href="/index/memberCenter">
@@ -10,14 +10,14 @@
               </span>
             </h1>
 					<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-							<el-form-item label="邮箱" prop="roleName">
-								<el-input v-model="ruleForm.roleName" placeholder='请输入邮箱'></el-input>
+							<el-form-item label="邮箱" prop="maiAccount">
+								<el-input v-model="ruleForm.maiAccount" placeholder='请输入邮箱'></el-input>
 							</el-form-item>
 							<el-form-item label="账户密码" prop="account_password">
 								<el-input type='password' v-model="ruleForm.account_password" placeholder='为保障账号安全，您需要填写当前登录账号和密码'></el-input>
 							</el-form-item>
 							<el-form-item>
-								<el-button class='addaccount_button' type="primary" @click="submitForm('ruleForm')">立即绑定</el-button>
+								<el-button class='addaccount_button' type="primary" @click="handleBindEmail">立即绑定</el-button>
 								<el-button class='addaccount_button' @click="$router.push({path:'/index/memberCenter'})">取消</el-button>
 							</el-form-item>
 					</el-form>
@@ -115,58 +115,88 @@
 </style>
       
 <script>
+import {isEmail} from '../../../../utils/index.js'
+import request from 'superagent'
 export default {
   data () {
+    var validateMail = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('邮箱不能为空'))
+      }
+      setTimeout(() => {
+        var res = isEmail(value)
+        if (res === true) {
+          return callback()
+        } else {
+          callback(new Error('邮箱格式不正确！！！'))
+        }
+      }, 1000)
+    }
     return {
       ruleForm: {
-        roleName: '',
+        maiAccount: '',
         account_password: ''
       },
+      loading: false,
       rules: {
-        roleName: [
-          { required: true, message: '请输入邮箱', trigger: 'blur' },
-          { min: 10, max: 20, message: '', trigger: 'blur' }
+        maiAccount: [
+          {required: true, trigger: 'blur', validator: validateMail}
         ],
         account_password: [
           { required: true, message: '请输入密码', trigger: 'blur' },
-          { min: 6, message: '请输入正确密码', trigger: 'blur' }
+          { min: 6, message: '密码长度最短为6位', trigger: 'blur' }
         ]
       }
     }
   },
   methods: {
-    submitForm (formName) {
+    handleBindEmail () {
       var that = this
-      this.$refs[formName].validate((valid) => {
+      this.$refs.ruleForm.validate((valid) => {
         if (valid) {
           this.$confirm('确认绑定吗?', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '信息有误',
             type: 'warning'
-          })
-        .then(() => {
-          this.$loading({customClass: 'loading_class'})
-          setTimeout(() => {
-            that.$loading({customClass: 'loading_class'}).close()
+          }).then(function () {
             that.$alert('我们已经向您的邮箱发送验证码', '申请绑定', {
               confirmButtonText: '确定',
-              callback: action => {
-                that.$router.push('/index/memberCenter')
-                that.$message({
-                  type: 'Success',
-                  message: ''
+              callback: function (action) {
+                that.loading = true
+                request.post('http://192.168.3.52:7099/franchisee/userCenter/bindingEmail2')
+                .send({franchiseeId: '123456', userId: 'admin', email: that.ruleForm.maiAccount, password: that.ruleForm.account_password})
+                .end((err, res) => {
+                  if (err) {
+                    console.log(err)
+                    that.loading = false
+                    that.$router.push('/index/memberCenter')
+                    that.$message({
+                      message: 'sorry，服务器请求超时，请稍候再试',
+                      type: 'error'
+                    })
+                  } else {
+                    var status = JSON.parse(res.text).code
+                    if (status === 0) {
+                      that.loading = false
+                      that.$router.push('/index/memberCenter')
+                      that.$message({
+                        message: '恭喜你，绑定成功',
+                        type: 'success'
+                      })
+                    } else {
+                      that.loading = false
+                      that.$message({
+                        message: 'sorry，绑定失败',
+                        type: 'error'
+                      })
+                    }
+                  }
                 })
               }
             })
-          }, 500)
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消绑定操作！'
           })
-        })
         } else {
-          console.log('error submit!!')
+          console.log('error submit')
           return false
         }
       })

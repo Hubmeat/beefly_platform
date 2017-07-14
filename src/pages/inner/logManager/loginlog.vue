@@ -1,6 +1,6 @@
 <template>
   <div class="loginlog">
-    <el-tabs type="border-card">
+    <el-tabs type="border-card" @tab-click="handleClickTab">
       <el-tab-pane>
         <span slot="label"><i class="el-icon-date"></i>平台</span>
        <el-row class="querybar">
@@ -17,28 +17,55 @@
               <el-date-picker type="date" placeholder="选择结束日期" v-model="form_plat.endTime" style="width: 100%;"></el-date-picker>
             </el-col>
            </el-form-item>
-           <el-button type="primary">查询</el-button>
+           <el-button id="platSearchBtn" type="primary">查询</el-button>
          </el-form>
        </el-row>
        <el-row class="table">
-         <table>
-            <thead>
-              <tr>
-                <th>用户名</th>
-                <th>姓名</th>
-                <th>操作类别</th>
-                <th>操作日期</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-bind:key="item.username" v-for="item of form_plat.tableData">
-                <td>{{item.username}}</td>
-                <td>{{item.firstname}}</td>
-                <td>{{item.operationtype}}</td>
-                <td>{{item.operationdate}}</td>
-              </tr>
-            </tbody>
+          <!-- <table>
+              <thead>
+                <tr>
+                  <th>用户名</th>
+                  <th>姓名</th>
+                  <th>操作类别</th>
+                  <th>操作日期</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-bind:key="item.username" v-for="item of form_plat.tableData">
+                  <td>{{item.userId}}</td>
+                  <td>{{item.name}}</td>
+                  <td>{{item.type===0?'登录':'注销'}}</td>
+                  <td>{{item.loginTime}}</td>
+                </tr>
+              </tbody>
           </table>
+          <div class="hasData" v-show="form_plat.hasPlatData">
+            暂无数据
+          </div> -->
+          <el-table :data="form_plat.tableData" style="width:100%">
+            <el-table-column
+              prop="userId"
+              label="用户名"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="name"
+              label="姓名"
+            >
+            </el-table-column>
+            <el-table-column
+              label="操作类别"
+            >
+              <template scope="scope">
+                {{scope.row.type===0?'登录':'注销'}}
+              </template>
+            </el-table-column>
+            <el-table-column 
+              prop="loginTime"
+              label="登录日期"
+            >
+            </el-table-column>
+          </el-table>
        </el-row>
        <div class="loginLog_page">
         <div class="M-box"></div>
@@ -70,28 +97,56 @@
               <el-date-picker type="date" placeholder="选择结束日期" v-model="form_join.endTime" style="width: 100%;"></el-date-picker>
             </el-col>
            </el-form-item>
-           <el-button type="primary">查询</el-button>
+           <el-button id="logSearchBtn" type="primary">查询</el-button>
          </el-form>
        </el-row>
        <el-row class="table">
-         <table>
+         <!-- <table>
             <thead>
               <tr>
                 <th>用户名</th>
                 <th>姓名</th>
-                <th>操作内容</th>
+                <th>操作类别</th>
                 <th>操作日期</th>
               </tr>
             </thead>
             <tbody>
               <tr v-bind:key="item.username" v-for="item of form_join.tableData">
-                <td>{{item.username}}</td>
-                <td>{{item.firstname}}</td>
-                <td>{{item.operationContent}}</td>
-                <td>{{item.operationdate}}</td>
+                <td>{{item.userId}}</td>
+                <td>{{item.name}}</td>
+                <td>{{item.type===0?'登录':'注销'}}</td>
+                <td>{{item.loginTime}}</td>
               </tr>
             </tbody>
           </table>
+          <div class="hasData" v-show="form_join.hasJoinData">
+                暂无数据
+          </div> -->
+           <el-table :data="form_join.tableData" style="width:100%">
+            <el-table-column
+              prop="userId"
+              label="用户名"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="name"
+              label="姓名"
+            >
+            </el-table-column>
+            <el-table-column
+              label="操作类别"
+            >
+              <template scope="scope">
+                {{scope.row.type===0?'登录':'注销'}}
+              </template>
+            </el-table-column>
+            <el-table-column 
+              prop="loginTime"
+              label="登录日期"
+            >
+            </el-table-column>
+          </el-table>
+       
        </el-row>
        <div class="loginLog_page">
         <div class="M-box"></div>
@@ -101,6 +156,7 @@
   </div>
 </template>
 <style scoped>
+  div.hasData{line-height: 60px;text-align: center;height: 60px;color:#9e9090;width: 100%;display:block;}
   div.loginlog i.el-icon-date{margin-right:5px;}
   div.operatortime{text-align: center;}
   div.querybar{padding-top: 20px;background: #f3f0f0;padding-left: 20px;}
@@ -116,54 +172,46 @@
   div.selectPlace span.active{border:1px solid orange;}
   div.el-form-item__content div.el-input{display:inline-block;width: 192px;}
   div.keywords span.keywords{width: 62px;display: inline-block;text-align: right;margin-right: 10px;}
+  button#logSearchBtn,button#platSearchBtn{width: 80px;
+    /* float: right; */
+    height: 36px;
+    line-height: 11px;
+    margin-right: 30px;
+    color: #fff;
+    outline: none;
+    border: none;
+    /* border-radius: 4px; */
+    background: rgba(52,52,67, 0.8);}
 </style>
 <script>
   import $ from 'jquery'
   require('../../../assets/lib/js/jquery.pagination.js')
   import '../../../assets/css/pagination.css'
   import moment from 'moment'
-  import {siblings} from '../../../../utils/index.js'
+  import request from 'superagent'
+  import {siblings, checkPositiveNumber} from '../../../../utils/index.js'
   export default {
     data: function () {
       return {
+        tabTitle: '平台',
         form_plat: {
           keyword: '姓名/用户名',
           startTime: moment(),
           endTime: moment(),
-          tableData: [
-            {
-              username: '孙悟饭',
-              firstname: '台亮',
-              operationtype: '登录',
-              operationdate: moment().format('YYYY-MM-DD HH:mm:ss')
-            },
-            {
-              username: '小花猫',
-              firstname: '台亮小弟',
-              operationtype: '退出',
-              operationdate: moment().format('YYYY-MM-DD HH:mm:ss')
-            }
-          ]
+          tableData: [],
+          hasPlatData: true
         },
         form_join: {
           keyword: '姓名/用户名',
           startTime: moment(),
           endTime: moment(),
-          tableData: [
-            {
-              username: '孙悟饭',
-              firstname: '台亮',
-              operationContent: '修改稿了本人密码，绑定了手机号13811111111',
-              operationdate: moment().format('YYYY-MM-DD HH:mm:ss')
-            },
-            {
-              username: '小花猫',
-              firstname: '台亮小弟',
-              operationContent: '修改了李四的密码，新增了管理员账号：abc',
-              operationdate: moment().format('YYYY-MM-DD HH:mm:ss')
-            }
-          ]
-        }
+          tableData: [],
+          hasJoinData: true
+        },
+        plat_totalPage: '',
+        join_totalPage: '',
+        plat_currentPage: 1,
+        join_currentPage: 1
       }
     },
     methods: {
@@ -173,18 +221,243 @@
           elems[i].setAttribute('class', '')
         }
         e.target.setAttribute('class', 'active')
+      },
+      handleClickTab (tab, event) {
+        var that = this
+        this.tabTitle = event.target.innerText
+         if(this.tabTitle === '平台') {
+          request.post('http://192.168.3.52:7099/franchisee/log/allLog')
+          .send({
+            franchiseeId: '123456',
+            userId: 'jjjj'
+          })
+          .end(function(err, res){
+            if (err) {
+              console.log(err)
+            } else {
+              var newArr =  JSON.parse(res.text).list.map((item) => {
+                var obj = Object.assign({},item,{loginTime: moment(item.loginTime).format('YYYY-MM-DD HH:mm:ss')})
+                return obj
+              })
+              that.form_plat.tableData = newArr
+              that.plat_totalPage = JSON.parse(res.text).totalPage || 20
+              var len = JSON.parse(res.text).list.length
+              if (len>0) {
+                that.form_plat.hasPlatData = false
+                $('.M-box').eq(0).pagination({
+                  pageCount: that.plat_totalPage,
+                  jump: true,
+                  coping: true,
+                  homePage: '首页',
+                  endPage: '尾页',
+                  prevContent: '«',
+                  nextContent: '»'
+                })
+                $('.M-box').eq(0).click(function (e) {
+                  if (e.target.getAttribute('class') === 'active') {
+                    return false
+                  }
+                  if (e.target.tagName === 'A') {
+                    if (e.target.innerText === '首页') {
+                      that.plat_currentPage = 1
+                    }
+                    if (e.target.innerText === '尾页') {
+                      that.plat_currentPage = that.totalPage
+                    }
+                    if (e.target.innerText === '»') {
+                      that.plat_currentPage++
+                    }
+                    if (e.target.innerText === '«') {
+                      that.plat_currentPage--
+                    }
+                    if (checkPositiveNumber(e.target.innerText)) {
+                      that.plat_currentPage = e.target.innerText
+                    }
+                    if (e.target.innerText === '跳转') {
+                      e.preventDefault()
+                      var jumpPageNum = $('.M-box .active')
+                      that.plat_currentPage = jumpPageNum[0].innerText
+                    }
+                  }
+                })
+                $(document).keydown(function (e) {
+                  if (e.keyCode === 13) {
+                    that.plat_currentPage = e.target.value
+                  }
+                })
+              }
+            }
+          })
+        }else {
+          request.post('http://192.168.3.52:7099/franchisee/log/getLoginLog')
+          .send({
+            franchiseeId: '123456',
+            userId: 'jjjj'
+          })
+          .end(function(err, res){
+            if (err) {
+              console.log(err)
+            } else {
+              var newArr =  JSON.parse(res.text).list.map((item) => {
+                var obj = Object.assign({},item,{loginTime: moment(item.loginTime).format('YYYY-MM-DD HH:mm:ss')})
+                return obj
+              })
+              that.form_join.tableData = newArr
+              that.join_totalPage = JSON.parse(res.text).totalPage || 20
+              var len = JSON.parse(res.text).list.length
+              if (len>0) {
+                that.form_join.hasJoinData = false
+                $('.M-box').eq(1).pagination({
+                  pageCount: that.join_totalPage,
+                  jump: true,
+                  coping: true,
+                  homePage: '首页',
+                  endPage: '尾页',
+                  prevContent: '«',
+                  nextContent: '»'
+                })
+                $('.M-box').eq(1).click(function (e) {
+                  if (e.target.getAttribute('class') === 'active') {
+                    return false
+                  }
+                  if (e.target.tagName === 'A') {
+                    if (e.target.innerText === '首页') {
+                      that.join_currentPage = 1
+                    }
+                    if (e.target.innerText === '尾页') {
+                      that.join_currentPage = that.totalPage
+                    }
+                    if (e.target.innerText === '»') {
+                      that.join_currentPage++
+                    }
+                    if (e.target.innerText === '«') {
+                      that.join_currentPage--
+                    }
+                    if (checkPositiveNumber(e.target.innerText)) {
+                      that.join_currentPage = e.target.innerText
+                    }
+                    if (e.target.innerText === '跳转') {
+                      e.preventDefault()
+                      var jumpPageNum = $('.M-box .active')
+                      that.join_currentPage = jumpPageNum[0].innerText
+                    }
+                  }
+                })
+                $(document).keydown(function (e) {
+                  if (e.keyCode === 13) {
+                    that.join_currentPage = e.target.value
+                  }
+                })
+              }
+            }
+          })
+        }
       }
     },
     mounted: function () {
-      $('.M-box').pagination({
-        pageCount: 50,
-        jump: true,
-        coping: true,
-        homePage: '首页',
-        endPage: '尾页',
-        prevContent: '«',
-        nextContent: '»'
-      })
+      var that = this
+      if(this.tabTitle === '平台') {
+         request.post('http://192.168.3.52:7099/franchisee/log/allLog')
+        .send({
+          franchiseeId: '123456',
+          userId: 'jjjj'
+        })
+        .end(function(err, res){
+          if (err) {
+            console.log(err)
+          } else {
+            var newArr =  JSON.parse(res.text).list.map((item) => {
+              var obj = Object.assign({},item,{loginTime: moment(item.loginTime).format('YYYY-MM-DD HH:mm:ss')})
+              return obj
+            })
+            that.form_plat.tableData = newArr
+            that.plat_totalPage = JSON.parse(res.text).totalPage || 20
+            var len = JSON.parse(res.text).list.length
+            if (len>0) {
+              that.form_plat.hasPlatData = false
+              $('.M-box').eq(0).pagination({
+                pageCount: that.plat_totalPage,
+                jump: true,
+                coping: true,
+                homePage: '首页',
+                endPage: '尾页',
+                prevContent: '«',
+                nextContent: '»'
+              })
+              $('.M-box').click(function (e) {
+                if (e.target.getAttribute('class') === 'active') {
+                  return false
+                }
+                if (e.target.tagName === 'A') {
+                  if (e.target.innerText === '首页') {
+                    that.plat_currentPage = 1
+                  }
+                  if (e.target.innerText === '尾页') {
+                    that.plat_currentPage = that.totalPage
+                  }
+                  if (e.target.innerText === '»') {
+                    that.plat_currentPage++
+                  }
+                  if (e.target.innerText === '«') {
+                    that.plat_currentPage--
+                  }
+                  if (checkPositiveNumber(e.target.innerText)) {
+                    that.plat_currentPage = e.target.innerText
+                  }
+                  if (e.target.innerText === '跳转') {
+                    e.preventDefault()
+                    var jumpPageNum = $('.M-box .active')
+                    that.plat_currentPage = jumpPageNum[0].innerText
+                  }
+                }
+              })
+              $(document).keydown(function (e) {
+                if (e.keyCode === 13) {
+                  that.plat_currentPage = e.target.value
+                }
+              })
+            }
+          }
+        })
+      }
+    },
+    watch: {
+      plat_currentPage: {
+        handler: function (val, oldVal) {
+          var that = this
+          request.post('http://192.168.3.52:7099/franchisee/log/allLog?page=' + that.plat_currentPage)
+            .send({
+              franchiseeId: '123456',
+              userId: 'jjjj'
+            })
+            .end(function (err, res) {
+              if (err) {
+                console.log(err)
+              } else {
+                that.form_plat.tableData = JSON.parse(res.text).list
+              }
+            })
+        },
+        deep: true
+      },
+      join_currentPage: {
+        handler: function (val, oldVal) {
+          var that = this
+          request.post('http://192.168.3.52:7099/franchisee/log/getLoginLog?page=' + that.join_currentPage)
+            .send({
+              franchiseeId: '123456',
+              userId: 'jjjj'
+            })
+            .end(function (err, res) {
+              if (err) {
+                console.log(err)
+              } else {
+                that.form_join.tableData = JSON.parse(res.text).list
+              }
+            })
+        },
+        deep: true
+      }
     }
   }
 </script>

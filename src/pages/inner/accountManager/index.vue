@@ -1,6 +1,6 @@
 <template>
   <div style="margin-right:20px;">
-    <el-tabs type="border-card">
+    <el-tabs type="border-card" @tab-click="handleClickTab" >
       <el-tab-pane>
         <span slot="label"><i class="el-icon-date"></i> 平台</span>
         <div id="am_search">
@@ -17,37 +17,98 @@
         </div>
         <!-- account -->
         <div class="account">
-          <h1>
-            <button type="button" @click="change('')">添加新账号</button>
-          </h1>
-      
-          <!-- 表单 -->
-          <el-table :data="tableData" style="width: 100%; font-size:13px;">
-            <el-table-column prop="user" label="用户名" min-width="140"></el-table-column>
-            <el-table-column prop="tel" label="手机号" min-width="140"></el-table-column>
-            <el-table-column prop="email" label="邮箱" min-width="170"></el-table-column>
-            <el-table-column prop="name" label="姓名" min-width="100"></el-table-column>
-            <el-table-column prop="type" label="类别" min-width="120"></el-table-column>
-            <el-table-column prop="status" label="状态" min-width="120" style="font-size:12px;">
-              <template scope="scoped">
-                <el-switch v-model='tableData[0].status' on-color="#13ce66" on-text="开启" off-text="冻结" off-color="#ff4949" myIndex='tableData.index' >
-                </el-switch>
-              </template>
-            </el-table-column>
-            <el-table-column prop="del" label="操作">
-              <template scope="scope">
-                <a href="javascript:;"></a>
-                <i class="el-icon-edit" style="margin-right:10px;"></i>
-                </a>
-                <i class="el-icon-close"></i>
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
-        <div id="account_page">
-          <div class="M-box">
-          </div>
-        </div>
+      <h1>
+        <button type="button" @click="addAccount">添加新账号</button>
+        <!--新增数据开始-->
+        <!--新增数据结束-->
+      </h1>
+  
+      <!-- 表单 -->
+      <el-table :data="tableData" style="width: 100%; font-size:13px;" v-loading="loading" element-loading-text="正在删除中">
+        <el-table-column prop="userId" label="用户名" min-width="140"></el-table-column>
+        <el-table-column prop="phoneNo" label="手机号" min-width="140"></el-table-column>
+        <el-table-column prop="email" label="邮箱" min-width="170"></el-table-column>
+        <el-table-column prop="name" label="姓名" min-width="100"></el-table-column>
+        <el-table-column prop="role" label="类别" min-width="120">
+          <template scope="scope">
+            <span v-if="scope.row.role===0">管理员</span>
+            <span v-else-if="scope.row.role===1">加盟商</span>
+            <span v-else>合伙人</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="状态" min-width="120" style="font-size:12px;">
+          <template scope="scope">
+            <el-switch
+                v-on:change="changeState(scope)"
+                v-model="scope.row.state" 
+                on-text="开启" 
+                off-text="关闭" 
+                on-color="#13ce66"
+                off-color="#ff4949"
+            >
+            </el-switch>
+          </template>
+        </el-table-column>
+        <el-table-column prop="del" label="操作">
+          <template scope="scope">
+            <a href="javascript:;"></a>
+            <i class="el-icon-edit" @click="openEdit(scope)" title="修改" style="margin-right:10px;"></i>
+            </a>
+            <i class="el-icon-close" title="删除" @click="openDelete(scope)"></i>
+            <!--dialog 弹窗开始-->
+             <el-dialog title="账号信息" :visible.sync="dialogVisible" :modal="true"
+              :modal-append-to-body="false">
+              <el-form :model="editAccount">
+                <el-form-item label="用户名" :label-width="formLabelWidth">
+                  <el-input v-model="editAccount.userId" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="手机号" :label-width="formLabelWidth">
+                  <el-input v-model="editAccount.phoneNo"></el-input>
+                </el-form-item>
+                <el-form-item label="邮箱" :label-width="formLabelWidth">
+                  <el-input v-model="editAccount.email" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="姓名" :label-width="formLabelWidth">
+                  <el-input v-model="editAccount.name" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="类别" :label-width="formLabelWidth">
+                  <el-select v-model="editAccount.role" placeholder="请选择类别">
+                    <el-option
+                      label="管理员"
+                      value="管理员">
+                    </el-option>
+                    <el-option
+                      label="合伙人"
+                      value="合伙人">
+                    </el-option>
+                    <el-option
+                      label="加盟商"
+                      value="加盟商">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="状态" :label-width="formLabelWidth">
+                  <el-radio-group v-model="editAccount.state">
+                    <el-radio v-bind:label="true">开启</el-radio>
+                    <el-radio v-bind:label="false">关闭</el-radio>
+                  </el-radio-group>
+                </el-form-item>
+              </el-form>
+              <div slot="footer" class="dialog-footer editfooter">
+                <el-button class="accountMangerBtn" type="primary" @click="handleEditAccount">确 定</el-button>
+                <el-button class="accountMangerBtn" @click="dialogVisible = false">取 消</el-button>
+              </div>
+            </el-dialog>
+            <!--dialog 弹窗结束-->
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+  
+    <div id="account_page">
+      <div class="M-box">
+      </div>
+    </div>
       </el-tab-pane>
       <el-tab-pane label="加盟商">
         <el-row class="selectPlace">
@@ -73,38 +134,99 @@
           <button type="submit">查&nbsp;&nbsp;询</button>
         </div>
         <!-- account -->
-        <div class="account">
-          <h1>
-            <button type="button" @click="change('2')">添加新账号</button>
-          </h1>
-      
-          <!-- 表单 -->
-          <el-table :data="tableData" style="width: 100%; font-size:13px;">
-            <el-table-column prop="user" label="用户名" min-width="140"></el-table-column>
-            <el-table-column prop="tel" label="手机号" min-width="140"></el-table-column>
-            <el-table-column prop="email" label="邮箱" min-width="170"></el-table-column>
-            <el-table-column prop="name" label="姓名" min-width="100"></el-table-column>
-            <el-table-column prop="type" label="类别" min-width="120"></el-table-column>
-            <el-table-column prop="status" label="状态" min-width="120" style="font-size:12px;">
-              <template scope="scoped">
-                <el-switch v-model='tableData[0].status' on-color="#13ce66" on-text="开启" off-text="冻结" off-color="#ff4949" myIndex='tableData.index' >
-                </el-switch>
-              </template>
-            </el-table-column>
-            <el-table-column prop="del" label="操作">
-              <template scope="scope">
-                <a href="javascript:;"></a>
-                <i class="el-icon-edit" style="margin-right:10px;"></i>
-                </a>
-                <i class="el-icon-close"></i>
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
-        <div id="account_page">
-          <div class="M-box">
-          </div>
-        </div>
+         <div class="account">
+      <h1>
+        <button type="button" @click="addAccount">添加新账号</button>
+        <!--新增数据开始-->
+        <!--新增数据结束-->
+      </h1>
+  
+      <!-- 表单 -->
+      <el-table :data="tableData" style="width: 100%; font-size:13px;" v-loading="loading" element-loading-text="正在删除中">
+        <el-table-column prop="userId" label="用户名" min-width="140"></el-table-column>
+        <el-table-column prop="phoneNo" label="手机号" min-width="140"></el-table-column>
+        <el-table-column prop="email" label="邮箱" min-width="170"></el-table-column>
+        <el-table-column prop="name" label="姓名" min-width="100"></el-table-column>
+        <el-table-column prop="role" label="类别" min-width="120">
+          <template scope="scope">
+            <span v-if="scope.row.role===0">管理员</span>
+            <span v-else-if="scope.row.role===1">加盟商</span>
+            <span v-else>合伙人</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="状态" min-width="120" style="font-size:12px;">
+          <template scope="scope">
+            <el-switch
+                v-on:change="changeState(scope)"
+                v-model="scope.row.state" 
+                on-text="开启" 
+                off-text="关闭" 
+                on-color="#13ce66"
+                off-color="#ff4949"
+            >
+            </el-switch>
+          </template>
+        </el-table-column>
+        <el-table-column prop="del" label="操作">
+          <template scope="scope">
+            <a href="javascript:;"></a>
+            <i class="el-icon-edit" @click="openEdit(scope)" title="修改" style="margin-right:10px;"></i>
+            </a>
+            <i class="el-icon-close" title="删除" @click="openDelete(scope)"></i>
+            <!--dialog 弹窗开始-->
+             <el-dialog title="账号信息" :visible.sync="dialogVisible" :modal="true"
+              :modal-append-to-body="false">
+              <el-form :model="editAccount">
+                <el-form-item label="用户名" :label-width="formLabelWidth">
+                  <el-input v-model="editAccount.userId" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="手机号" :label-width="formLabelWidth">
+                  <el-input v-model="editAccount.phoneNo"></el-input>
+                </el-form-item>
+                <el-form-item label="邮箱" :label-width="formLabelWidth">
+                  <el-input v-model="editAccount.email" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="姓名" :label-width="formLabelWidth">
+                  <el-input v-model="editAccount.name" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="类别" :label-width="formLabelWidth">
+                  <el-select v-model="editAccount.role" placeholder="请选择类别">
+                    <el-option
+                      label="管理员"
+                      value="管理员">
+                    </el-option>
+                    <el-option
+                      label="合伙人"
+                      value="合伙人">
+                    </el-option>
+                    <el-option
+                      label="加盟商"
+                      value="加盟商">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="状态" :label-width="formLabelWidth">
+                  <el-radio-group v-model="editAccount.state">
+                    <el-radio v-bind:label="true">开启</el-radio>
+                    <el-radio v-bind:label="false">关闭</el-radio>
+                  </el-radio-group>
+                </el-form-item>
+              </el-form>
+              <div slot="footer" class="dialog-footer editfooter">
+                <el-button class="accountMangerBtn" type="primary" @click="handleEditAccount">确 定</el-button>
+                <el-button class="accountMangerBtn" @click="dialogVisible = false">取 消</el-button>
+              </div>
+            </el-dialog>
+            <!--dialog 弹窗结束-->
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+  
+    <div id="account_page">
+      <div class="M-box">
+      </div>
+    </div>
       </el-tab-pane>
     </el-tabs>
     
@@ -117,51 +239,49 @@
 
 <script>
 import $ from 'jquery'
-import {siblings} from '../../../../utils/index.js'
+import {siblings,checkPositiveNumber } from '../../../../utils/index.js'
 require('../../../assets/lib/js/jquery.pagination.js')
 import '../../../assets/css/pagination.css'
+import request from 'superagent'
 export default {
   data () {
     return {
+      tableTitle:'平台',
       input: '',
-      currentPage: 3,
-      tableData: [ {
-        user: '老司机',
-        tel: '15642657777',
-        email: 'wangqqiuaw@163.com',
-        name: '胡经华',
-        type: '管理员',
-        status: true,
-        index: 2
-      }, {
-        user: '老司机',
-        tel: '15642657777',
-        email: 'wangqqiuaw@163.com',
-        name: '胡经华',
-        type: '管理员',
-        status: false
-      }, {
-        user: '老司机',
-        tel: '15642657777',
-        email: 'wangqqiuaw@163.com',
-        name: '胡经华',
-        type: '管理员',
-        status: true
-      }, {
-        user: '老司机',
-        tel: '15642657777',
-        email: 'wangqqiuaw@163.com',
-        name: '胡经华',
-        type: '管理员',
-        status: true
-      }],
-      router_show: false
-    }
+      currentPage: 1,
+      tableData: [],
+      router_show: false,
+      dialogVisible: false,
+      totalPage: '',
+      loading: false,
+      formLabelWidth: '60px',
+      editAccount: {
+        userId: '',
+        phoneNo: '',
+        email: '',
+        name: '',
+        role: '',
+        state: '',
+        value: '',
+        index:''
+      }
+    } 
   },
   methods: {
     change (type) {
       this.$router.push('/index/accountManager/addaccount' + type)
       this.router_show = true
+    },
+    addAccount () {
+      if(this.tableTitle==='平台') {
+         this.$router.push('/index/accountManager/addaccount')
+         this.router_show = true
+         this.tableTitle='平台'
+      }else {
+        this.$router.push('/index/accountManager/addaccount2')
+        this.router_show = true
+        this.tableTitle='加盟商'
+      }
     },
     handleClick (e) {
       var elems = siblings(e.target)
@@ -169,18 +289,402 @@ export default {
         elems[i].setAttribute('class', '')
       }
       e.target.setAttribute('class', 'active')
-    }
+    },
+    openEdit (scope) {
+      if (scope.row.role === 0) {
+        this.editAccount.role = '管理员'
+      } else if (scope.row.role === 1) {
+        this.editAccount.role = '加盟商'
+      } else {
+        this.editAccount.role = '合伙人'
+      }
+      this.dialogVisible = true
+      this.editAccount.userId = scope.row.userId
+      this.editAccount.email = scope.row.email
+      this.editAccount.phoneNo = scope.row.phoneNo
+      this.editAccount.name = scope.row.name
+      this.editAccount.state = scope.row.state
+      this.editAccount.index= scope.$index
+    },
+    handleEditAccount () {
+      this.dialogVisible = false
+      var newAccountInfo = {}
+      if (this.editAccount.role === '管理员') {
+        newAccountInfo.role = 0
+      } else if (this.editAccount.role === '加盟商') {
+        newAccountInfo.role = 1
+      } else {
+        newAccountInfo.role = 2
+      }
+      newAccountInfo.userId = this.editAccount.userId
+      newAccountInfo.email = this.editAccount.email
+      newAccountInfo.phoneNo = this.editAccount.phoneNo
+      newAccountInfo.name = this.editAccount.name
+      newAccountInfo.state = this.editAccount.state
+      var index = this.editAccount.index
+      this.tableData.splice(index,1,newAccountInfo)
+    },
+    openDelete (scope) {
+      var that = this
+      this.$confirm('此操作将永久删除该账号, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+          that.loading = true
+          request.post('http://192.168.3.52:7099/franchisee/account/delAccount')
+            .send({
+              curAcc: {
+                id: 0,
+                emailBinding: 0,
+                franchiseeId: '123456',
+                loginAuth: 0,
+                phoneNoBinding: 0,
+                role: 0,
+                state: 0,
+                userId: '123'
+              },
+              newAcc: {
+                id: scope.row.id,
+                emailBinding: 0,
+                franchiseeId: '123456',
+                loginAuth: 0,
+                phoneNoBinding: 0,
+                role: scope.row.role,
+                state: scope.row.state?0:1,
+                userId: scope.row.userId
+              }
+            })
+            .end((err, res) => {
+              if (err) {
+                console.log(err)
+              } else {
+                var code = JSON.parse(res.text).code
+                if (code === 1) {
+                  that.loading = false
+                  that.$message({
+                    type: 'error',
+                    message: '对不起，您没有权限!'
+                  })
+                }else if(code === 0) {
+                  that.loading = false
+                  that.$message({
+                    type: 'success',
+                    message: '恭喜您，删除成功!'
+                  })
+                  that.tableData.splice(scope.$index,1)
+                }
+              }
+            })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })      
+        })
+    },
+    changeState (scope) {
+     var index= scope.$index
+     var obj = Object.assign({},scope.row,{state: !scope.row.state})
+     this.tableData.splice(index,1,obj)
+     if( this.tableData[index].state ) {
+       // 状态为true 发送请求 修改数据库状态
+       console.error('状态为true 发送请求 修改数据库状态')
+     }else {
+       // 状态为false 发送请求 修改数据库状态
+       console.error('false 发送请求 修改数据库状态')
+     }
+    },
+    handleClickTab (tab, event) {
+        var that = this
+        this.tableTitle = event.target.innerText
+         if(this.tableTitle === '平台') {
+          request.post('http://192.168.3.52:7099/franchisee/account/getAllAccount')
+            .send({
+              franchiseeId: '123456',
+              userId: 'admin'
+            })
+            .end(function (err, res) {
+              if (err) {
+                console.log(err)
+              } else {
+                that.totalPage = JSON.parse(res.text).totalPage || 20
+                var arr = JSON.parse(res.text).list
+                arr = arr.map((item) => {
+                  var obj = {}
+                  var state = null
+                  if (item.state === 0) {
+                    state = true
+                  } else {
+                    state = false
+                  }
+                  obj = Object.assign({}, item, {state: state})
+                  return obj
+                })
+                that.tableData = arr
+                that.$store.state.accountMangerData = arr
+                if (that.totalPage != null) {
+                  $('.M-box').pagination({
+                    pageCount: that.totalPage,
+                    jump: true,
+                    coping: true,
+                    homePage: '首页',
+                    endPage: '尾页',
+                    prevContent: '«',
+                    nextContent: '»'
+                  })
+                  $('.M-box').click(function (e) {
+                    if (e.target.getAttribute('class') === 'active') {
+                      return false
+                    }
+                    if (e.target.tagName === 'A') {
+                      if (e.target.innerText === '首页') {
+                        that.currentPage = 1
+                      }
+                      if (e.target.innerText === '尾页') {
+                        that.currentPage = that.totalPage
+                      }
+                      if (e.target.innerText === '»') {
+                        that.currentPage++
+                      }
+                      if (e.target.innerText === '«') {
+                        that.currentPage--
+                      }
+                      if (checkPositiveNumber(e.target.innerText)) {
+                        that.currentPage = e.target.innerText
+                      }
+                      if (e.target.innerText === '跳转') {
+                        e.preventDefault()
+                        var jumpPageNum = $('.M-box .active').text()
+                        that.currentPage = jumpPageNum
+                      }
+                    }
+                  })
+                  $(document).keydown(function (e) {
+                    if (e.keyCode === 13) {
+                      that.currentPage = e.target.value
+                    }
+                  })
+                }
+              }
+            })
+        }else {
+          request.post('http://192.168.3.52:7099/franchisee/account/getAllAccount')
+            .send({
+              franchiseeId: '123456',
+              userId: 'admin'
+            })
+            .end(function (err, res) {
+              if (err) {
+                console.log(err)
+              } else {
+                that.totalPage = JSON.parse(res.text).totalPage || 20
+                var arr = JSON.parse(res.text).list
+                arr = arr.map((item) => {
+                  var obj = {}
+                  var state = null
+                  if (item.state === 0) {
+                    state = true
+                  } else {
+                    state = false
+                  }
+                  obj = Object.assign({}, item, {state: state})
+                  return obj
+                })
+                that.tableData = arr
+                that.$store.state.accountMangerData = arr
+                if (that.totalPage != null) {
+                  $('.M-box').pagination({
+                    pageCount: that.totalPage,
+                    jump: true,
+                    coping: true,
+                    homePage: '首页',
+                    endPage: '尾页',
+                    prevContent: '«',
+                    nextContent: '»'
+                  })
+                  $('.M-box').click(function (e) {
+                    if (e.target.getAttribute('class') === 'active') {
+                      return false
+                    }
+                    if (e.target.tagName === 'A') {
+                      if (e.target.innerText === '首页') {
+                        that.currentPage = 1
+                      }
+                      if (e.target.innerText === '尾页') {
+                        that.currentPage = that.totalPage
+                      }
+                      if (e.target.innerText === '»') {
+                        that.currentPage++
+                      }
+                      if (e.target.innerText === '«') {
+                        that.currentPage--
+                      }
+                      if (checkPositiveNumber(e.target.innerText)) {
+                        that.currentPage = e.target.innerText
+                      }
+                      if (e.target.innerText === '跳转') {
+                        e.preventDefault()
+                        var jumpPageNum = $('.M-box .active').text()
+                        that.currentPage = jumpPageNum
+                      }
+                    }
+                  })
+                  $(document).keydown(function (e) {
+                    if (e.keyCode === 13) {
+                      that.currentPage = e.target.value
+                    }
+                  })
+                }
+              }
+            })
+        }
+      }
   },
   mounted () {
-    $('.M-box').pagination({
-      pageCount: 50,
-      jump: true,
-      coping: true,
-      homePage: '首页',
-      endPage: '尾页',
-      prevContent: '«',
-      nextContent: '»'
-    })
+    if(this.tableTitle==='平台'){
+       var that = this
+        request.post('http://192.168.3.52:7099/franchisee/account/getAllAccount')
+        .send({
+          franchiseeId: '123456',
+          userId: 'admin'
+        })
+        .end(function (err, res) {
+          if (err) {
+            console.log(err)
+          } else {
+            that.totalPage = JSON.parse(res.text).totalPage || 20
+            var arr = JSON.parse(res.text).list
+            arr = arr.map((item) => {
+              var obj = {}
+              var state = null
+              if (item.state === 0) {
+                state = true
+              } else {
+                state = false
+              }
+              obj = Object.assign({}, item, {state: state})
+              return obj
+            })
+            that.tableData = arr
+            that.$store.state.accountMangerData = arr
+            if (that.totalPage != null) {
+              $('.M-box').pagination({
+                pageCount: that.totalPage,
+                jump: true,
+                coping: true,
+                homePage: '首页',
+                endPage: '尾页',
+                prevContent: '«',
+                nextContent: '»'
+              })
+              $('.M-box').click(function (e) {
+                if (e.target.getAttribute('class') === 'active') {
+                  return false
+                }
+                if (e.target.tagName === 'A') {
+                  if (e.target.innerText === '首页') {
+                    that.currentPage = 1
+                  }
+                  if (e.target.innerText === '尾页') {
+                    that.currentPage = that.totalPage
+                  }
+                  if (e.target.innerText === '»') {
+                    that.currentPage++
+                  }
+                  if (e.target.innerText === '«') {
+                    that.currentPage--
+                  }
+                  if (checkPositiveNumber(e.target.innerText)) {
+                    that.currentPage = e.target.innerText
+                  }
+                  if (e.target.innerText === '跳转') {
+                    e.preventDefault()
+                    var jumpPageNum = $('.M-box .active').text()
+                    that.currentPage = jumpPageNum
+                  }
+                }
+              })
+              $(document).keydown(function (e) {
+                if (e.keyCode === 13) {
+                  that.currentPage = e.target.value
+                }
+              })
+            }
+          }
+        })
+    } else {
+       var that = this
+        request.post('http://192.168.3.52:7099/franchisee/account/getAllAccount')
+          .send({
+            franchiseeId: '123456',
+            userId: 'admin'
+          })
+          .end(function (err, res) {
+            if (err) {
+              console.log(err)
+            } else {
+              that.totalPage = JSON.parse(res.text).totalPage || 20
+              var arr = JSON.parse(res.text).list
+              arr = arr.map((item) => {
+                var obj = {}
+                var state = null
+                if (item.state === 0) {
+                  state = true
+                } else {
+                  state = false
+                }
+                obj = Object.assign({}, item, {state: state})
+                return obj
+              })
+              that.tableData = arr
+              that.$store.state.accountMangerData = arr
+              if (that.totalPage != null) {
+                $('.M-box').pagination({
+                  pageCount: that.totalPage,
+                  jump: true,
+                  coping: true,
+                  homePage: '首页',
+                  endPage: '尾页',
+                  prevContent: '«',
+                  nextContent: '»'
+                })
+                $('.M-box').click(function (e) {
+                  if (e.target.getAttribute('class') === 'active') {
+                    return false
+                  }
+                  if (e.target.tagName === 'A') {
+                    if (e.target.innerText === '首页') {
+                      that.currentPage = 1
+                    }
+                    if (e.target.innerText === '尾页') {
+                      that.currentPage = that.totalPage
+                    }
+                    if (e.target.innerText === '»') {
+                      that.currentPage++
+                    }
+                    if (e.target.innerText === '«') {
+                      that.currentPage--
+                    }
+                    if (checkPositiveNumber(e.target.innerText)) {
+                      that.currentPage = e.target.innerText
+                    }
+                    if (e.target.innerText === '跳转') {
+                      e.preventDefault()
+                      var jumpPageNum = $('.M-box .active').text()
+                      that.currentPage = jumpPageNum
+                    }
+                  }
+                })
+                $(document).keydown(function (e) {
+                  if (e.keyCode === 13) {
+                    that.currentPage = e.target.value
+                  }
+                })
+              }
+            }
+          })
+        }
   }
 }
 </script>
