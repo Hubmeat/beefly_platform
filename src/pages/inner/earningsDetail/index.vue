@@ -2,252 +2,91 @@
   <div style="margin-right:20px;">
     <div id="earD_header">
       <div class="earD_con">
-        <el-row class="city">
-          <address class="joinArea">加盟区域：</address>
-          <div class="citys">
-            <span @click="handleClick">全部地区</span>
-            <span @click="handleClick">芜湖</span>
-            <span @click="handleClick">郑州</span>
-            <span @click="handleClick">南京</span>
-            <span @click="handleClick" class="active">上海</span>
-          </div>
-        </el-row>
-        <div class="timeSelectBtn">
-          <el-button @click='getAllDate' class="active">所有明细</el-button>
-          <el-button @click='getMonthDate'>本月明细</el-button>
-          <el-button @click='getDailyDate'>今日明细</el-button>
+        <div style="height:40px;">
+          <el-row class="city">
+            <address class="joinArea">加盟区域：</address>
+            <div class="citys">
+              <span @click="handleClick">全部地区</span>
+              <span @click="handleClick">芜湖</span>
+              <span @click="handleClick">郑州</span>
+              <span @click="handleClick">南京</span>
+              <span @click="handleClick" class="active">上海</span>
+            </div>
+          </el-row>
+        </div>
+        <div class="time_earning">
+          <el-button @click='getDailyDate' class="active">今日</el-button>
+          <el-button @click='getMonthDate'>本月</el-button>
+          <el-button @click='getWeekDate'>本周</el-button>
+          <el-button @click='getAllDate'>所有日期</el-button>
           <el-button @click='handleChangeType'>指定时间段</el-button>
         </div>
-        <el-date-picker style="vertical-align: middle;" v-show="show" type="datetimerange" :picker-options="pickerOptions2" placeholder="选择时间范围" align="right">
+        <el-date-picker v-model="timeLine" style="vertical-align: middle; margin-top: 0px;" v-show="show" type="datetimerange" :picker-options="pickerOptions2" placeholder="选择时间范围" align="right">
         </el-date-picker>
-        <el-button style="vertical-align: middle;" icon="search" class="timeSelect_button">查询</el-button>
+        <el-button v-show="show2" class="earning_btn" @click="searchByTimeLine">查询</el-button>        
       </div>
-    </div>
-  
-    <div id="earD_excel">
-      <div id="earD_all">
-        <h1>
-          <el-tooltip class="item" effect="dark" content="所有车辆骑行收益" placement="bottom-end">
-            <p>合计：
-              <span>30000元</span>
-            </p>
+		</div>
+
+		<div id="earD_excel">
+			<div id="earD_all">
+				<h1>
+          <el-tooltip class="item" effect="dark" content="所有车辆骑行收益" placement="bottom-end"> 
+					  <p>合计：<span>30000元</span></p>
           </el-tooltip>
-          <p @click='export_excel'>导出明细到Excel</p>
-        </h1>
-      </div>
-    </div>
-  
-    <div id="earD_body">
-      <el-table :data="tableData" style="width: 100%">
-        <el-table-column prop="money" label="金额" min-width="60">
-        </el-table-column>
-        <el-table-column prop="bikeCode" label="车牌号" min-width="70">
-        </el-table-column>
-        <el-table-column prop="placeOrderTime" label="消费时间" min-width="70">
-        </el-table-column>
-        <el-table-column prop="journey" label="里程" min-width="70">
-        </el-table-column>
-        </el-table-column>
-        <el-table-column prop="orderDate" label="订单日期">
-        </el-table-column>
-      </el-table>
-    </div>
-  
-    <div id="earD_page">
-      <div class="M-box">
-      </div>
-    </div>
-  </div>
+					<p @click='export_excel'>导出明细到Excel</p>
+				</h1>
+			</div>
+		</div>
+
+		<div id="earD_body">
+			<el-table
+      :data="tableData"
+      style="width: 100%">
+      <el-table-column
+        prop="money"
+        label="金额"
+        min-width="60">
+      </el-table-column>
+      <el-table-column
+        prop="bikeCode"
+        label="车牌号"
+        min-width="70">
+      </el-table-column>
+      <el-table-column
+        prop="placeOrderTime"
+        label="消费时间"
+        min-width="70">
+      </el-table-column>
+      <el-table-column
+        prop="journey"
+        label="里程"
+        min-width="70">
+      </el-table-column>
+      </el-table-column>
+      <el-table-column
+        prop="orderDate"
+        label="订单日期">
+      </el-table-column>
+    </el-table>
+		</div>
+
+		<div id="earD_page">
+			<div class="M-box">
+			</div>
+		</div>
+	</div>
 </template>
 
 <style scoped>
-html,
-body,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-td,
-tr,
-th,
-table,
-thead,
-tbody,
-dl,
-dt,
-dd,
-p,
-span,
-ul,
-li,
-ol {
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
-}
-
-.loading_class {
-  background: rgba(68, 68, 68, 0.4);
-}
-
-#earD_header {
-  /*width: 100%;*/
-  height: 126px;
-  line-height: 52px;
-  background: #fff;
-  border: 1px solid #e7ecf1;
-  padding: 20px 30px 20px 30px;
-}
-
-#earD_header .earD_con {
-  background: #f3f0f0;
-  padding: 10px;
-}
-
-
-/*#earD_header button {
-		width: 100px;
-    height: 30px;
-		font-size: 12px;
-    margin-right: 10px;
-    cursor: pointer;
-    background-color: #fff;
-    border-radius: 4px;
-		outline: none;
-    color: #878787;
-    border: 1px solid #cecece;
-    transition: all .2s linear 0s;
-	}
-
-	#earD_header button:nth-of-type(1) {
-		margin-left: 30px;
-	}*/
-
-
-/*#earD_header button:hover {
-    background: rgb(66,66,66);
-    border: 1px solid rgb(66,66,66);
-		color: #fff;
-	}*/
-
-
-/*#earD_header button.active {
-    font-size: 12px;
-    color: #fff;
-    background: rgba(66,66,66, 0.8);
-    border: 1px solid rgb(66,66,66);
-	}*/
-
-.el-table td:nth-of-type(1) .cell {
-  color: #f60;
-}
-
-div.timeSelectBtn {
-  display: block;
-  float: left;
-  margin-right: 8px;
-  padding-left: 8px;
-}
-
-div.timeSelectBtn button {
-  margin-left: 8px;
-  display: inline-block;
-  border: none;
-  outline: none;
-  font-size: 12px;
-  color: #fff;
-  background: rgba(66, 66, 66, 0.8);
-  transition: all .2s linear 0s;
-  box-sizing: border-box;
-  height: 35px;
-}
-
-div.timeSelectBtn button.active {
-  background: rgb(66, 66, 66);
-  color: #fff
-}
-
-div.timeSelectBtn button:hover {
-  color: #fff
-}
-
-#earD_excel {
-  padding: 10px 30px 0px 30px;
-  background: #fff;
-  border: 1px solid #e7ecf1;
-  border-bottom: none;
-  margin-bottom: -10px;
-  margin-top: 20px;
-}
-
-#earD_all {
-  width: 100%;
-  height: 40px;
-  background: #fcfcd3;
-  margin-top: 20px;
-  margin-bottom: 10px;
-}
-
-#earD_all h1 {
-  width: 100%;
-  line-height: 40px;
-  height: 40px;
-}
-
-#earD_all h1 p:nth-of-type(1) {
-  float: left;
-  margin-left: 10px;
-  font-size: 12px;
-  color: #868671;
-  cursor: pointer;
-}
-
-#earD_all h1 p:nth-of-type(2) {
-  float: right;
-  font-size: 12px;
-  margin-right: 10px;
-  color: #ff9900;
-}
-
-#earD_all h1 p:nth-of-type(2):hover {
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-#earD_body {
-  padding: 20px 20px 10px 20px;
-  background: #fff;
-  /*margin-top: 20px;*/
-  padding-left: 28px;
-  padding-right: 28px;
-  border: 1px solid #e7ecf1;
-  border-bottom: none;
-  border-top: none;
-}
-
-#earD_body tr.el-table__row div.cell {
-  color: #f60;
-}
-
-#earD_page {
-  padding: 4px 10px 0 18px;
-  padding-bottom: 100px;
-  background: #fff;
-  border: 1px solid #e7ecf1;
-  border-top: none;
-  min-height: 233px;
-}
+/* div.city {
+   line-height: 30px; 
+} */
 
 #earD_header .city address {
   font-style: normal;
   display: inline;
   font-size: 14px;
-  margin-left: 18px;
+  margin-left: 34px;
 }
 
 #earD_header .city div.citys {
@@ -267,6 +106,185 @@ div.timeSelectBtn button:hover {
 #earD_header .city span.active {
   border: 1px solid orange;
 }
+
+/* 加盟商样式 */
+  html,body,h1,h2,h3,h4,h5,h6,td,tr,th,table,thead,tbody,dl,dt,dd,p,span,ul,li,ol {
+  	margin: 0;
+  	padding: 0;
+  }
+
+  body {
+  	font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+  }
+
+  .loading_class {
+    background: rgba(68,68,68,0.4);
+  }
+
+	#earD_header {
+    /*width: 100%;*/
+    height: 112px;
+    line-height: 52px;
+    background: #fff;
+    border: 1px solid #e7ecf1;
+	}
+
+  /*#earD_header .earD_con {
+    background: #f3f0f0;
+    padding: 10px;
+  }*/
+
+	/*#earD_header button {
+		width: 100px;
+    height: 30px;
+		font-size: 12px;
+    margin-right: 10px;
+    cursor: pointer;
+    background-color: #fff;
+    border-radius: 4px;
+		outline: none;
+    color: #878787;
+    border: 1px solid #cecece;
+    transition: all .2s linear 0s;
+	}
+
+	#earD_header button:nth-of-type(1) {
+		margin-left: 30px;
+	}*/
+
+	/*#earD_header button:hover {
+    background: rgb(66,66,66);
+    border: 1px solid rgb(66,66,66);
+		color: #fff;
+	}*/
+
+	/*#earD_header button.active {
+    font-size: 12px;
+    color: #fff;
+    background: rgba(66,66,66, 0.8);
+    border: 1px solid rgb(66,66,66);
+	}*/
+
+  .el-table td:nth-of-type(1) .cell {
+    color: #f60;
+  }
+
+  #earD_header div.time_earning {
+    display:block;
+    float:left;
+    margin-right: 8px;
+    margin-top: 8px;
+    padding-left: 25px;
+  }
+
+  #earD_header div.time_earning button {
+    margin-left: 8px;
+    display: inline-block;
+    border: 1px solid #ddd;
+    outline: none;
+    font-size: 12px;
+    color: #666;
+    /*background: rgba(66, 66, 66, 0.8);*/
+    background: #fff;
+    /*transition: all .2s linear 0s;*/
+    box-sizing: border-box;
+    height: 35px;
+  }
+
+  #earD_header div.time_earning button.active {
+    /*background: rgb(66, 66, 66);*/
+    background: rgba(	255,140,0, 0.8);
+    color: #fff;
+    border: 1px solid rgba(	255,140,0, 0.5);
+  }
+
+  /*#earD_header div.time_earning button:hover{color:#999;}*/
+
+	#earD_excel {
+    padding: 0px 30px 0px 30px;
+		background:#fff;
+    border: 1px solid #e7ecf1;
+    border-bottom: none;
+    margin-bottom: -10px;
+    margin-top: 20px;
+	}
+
+	#earD_all {
+		width: 100%;
+		height: 40px;
+		background: #fcfcd3;
+		margin-top: 20px;
+		margin-bottom: 10px;
+	}
+
+	#earD_all h1 {
+		width: 100%;
+		line-height: 40px;
+		height: 40px;
+	}
+
+	#earD_all h1 p:nth-of-type(1) {
+		float: left;
+		margin-left: 10px;
+		font-size: 12px;
+		color: #868671;
+    cursor: pointer;
+	}
+
+	#earD_all h1 p:nth-of-type(2) {
+		float: right;
+		font-size: 12px;
+		margin-right: 10px;
+		color: #ff9900;
+	}
+
+	#earD_all h1 p:nth-of-type(2):hover {
+		text-decoration: underline;
+    cursor: pointer;
+	}
+
+	#earD_body {
+    padding: 10px 20px 10px 20px;
+    background: #fff;
+    /*margin-top: 20px;*/
+    padding-left: 28px;
+    padding-right: 28px;
+    border: 1px solid #e7ecf1;
+    border-bottom: none;
+    border-top: none;
+	}
+
+  #earD_body tr.el-table__row div.cell {
+    color: #f60;
+  }
+
+	#earD_page {
+    padding: 4px 10px 0 18px;
+		padding-bottom: 100px;
+		background: #fff;
+		border: 1px solid #e7ecf1;
+		border-top: none;
+		min-height: 233px;
+	}
+
+  #earD_header .earning_btn {
+      width: 80px;
+      /*float: right;*/
+      height: 36px;
+      line-height: 11px;
+      margin-right: 30px;
+      color: #fff;
+      margin-top: 18px;
+      outline: none;
+      border: none;
+      /* border-radius: 4px; */
+      background: rgba(52,52,67, 0.8);
+  }
+
+  #earD_header .earning_btn:hover {
+      background: rgba(52,52,67, 0.9);
+      color: #fff;
+  }
 </style>
 
 <script>
@@ -274,12 +292,12 @@ import $ from 'jquery'
 import request from 'superagent'
 import moment from 'moment'
 // require('../../../assets/lib/js/exportExcel.js')
+import { siblings } from '../../../../utils/index.js'
 require('../../../assets/lib/js/Blob.js')
 import '../../../assets/css/pagination.css'
 require('../../../assets/lib/js/jquery.pagination.js')
-import { siblings } from '../../../../utils/index.js'
 export default {
-  data() {
+  data () {
     return {
       tableData: [],
       timer: null,
@@ -288,7 +306,7 @@ export default {
         shortcuts: [
           {
             text: '最近一周',
-            onClick(picker) {
+            onClick (picker) {
               const end = new Date()
               const start = new Date()
               start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
@@ -297,7 +315,7 @@ export default {
           },
           {
             text: '最近一个月',
-            onClick(picker) {
+            onClick (picker) {
               const end = new Date()
               const start = new Date()
               start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
@@ -306,7 +324,7 @@ export default {
           },
           {
             text: '最近三个月',
-            onClick(picker) {
+            onClick (picker) {
               const end = new Date()
               const start = new Date()
               start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
@@ -315,11 +333,12 @@ export default {
           }
         ]
       },
-      time_line: '',
-      show: false
+      timeLine: '',
+      show: false,
+      show2: false
     }
   },
-  mounted() {
+  mounted () {
     // console.log(this.$route.query)
     this.$router.push('/index/earningsDetail?type=getAllRevenue')
     request
@@ -358,77 +377,82 @@ export default {
       $(this).addClass('active')
     })
     var that = this
-    $('.timeSelectBtn button').on('click', function (e) {
+    $('.time_earning button').on('click', function (e) {
       that.handleChangeType(e)
     })
   },
-  beforeUpdate() {
+  beforeUpdate () {
     var that = this
     $('.M-box').click('a', function (e) {
       // console.log(e)
       that.pageUpdate(e)
     })
+  }, 
+  beforeMount () {
+    this.$router.push('/index/earningsDetail?type=getAllRevenue')
   },
   methods: {
-    handleChangeType(e) {
+    handleChangeType (e) {
       // console.log(e.currentTarget.innerText)
       if (e.currentTarget.innerText === '指定时间段') {
         this.show = true
+        this.show2 = true
       } else {
         this.show = false
+        this.show2 = false
       }
     },
-    export_excel() {
+    export_excel () {
       this.$confirm('确认导出吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
-        .then(() => {
-          console.log('this is entry')
-          require.ensure([], () => {
-            this.$loading({ customClass: 'loading_class' })
-            var that = this
-            setTimeout(() => {
-              that.$loading({ customClass: 'loading_class' }).close()
-              const { export_json_to_excel } = require('../../../assets/lib/js/Export2Excel.js')
-              const tHeader = ['金额', '车牌号', '消费时间', '里程', '订单日期']
-              const filterVal = ['money', 'bikeCode', 'placeOrderTime', 'journey', 'orderDate']
-              const list = this.tableData
-              var type = that.$route.query.type
-              request
-                .post('url?type=' + type)
-                .send({
-                  'franchiseeId': '123456',
-                  'userId': 'admin'
-                })
-                .end((err, res) => {
-                  if (err) {
-                    console.log('err:' + err)
-                  } else {
-                    console.log(res)
-                    // 数据处理
-                    const data = this.formatJson(filterVal, list)
-                    export_json_to_excel(tHeader, data, '列表excel')
-                    that.$message({
-                      type: 'success',
-                      message: '导出成功'
-                    })
-                  }
-                })
-            }, 1000)
-          })
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消'
-          })
+      .then(() => {
+        console.log('this is entry')
+        require.ensure([], () => {
+          this.$loading({customClass: 'loading_class'})
+          var that = this
+          setTimeout(() => {
+            that.$loading({customClass: 'loading_class'}).close()
+            const { export_json_to_excel } = require('../../../assets/lib/js/Export2Excel.js')
+            const tHeader = ['金额', '车牌号', '消费时间', '里程', '订单日期']
+            const filterVal = ['money', 'bikeCode', 'placeOrderTime', 'journey', 'orderDate']
+            const list = this.tableData
+            var type = that.$route.query.type
+            request
+              .post('url?type=' + type)
+              .send({
+                'franchiseeId': '123456',
+                'userId': 'admin'
+              })
+              .end((err, res) => {
+                if (err) {
+                  console.log('err:' + err)
+                } else {
+                  console.log(res)
+                  // 数据处理
+                  const data = this.formatJson(filterVal, list)
+                  export_json_to_excel(tHeader, data, '列表excel')
+                  that.$message({
+                    type: 'success',
+                    message: '导出成功'
+                  })
+                }
+              })
+          }, 1000)
         })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消'
+        })
+      })
     },
-    formatJson(filterVal, jsonData) {
+    formatJson (filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => v[j]))
     },
-    tableDataDel(arr) {
+    tableDataDel (arr) {
       var arrDeled = []
       for (var i = 0; i < arr.length; i++) {
         var obj = {}
@@ -443,10 +467,10 @@ export default {
       console.log('arrDeled:', arrDeled)
       return arrDeled
     },
-    getAllDate() {
+    getAllDate () {
       this.$router.push('/index/earningsDetail?type=getAllRevenue')
     },
-    getMonthDate() {
+    getMonthDate () {
       this.$router.push('/index/earningsDetail?type=getRevenueCurMonth')
       request
         .post('http://192.168.3.52:7099/franchisee/revenue/getRevenueCurMonth')
@@ -477,7 +501,7 @@ export default {
           }
         })
     },
-    getDailyDate() {
+    getDailyDate () {
       this.$router.push('/index/earningsDetail?type=getRevenueCurDay')
       request
         .post('http://192.168.3.52:7099/franchisee/revenue/getRevenueCurDay')
@@ -507,7 +531,37 @@ export default {
           }
         })
     },
-    pageUpdate(e) {
+    getWeekDate () {
+      this.$router.push('/index/earningsDetail?type=getRevenueCurWeek')
+      request
+        .post('http://192.168.3.52:7099/franchisee/revenue/getRevenueCurWeek')
+        .send({
+          'franchiseeId': '123456',
+          'userId': 'admin'
+        })
+        .end((err, res) => {
+          if (err) {
+            console.log('err:' + err)
+          } else {
+            var newArr = JSON.parse(res.text).list
+            var pageNumber = JSON.parse(res.text).totalPage
+            var arr2 = this.tableDataDel(newArr)
+            this.totalPage = pageNumber
+            this.$store.dispatch('earningsDate_action', { arr2 })
+            this.tableData = this.$store.state.earningsDate.arr2
+            $('.M-box').pagination({
+              pageCount: pageNumber,
+              jump: true,
+              coping: true,
+              homePage: '首页',
+              endPage: '尾页',
+              prevContent: '«',
+              nextContent: '»'
+            })
+          }
+        })
+    },
+    pageUpdate (e) {
       var that = this
       console.log(this.pagetotal)
       clearTimeout(this.timer)
@@ -548,7 +602,9 @@ export default {
           })
       }, 200)
     },
-    dataUpdate() {
+    dataUpdate () {
+      console.log('this is error')
+      console.log(this.$route.query.type)
       var type = this.$route.query.type
       request
         .post('http://192.168.3.52:7099/franchisee/revenue/' + type)
@@ -570,7 +626,55 @@ export default {
           }
         })
     },
-    handleClick(e) {
+    searchByTimeLine () {
+      if (this.timeLine === '') {
+        this.$message({
+          message: '请输入时间段',
+          type: 'warning'
+        })
+      } else {
+        var startTime = moment(this.timeLine[0]).format('YYYY-MM-DD HH:MM:SS')
+        var endTime = moment(this.timeLine[1]).format('YYYY-MM-DD HH:MM:SS')
+        console.log(startTime, endTime)
+        // request
+        //   .post('http://')
+        //   .send({
+        //     "account": {
+        //       'franchiseeId': '123456',
+        //       'userId': 'admin'
+        //     },
+        //     'startDate': startTime,
+        //     'endDate': endTime
+        //   })
+        //   .end((error, res) => {
+        //     if (error) {
+        //       console.log('error:', error)
+        //     } else {
+        //       // console.log(JSON.parse(res.text))
+        //       var pagedata = (JSON.parse(res.text)).list
+        //       var arr2 = this.tableDataDel(pagedata)
+        //       this.$store.dispatch('earningsDate_action', { arr2 })
+        //       this.tableData = this.$store.state.earningsDate.arr2
+        //       var pageNumber = JSON.parse(res.text).totalPage
+        //       this.totalPage = pageNumber
+        //       if (pageNumber < 10) {
+        //         return
+        //       } else {
+        //         $('.M-box').pagination({
+        //           pageCount: pageNumber,
+        //           jump: true,
+        //           coping: true,
+        //           homePage: '首页',
+        //           endPage: '尾页',
+        //           prevContent: '«',
+        //           nextContent: '»'
+        //         })
+        //       }
+        //     }
+        //   })
+      }
+    },
+    handleClick (e) {
       var elems = siblings(e.target)
       for (var i = 0; i < elems.length; i++) {
         elems[i].setAttribute('class', '')
@@ -578,7 +682,10 @@ export default {
       e.target.setAttribute('class', 'active')
     }
   },
-  created() {
+  created () {
+    this.dataUpdate()
+  },
+  beforeRouteUpdate () {
     this.dataUpdate()
   },
   watch: {
