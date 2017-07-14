@@ -16,7 +16,7 @@
             <el-menu-item index="/index/incomingDetail">收益明细</el-menu-item>
             <el-menu-item index="/index/allDaysData">24小时数据走势</el-menu-item>
             <el-menu-item index="/index/hotMap">热力图</el-menu-item>
-            <el-menu-item index="/index/abnormalData">异常数据</el-menu-item>
+            <!-- <el-menu-item index="/index/abnormalData">异常数据</el-menu-item> -->
           </el-menu-item-group>
         </el-submenu>
         <el-menu-item index="/index/accountManager">
