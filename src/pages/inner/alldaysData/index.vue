@@ -92,7 +92,7 @@ div.allDays {
 }
 
 div.allDays div.DatePicker {
-  padding: 20px 30px 20px 30px;
+  padding: 20px 30px 20px 20px;
   background: #fff;
   border: 1px solid #e7ecf1;
 }

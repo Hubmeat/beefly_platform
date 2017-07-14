@@ -34,7 +34,7 @@
     </div>
   
     <div style="margin-bottom: -10px;">
-      <el-row class="showTime">
+      <el-row class="showTime" style="border: 1px solid #e7ecf1; border-bottom: none;">
         <el-col class="dateArrow" ref="dateArrow" v-bind:data-timetype="arrowTimeType">
           <el-button @click="dateMinus">
             <i class="el-icon-arrow-left"></i>
@@ -50,7 +50,7 @@
       </el-row>
     </div>
   
-    <div class="gmap">
+    <div class="gmap" style="border: 1px solid #e7ecf1; border-top: none;">
       <div id="map-container"></div>
     </div>
   
@@ -88,6 +88,7 @@
   padding: 20px 30px 20px 30px;
   background: #fff;
   margin-bottom: 10px;
+  border: 1px solid #e7ecf1;
 }
 
 
