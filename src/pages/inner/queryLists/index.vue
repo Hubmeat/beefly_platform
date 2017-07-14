@@ -1,7 +1,7 @@
 <template>
   <div class="queryLists">
     <h3>
-      <el-button @click="handeClick">查看统计图</el-button>
+      <button class="btn_list" @click="handeClick">查看统计图</button>
     </h3>
     <div>
       <table>
@@ -20,6 +20,9 @@
           </tr>
         </tbody>
       </table>
+      <div class="datashow" v-show="noDate">
+        <p>暂无数据</p>
+      </div>
     </div>
 
 		<div id="earD_page">
@@ -30,20 +33,27 @@
 </template>
 <style scoped>
 
+.datashow {
+  width: 100%;
+  height: 60px;
+  line-height: 60px;
+}
+
+.datashow p {
+  text-align: center;
+  color: #5e7382;
+}
+
 div.queryLists h3 {
   text-align: right;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 div.queryLists {
   width: 100%;
   box-sizing: border-box;
   padding: 20px 30px 20px 30px;
-}
-
-div.queryLists h3 {
-  text-align: right;
-  margin-bottom: 20px;
+  border: 1px solid #e7ecf1;
 }
 
 div.queryLists h3 button {
@@ -52,23 +62,33 @@ div.queryLists h3 button {
 }
 
 div.queryLists table {
-  width: 100%;
   border-collapse: collapse;
+  width: 100%;
+  border-left: 1px solid #eee;
+  border-right: 1px solid #eee;
 }
 
 div.queryLists table tr th {
   text-align: left;
-  border: 1px solid #dfe6ec;
-  padding: 10px;
-  background: #eef1f6;
+  border: 1px solid #eee;
+  height: 40px;
+  font-size: 14px;
+  background: #eee;
+  font-weight: 400;
   color: #444;
-  font-weight: bold;
+}
+
+div.queryLists table tr {
+  border-bottom: 1px solid #eee;
+  text-indent: 2em;
 }
 
 div.queryLists table tr td {
   text-align: left;
-  border: 1px solid #dfe6ec;
-  padding: 10px;
+  /*border: 1px solid #dfe6ec;*/
+  padding: 10px 0;
+  color: #555;
+  font-size: 14px;
 }
 
 #earD_page {
@@ -78,6 +98,26 @@ div.queryLists table tr td {
   border-top: none;
   min-height: 233px;
   margin-left: -9px;
+}
+
+.btn_list {
+  display: inline-block;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #c4c4c4;
+  color: #1f2d3d;
+  font-size: 14px;
+  margin: 0;
+  padding: 10px 15px;
+  outline: none;
+  border-radius: 4px;
+}
+
+.btn_list:hover {
+  color: rgba(255,140,0, 0.8);
+  border: 1px solid rgba(	255,140,0, 0.8);
 }
 </style>
 <script>
@@ -90,7 +130,8 @@ export default {
   data () {
     return {
       lists: [],
-      pageTotal: ''
+      pageTotal: '',
+      noDate: false
     }
   },
   methods: {
@@ -190,7 +231,7 @@ export default {
       if (this.$store.state.timeline.length === 0) {
         console.log('beforeUpdate is noy entrey')
         return
-      } else {
+      } else { 
         var type
         if (this.$route.query.type === 'day') {
           type = 0
@@ -244,6 +285,9 @@ export default {
     this.dataUpdate()
   },
   beforeMount () {
+    if (this.$store.state.consumeData === '') {
+      this.noDate = true
+    }
     this.time()
   },
   watch: {

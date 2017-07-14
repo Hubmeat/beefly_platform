@@ -4,6 +4,7 @@ import pageIndex from '../pages/inner/pageIndex/index.vue'
 
 // [ ====== carManager ====== ]
 import carManager from '../pages/inner/carManager/index.vue'
+import carUseDetail from '../pages/inner/carUseDetail/index.vue'
 
 // [ ====== incomingRank ====== ]
 import incomingRank from '../pages/inner/incomingRank/index.vue'
@@ -75,6 +76,11 @@ export default [
         path: '/index/carManager',
         name: '车辆管理',
         component: carManager
+      },
+      {
+          path: '/index/carUseDetail',
+          name: '车辆明细',
+          component: carUseDetail
       },
       {
         path: '/index/incomingRank',

@@ -73,7 +73,7 @@
             backgroundColor: 'rgba(255,255,255,0)'                        // 指定图表的类型，默认是折线图（line）
           },
           title: {
-            text: ' '                 // 指定图表标题
+            text: ''                 // 指定图表标题
           },
           xAxis: {
             categories: this.x_data,
@@ -98,7 +98,7 @@
           series: [
             {
               name: ' ',
-              color: '#74f7af',
+              color: '#996600',
               data: this.orderNumber,
               tooltip: {
                 valueSuffix: '单',
@@ -111,7 +111,7 @@
             },
             {
               name: ' ',
-              color: '#ff4949',
+              color: '#00cdcd',
               data: this.consumeMoney,
               tooltip: {
                 valuePrefix: '￥',
@@ -128,7 +128,6 @@
       },
       getChartDate () {
         console.log(this.$store.state.consumeData)
-        console.log('sssss')
         var res = this.$store.state.consumeData.map((item) => {
           return item.time
         })
