@@ -1,7 +1,7 @@
 <template>
   <div class="carManager" style="margin-right: 20px;">
-    <el-tabs type="border-card">
-      <el-tab-pane>
+    <el-tabs type="border-card" @tab-click="getTabName" v-model="activeName">
+      <el-tab-pane name='已分配'>
         <span slot="label">
           <i class="el-icon-date"></i> 已分配</span>
             <div class="carManager_content">
@@ -79,7 +79,7 @@
               <div class="M-box"></div>
             </div>
       </el-tab-pane>
-      <el-tab-pane label="未分配">
+      <el-tab-pane label="未分配" name='未分配'>
         <div class="carManager_content">
               <div class="queryCarInfo">
                 <el-form :model="form">
@@ -167,40 +167,20 @@ export default {
       tableData: [],
       timer: null,
       pagetotal: '',
-      terminalNumber: ''
+      terminalNumber: '',
+      activeName: '已分配'
     }
   },
   mounted: function () {
-    request
-      .post('http://192.168.3.52:7099/franchisee/bikeManager/getBikes')
-      .send({
-        'franchiseeId': '123456',
-        'userId': 'admin'
-      })
-      .end((error, res) => {
-        // console.log('this is entry')
-        if (error) {
-          console.log('error:', error)
-        } else {
-          console.log(res)
-          console.log((JSON.parse(res.text)).totalPage)
-          const data = (JSON.parse(res.text)).list
-          console.log(data)
-          this.pagetotal = (JSON.parse(res.text)).totalPage
-          $('.M-box').pagination({
-            pageCount: this.pagetotal,
-            jump: true,
-            coping: true,
-            homePage: '首页',
-            endPage: '尾页',
-            prevContent: '«',
-            nextContent: '»'
-          })
-          this.tableData = data
-        }
-      })
+    this.getDateByTabName('getAllotBikes')
   },
   beforeUpdate: function () {
+    var type 
+    if (this.activeName === '已分配') {
+      type = 'getAllotBikes'
+    } else {
+      type = 'getNotAllotBikes'
+    }
     var that = this
     $('.M-box').click('a', function (e) {
       clearTimeout(this.timer)
@@ -222,7 +202,7 @@ export default {
       }
       this.timer = setTimeout(function () {
         request
-          .post('http://192.168.3.52:7099/franchisee/bikeManager/getBikes?page=' + e.target.innerHTML)
+          .post('http://192.168.3.52:7099/franchisee/franchiseeManager/' + type + '?page=' + e.target.innerHTML)
           .send({
             'franchiseeId': '123456',
             'userId': 'admin'
@@ -283,6 +263,44 @@ export default {
         elems[i].setAttribute('class', '')
       }
       e.target.setAttribute('class', 'active')
+    },
+    getTabName (tab, event) {
+      console.log(this.activeName)
+      if (this.activeName === '未分配') {
+        this.getDateByTabName('getNotAllotBikes')
+      } else {
+        this.getDateByTabName('getAllotBikes')
+      }
+    },
+    getDateByTabName (type) {
+      request
+        .post('http://192.168.3.52:7099/franchisee/franchiseeManager/' + type)
+        .send({
+          'franchiseeId': '123456',
+          'userId': 'admin'
+        })
+        .end((error, res) => {
+          // console.log('this is entry')
+          if (error) {
+            console.log('error:', error)
+          } else {
+            console.log(res)
+            console.log((JSON.parse(res.text)).totalPage)
+            const data = (JSON.parse(res.text)).list
+            console.log(data)
+            this.pagetotal = (JSON.parse(res.text)).totalPage
+            $('.M-box').pagination({
+              pageCount: this.pagetotal,
+              jump: true,
+              coping: true,
+              homePage: '首页',
+              endPage: '尾页',
+              prevContent: '«',
+              nextContent: '»'
+            })
+            this.tableData = data
+          }
+        })      
     }
   }
 }

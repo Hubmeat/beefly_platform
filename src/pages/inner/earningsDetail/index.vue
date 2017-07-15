@@ -82,11 +82,10 @@
    line-height: 30px; 
 } */
 
-#earD_header .city address {
+/* #earD_header .city address {
   font-style: normal;
   display: inline;
   font-size: 14px;
-  margin-left: 34px;
 }
 
 #earD_header .city div.citys {
@@ -96,14 +95,34 @@
 #earD_header .city span {
   cursor: pointer;
   font-size: 14px;
-  height: 30px;
-  line-height: 30px;
   display: inline-block;
-  padding: 2px;
+  padding: 5px;
   border: 1px solid transparent;
 }
 
 #earD_header .city span.active {
+  border: 1px solid orange;
+} */
+
+#earD_header address {
+  font-style: normal;
+  display: inline;
+  font-size: 14px;
+  margin-left: 34px;
+}
+
+#earD_header div.citys {
+  display: inline-block;
+}
+
+#earD_header span {
+  cursor: pointer;
+  font-size: 14px;
+  display: inline;
+  padding: 7px 5px 7px 5px;
+  border: 1px solid transparent;
+}
+#earD_header span.active {
   border: 1px solid orange;
 }
 

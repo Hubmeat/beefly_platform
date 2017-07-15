@@ -4,7 +4,7 @@
       <!-- <el-col style="background: #f3f0f0; padding: 20px;"> -->
       <el-col>
         <el-form :inline="true">
-          <el-row class="selectPlace">
+          <el-row class="allDate_alliance">
             <address class="joinArea">加盟区域：</address>
             <div class="citys">
               <span @click="handleClick">全部地区</span>
@@ -58,22 +58,22 @@
   </div>
 </template>
 <style scoped>
-div.selectPlace {
+div.allDate_alliance {
   margin-bottom: 15px;
-  margin-left: 8px;
+  margin-left: 12px;
 }
 
-div.selectPlace address {
+div.allDate_alliance address {
   font-style: normal;
   display: inline;
   font-size: 14px;
 }
 
-div.selectPlace div.citys {
+div.allDate_alliance div.citys {
   display: inline-block;
 }
 
-div.selectPlace span {
+div.allDate_alliance span {
   cursor: pointer;
   font-size: 14px;
   display: inline-block;
@@ -81,7 +81,7 @@ div.selectPlace span {
   border: 1px solid transparent;
 }
 
-div.selectPlace span.active {
+div.allDate_alliance span.active {
   border: 1px solid orange;
 }
 
@@ -150,6 +150,7 @@ div.timeSelectBtn {
   display:block;
   float:left;
   margin-right: 8px;
+  margin-left: 4px;
 }
 
 div.timeSelectBtn button {

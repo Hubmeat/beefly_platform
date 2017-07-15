@@ -73,7 +73,7 @@
   height: 30px;
   line-height: 30px;
   display: inline-block;
-  padding: 4px;
+  padding: 0px 5px 0px 5px;
   border: 1px solid transparent;
 }
 
@@ -85,7 +85,7 @@
 /* 加盟商样式  */
 
 #hotmap_controller {
-  padding: 20px 30px 20px 30px;
+  padding: 20px 30px 20px 32px;
   background: #fff;
   margin-bottom: 10px;
   border: 1px solid #e7ecf1;
