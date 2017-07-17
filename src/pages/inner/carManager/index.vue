@@ -62,14 +62,14 @@
                 <tbody>
                   <tr v-bind:key="item.finnalNum" v-for="item of tableData">
                     <td>
-                      <router-link v-bind:to="{path:'/index/carUseDetail', query: {code:item.code}}">{{item.code}}</router-link>
+                      <router-link v-bind:to="{path:'/index/carUseDetail', query: {code:item.bikeCode}}">{{item.bikeCode}}</router-link>
                     </td>
                     <td>{{item.boxCode}}</td>
                     <td>{{item.generationsName}}</td>
-                    <td>{{item.generationsCode}}</td>
-                    <td>{{item.onlineDate}}</td>
-                    <td>{{item.carStatus}}</td>
-                    <td>{{item.carRideTimes}}</td>
+                    <td>{{item.model}}</td>
+                    <td>{{item.onlineTime}}</td>
+                    <td>{{item.state}}</td>
+                    <td>{{item.orderNum}}</td>
                   </tr>
                 </tbody>
               </table>
@@ -128,14 +128,14 @@
                 <tbody>
                   <tr v-bind:key="item.finnalNum" v-for="item of tableData">
                     <td>
-                      <router-link v-bind:to="{path:'/index/carUseDetail', query: {code:item.code}}">{{item.code}}</router-link>
+                      <router-link v-bind:to="{path:'/index/carUseDetail', query: {code:item.bikeCode}}">{{item.bikeCode}}</router-link>
                     </td>
                     <td>{{item.boxCode}}</td>
                     <td>{{item.generationsName}}</td>
-                    <td>{{item.generationsCode}}</td>
-                    <td>{{item.onlineDate}}</td>
-                    <td>{{item.carStatus}}</td>
-                    <td>{{item.carRideTimes}}</td>
+                    <td>{{item.model}}</td>
+                    <td>{{item.onlineTime}}</td>
+                    <td>{{item.state}}</td>
+                    <td>{{item.orderNum}}</td>
                   </tr>
                 </tbody>
               </table>
@@ -213,10 +213,9 @@ export default {
             } else {
               // console.log(res)
               console.log(JSON.parse(res.text))
-              const pagedata = (JSON.parse(res.text)).list
-              // console.log(pagedata)
-              // console.log(this.tableData)
-              that.tableData = pagedata
+              var pagedata = (JSON.parse(res.text)).list
+              var newData = that.tableDataDel(pagedata)
+              that.tableData = newData
             }
           })
       }, 200)
@@ -224,6 +223,13 @@ export default {
   },
   methods: {
     searchByTimeline () {
+      var type 
+      if (this.activeName === '已分配') {
+        type = 'getAllotBikes'
+      } else {
+        type = 'getNotAllotBikes'
+      }
+
       if (this.terminalNumber === '' && this.form.data1 === '' && this.form.data2 === '' && this.form.radio === '') {
         this.$message({
           message: '请输入查询条件',
@@ -237,7 +243,7 @@ export default {
         var startTime = moment(this.form.data1).format('YYYY-MM-DD')
         var endTime = moment(this.form.data2).format('YYYY-MM-DD')
         request
-          .post('http://192.168.3.52:7099/franchisee/bikeManager/getBikes?page=')
+          .post('http://192.168.3.52:7099/franchisee/queryBikes')
           .send({
             "account": {
               'franchiseeId': '123456',
@@ -252,7 +258,24 @@ export default {
             if (error) {
               console.log('error:', error)
             } else {
-              console.log(res)
+              console.log(JSON.parse(res.text))
+              var data = (JSON.parse(res.text)).list
+              var newData = this.tableDataDel(data)
+              this.pagetotal = (JSON.parse(res.text)).totalPage
+              this.tableData = newData
+              if (this.pagetotal > 1) {
+                $('.M-box').pagination({
+                  pageCount: this.pagetotal,
+                  jump: true,
+                  coping: true,
+                  homePage: '首页',
+                  endPage: '尾页',
+                  prevContent: '«',
+                  nextContent: '»'
+                })
+              } else {
+                return
+              }
             }
           })
       }
@@ -286,21 +309,47 @@ export default {
           } else {
             console.log(res)
             console.log((JSON.parse(res.text)).totalPage)
-            const data = (JSON.parse(res.text)).list
-            console.log(data)
+            var data = (JSON.parse(res.text)).list
             this.pagetotal = (JSON.parse(res.text)).totalPage
-            $('.M-box').pagination({
-              pageCount: this.pagetotal,
-              jump: true,
-              coping: true,
-              homePage: '首页',
-              endPage: '尾页',
-              prevContent: '«',
-              nextContent: '»'
-            })
-            this.tableData = data
+            var newData = this.tableDataDel(data)
+            this.tableData = newData
+            if (this.pagetotal > 1) {
+              $('.M-box').pagination({
+                pageCount: this.pagetotal,
+                jump: true,
+                coping: true,
+                homePage: '首页',
+                endPage: '尾页',
+                prevContent: '«',
+                nextContent: '»'
+              })
+            } else {
+              return
+            }
           }
         })      
+    },
+    tableDataDel (arr) {
+      var arrDeled = []
+      for (var i = 0; i < arr.length; i++) {
+        var obj = {}
+        obj.bikeCode = arr[i].bikeCode
+        obj.boxCode = arr[i].boxCode
+        obj.generationsName = arr[i].generationsName
+        obj.model = arr[i].model
+        if (arr[i].onlineTime == '') {
+          obj.onlineTime = ''
+        } else {
+          obj.onlineTime = moment(arr[i].onlineTime).format('YYYY-MM-DD HH:MM:SS')
+        }
+        obj.state = arr[i].state
+        obj.orderNum = arr[i].orderNum
+
+        arrDeled.push(obj)
+      }
+
+      // console.log('arrDeled:', arrDeled)
+      return arrDeled
     }
   }
 }
