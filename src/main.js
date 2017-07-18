@@ -16,5 +16,21 @@ new Vue({
   store,
   el: '#app',
   router,
-  render: h => h(App)
+  render: h => h(App),
+  methods: {
+    checkLogin () {
+      // if(3>2) {
+      //   this.$router.push('/index')
+      // }else{
+      //  this.$router.push('/')
+      // }
+      console.log('checkLogin')
+    }
+  },
+  created () {
+    this.checkLogin()
+  },
+  // watch: {
+  //   '$route': 'checkLogin'
+  // }
 })
