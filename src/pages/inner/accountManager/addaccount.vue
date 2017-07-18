@@ -20,7 +20,6 @@
 								<el-select v-model="ruleForm.role" placeholder="选择角色类型">
 									<el-option label="管理员" value="管理员"></el-option>
 									<el-option label="加盟商" value="加盟商"></el-option>
-									<el-option label="合伙人" value="合伙人"></el-option>
 								</el-select>
 							</el-form-item>
 							<el-form-item label="姓名" prop="name">
@@ -129,6 +128,7 @@
 </style>
       
 <script>
+import request from 'superagent'
 export default {
   data () {
     return {
@@ -167,6 +167,13 @@ export default {
   },
   methods: {
     submitForm (formName) {
+      var that = this
+      var roleType =  null
+      if(this.ruleForm.role==='管理员'){
+        roleType= 0
+      }else {
+        roleType = 1
+      }
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.$confirm('确认添加吗?', '提示', {
@@ -175,11 +182,36 @@ export default {
             type: 'warning'
           })
         .then(() => {
-          this.$router.push('/index/accountManager')
-          this.$message({
-            type: 'success',
-            message: '添加成功'
-          })
+          request.post('http://192.168.3.52:7099/franchisee/account/addAdminUser')
+            .send({
+              curUser:{id: 0,auth: 0,role:0,userId:"jjjj"},
+              user: {state: 0, role: roleType,phoneNo:that.ruleForm.tel, userId: that.ruleForm.username,name: that.ruleForm.name}
+            })
+            .end(function(err,res){
+              if(err){
+                console.log(err)
+              }else{
+                var code = JSON.parse(res.text).code
+                var data = JSON.parse(JSON.parse(res.text).data)
+                var newData = Object.assign({},data,{state: true})
+                if(code === 0 ){
+                  that.$message({
+                    type: 'success',
+                    message: '恭喜您!添加账号成功'
+                  })
+                  that.$store.commit({
+                    type:'addPlatAcount',
+                    obj: newData
+                  })
+                  that.$router.push('/index/accountManager')
+                }
+              }
+            })
+          // this.$router.push('/index/accountManager')
+          // this.$message({
+          //   type: 'success',
+          //   message: '添加成功'
+          // })
         }).catch(() => {
           this.$message({
             type: 'info',

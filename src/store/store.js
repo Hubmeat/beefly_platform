@@ -9,10 +9,18 @@ const state = {
     settlementDate: [],
     timeline: [],
     allData: [],
-    partnerList: []
+    partnerList: [],
+    platTableData: [],
+    joinTableData: []
 }
 
 const mutations = {
+    addPlatAcount(state, {obj}) {
+        state.platTableData.push(obj)
+    },
+    addJoinAcount(state, {obj}) {
+        state.joinTableData.push(obj)
+    },
     consumeData_evaluation(state, { newArr }) {
         console.log('[[ consumeData_evaluation is commited ]]')
         state.consumeData = newArr.newArr

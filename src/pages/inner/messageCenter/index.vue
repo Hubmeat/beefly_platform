@@ -43,9 +43,10 @@
           <el-table-column
            label="标题"
            min-width="20%"
+           label-class-name="tableTitle"
           >
             <template scope="scope">
-              <span v-bind:class="{unRead:scope.row.unRead,read:scope.row.read}"></span>
+              <span style="margin-left:-10px;" v-bind:class="{unRead:scope.row.unRead,read:scope.row.read}"></span>
               <span class="title">{{scope.row.title}}</span>
             </template>
           </el-table-column>
@@ -98,6 +99,7 @@ div.hasData{line-height: 60px;text-align: center;height: 60px;color:#9e9090;widt
   span.unRead{width:18px;height:18px;border-radius:20px;background:#ecb042;display:inline-block;vertical-align: middle;margin-top: -2px;}
   span.read{background:transparent;opacity: 0}
   i.icon-xinfeng{cursor:pointer}
+  .el-table th>.tableTitle{margin-left: 20px;}
 </style>
 <script>
   import request from 'superagent'
