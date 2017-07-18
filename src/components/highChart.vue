@@ -15,17 +15,20 @@
       }
     },
     mounted: function () {
+      console.log(this.$route.params)
       request
         .post('http://192.168.3.52:7099/franchisee/report/get24HourTrend?type=' + this.$route.query.type)
         .send({
-          'franchiseeId': '123456',
-          'userId': 'admin'
+          "account": {
+            'franchiseeId': '123456',
+            'userId': 'admin'
+          }
         })
         .end((err, res) => {
           if (err) {
             console.log('err:' + err)
           } else {
-            console.log(res)
+            // console.log(res)
             var data = JSON.parse(res.text)
             this.getChartByRoute(data)
             this.initHighCharDate()
@@ -106,7 +109,7 @@
           })
       },
       getChartByRoute (arr) {
-        console.log(arr)
+        // console.log(arr)
         var money = arr.map((item) => {
           return item.money
         })
@@ -119,7 +122,7 @@
         this.moneyList = order
       },
       dataUpdate () {
-        console.log(this.$route.query)
+        // console.log(this.$route.query)
         request
           .post('http://192.168.3.52:7099/franchisee/report/get24HourTrend?type=' + this.$route.query.type)
           .send({
@@ -140,13 +143,19 @@
               this.initHighCharDate()
             }
           })
+      },
+      getCityInfo () {
+        console.log(this.$route.params)
       }
     },
     beforeUpdate () {
+      console.log(this.$route)
+      console.log(this.$route.params)
       this.dataUpdate()
     },
     watch: {
-      '$route': 'dataUpdate'
+      '$route': 'dataUpdate',
+      '$route.params': 'getCityInfo'
     }
   }
 </script>

@@ -1,16 +1,13 @@
 <template>
   <div style="margin-right:20px;">
     <div id="earD_header">
-      <div class="earD_con">
+      <div class="earD_con" style="margin-top: 10px;">
         <div style="height:40px;">
           <el-row class="city">
             <address class="joinArea">加盟区域：</address>
             <div class="citys">
-              <span @click="handleClick">全部地区</span>
-              <span @click="handleClick">芜湖</span>
-              <span @click="handleClick">郑州</span>
-              <span @click="handleClick">南京</span>
-              <span @click="handleClick" class="active">上海</span>
+              <span @click="handleClick" myId='0' class="active">全部地区</span>
+              <span @click="handleClick" :key='item.id' :myId='item.areaID' v-for="item in cityList">{{item.area}}</span>
             </div>
           </el-row>
         </div>
@@ -142,7 +139,7 @@
 
 	#earD_header {
     /*width: 100%;*/
-    height: 112px;
+    height: 126px;
     line-height: 52px;
     background: #fff;
     border: 1px solid #e7ecf1;
@@ -310,8 +307,8 @@
 import $ from 'jquery'
 import request from 'superagent'
 import moment from 'moment'
-// require('../../../assets/lib/js/exportExcel.js')
 import { siblings } from '../../../../utils/index.js'
+// require('../../../assets/lib/js/exportExcel.js')
 require('../../../assets/lib/js/Blob.js')
 import '../../../assets/css/pagination.css'
 require('../../../assets/lib/js/jquery.pagination.js')
@@ -353,15 +350,17 @@ export default {
         ]
       },
       timeLine: '',
+      cityList: [],
       show: false,
       show2: false
     }
   },
   mounted () {
+    this.getCityList()
     // console.log(this.$route.query)
-    this.$router.push('/index/earningsDetail?type=getAllRevenue')
+    this.$router.push('/index/earningsDetail?type=getRevenueCurDay')
     request
-      .post('http://192.168.3.52:7099/franchisee/revenue/getAllRevenue')
+      .post('http://192.168.3.52:7099/franchisee/revenue/getRevenueCurDay')
       .send({
         'franchiseeId': '123456',
         'userId': 'admin'
@@ -406,14 +405,58 @@ export default {
       // console.log(e)
       that.pageUpdate(e)
     })
+
+    $('.citys span').on('click', function () {
+      clearTimeout(this.timer2)
+      var id = $(this).attr('myid')
+      this.timer2 = setTimeout(function () {
+        console.log('this is city')
+        request
+          .post('http://')
+          .send({
+            'franchiseeId': '123456',
+            'userId': 'admin',
+            'cityCode': id
+          })
+          .end((error, res) => {
+            // console.log('this is entry')
+            if (error) {
+              console.log('error:', error)
+            } else {
+              console.log(res)
+              console.log(res)
+              var newArr = JSON.parse(res.text).list
+              var pageNumber = JSON.parse(res.text).totalPage
+              var arr2 = this.tableDataDel(newArr)
+              this.totalPage = pageNumber
+              this.$store.dispatch('earningsDate_action', { arr2 })
+              this.tableData = this.$store.state.earningsDate.arr2
+              if (pageNumber > 1) {
+                $('.M-box').pagination({
+                  pageCount: pageNumber,
+                  jump: true,
+                  coping: true,
+                  homePage: '首页',
+                  endPage: '尾页',
+                  prevContent: '«',
+                  nextContent: '»'
+                })
+              } else {
+                return
+              }
+            }
+          })
+      }, 200)
+    })
   }, 
   beforeMount () {
-    this.$router.push('/index/earningsDetail?type=getAllRevenue')
+    this.$router.push('/index/earningsDetail?type=getRevenueCurDay')
   },
   methods: {
     handleChangeType (e) {
-      // console.log(e.currentTarget.innerText)
+      // console.log(e.currentTarget.innerText)  
       if (e.currentTarget.innerText === '指定时间段') {
+        this.$router.push('/index/earningsDetail?type=getRevenueDefine')    
         this.show = true
         this.show2 = true
       } else {
@@ -435,28 +478,70 @@ export default {
           setTimeout(() => {
             that.$loading({customClass: 'loading_class'}).close()
             const { export_json_to_excel } = require('../../../assets/lib/js/Export2Excel.js')
-            const tHeader = ['金额', '车牌号', '消费时间', '里程', '订单日期']
+            const tHeader = ['金额', '车牌号', '消费时间', '里程(公里)', '订单日期']
             const filterVal = ['money', 'bikeCode', 'placeOrderTime', 'journey', 'orderDate']
-            const list = this.tableData
             var type = that.$route.query.type
+            var newType
+            switch (type) {
+              case 'getRevenueCurDay': {
+                newType = 0
+                break
+              }
+              case 'getRevenueCurWeek': {
+                newType = 1
+                break
+              }
+              case 'getRevenueCurMonth': {
+                newType = 2
+                break
+              }
+              case 'getAllRevenue': {
+                newType = 3
+                break
+              }
+              default : {
+                if (this.timeLine === '') {
+                  this.$message({
+                    message: '请输入时间段',
+                    type: 'warning'
+                  })
+                } else {
+                  newType = 4
+                  var startTime = moment(this.timeLine[0]).format('YYYY-MM-DD HH:MM:SS')
+                  var endTime = moment(this.timeLine[1]).format('YYYY-MM-DD HH:MM:SS')
+                }
+              }
+            }
             request
-              .post('url?type=' + type)
+              .post('http://192.168.3.52:7099/franchisee/revenue/exportRevenueData?type=' + newType)
               .send({
-                'franchiseeId': '123456',
-                'userId': 'admin'
+                'account': {
+                  'franchiseeId': '123456',
+                  'userId': 'admin'
+                },
+                'startTime': startTime,
+                'endTime': endTime
               })
               .end((err, res) => {
                 if (err) {
                   console.log('err:' + err)
                 } else {
                   console.log(res)
+                  console.log(JSON.parse(res.text))
                   // 数据处理
-                  const data = this.formatJson(filterVal, list)
-                  export_json_to_excel(tHeader, data, '列表excel')
-                  that.$message({
-                    type: 'success',
-                    message: '导出成功'
-                  })
+                  var list = JSON.parse(res.text)
+                  var newList = this.tableDataDel(list)
+                  if (list.length === 0) {
+                    this.$message.error('当前查询没有信息，无法导出哦~');
+                  } else {
+                    const data = this.formatJson(filterVal, newList)
+                    export_json_to_excel(tHeader, data, '列表excel')
+                    that.$message({
+                      type: 'success',
+                      message: '导出成功'
+                    })
+                  }
+
                 }
               })
           }, 1000)
@@ -508,15 +593,19 @@ export default {
             this.totalPage = pageNumber
             this.$store.dispatch('earningsDate_action', { arr2 })
             this.tableData = this.$store.state.earningsDate.arr2
-            $('.M-box').pagination({
-              pageCount: pageNumber,
-              jump: true,
-              coping: true,
-              homePage: '首页',
-              endPage: '尾页',
-              prevContent: '«',
-              nextContent: '»'
-            })
+            if (pageNumber > 1) {
+              $('.M-box').pagination({
+                pageCount: pageNumber,
+                jump: true,
+                coping: true,
+                homePage: '首页',
+                endPage: '尾页',
+                prevContent: '«',
+                nextContent: '»'
+              })
+            } else {
+              return
+            }
           }
         })
     },
@@ -622,28 +711,30 @@ export default {
       }, 200)
     },
     dataUpdate () {
-      console.log('this is error')
-      console.log(this.$route.query.type)
       var type = this.$route.query.type
-      request
-        .post('http://192.168.3.52:7099/franchisee/revenue/' + type)
-        .send({
-          'franchiseeId': '123456',
-          'userId': 'admin'
-        })
-        .end((error, res) => {
-          if (error) {
-            console.log('error:', error)
-          } else {
-            // console.log(JSON.parse(res.text))
-            var pagedata = (JSON.parse(res.text)).list
-            var pageNumber = JSON.parse(res.text).totalPage
-            var arr2 = this.tableDataDel(pagedata)
-            this.totalPage = pageNumber
-            this.$store.dispatch('earningsDate_action', { arr2 })
-            this.tableData = this.$store.state.earningsDate.arr2
-          }
-        })
+      if (type === 'getRevenueDefine') {
+        return
+      } else {
+        request
+          .post('http://192.168.3.52:7099/franchisee/revenue/' + type)
+          .send({
+            'franchiseeId': '123456',
+            'userId': 'admin'
+          })
+          .end((error, res) => {
+            if (error) {
+              console.log('error:', error)
+            } else {
+              // console.log(JSON.parse(res.text))
+              var pagedata = (JSON.parse(res.text)).list
+              var pageNumber = JSON.parse(res.text).totalPage
+              var arr2 = this.tableDataDel(pagedata)
+              this.totalPage = pageNumber
+              this.$store.dispatch('earningsDate_action', { arr2 })
+              this.tableData = this.$store.state.earningsDate.arr2
+            }
+          })
+      }
     },
     searchByTimeLine () {
       if (this.timeLine === '') {
@@ -655,42 +746,42 @@ export default {
         var startTime = moment(this.timeLine[0]).format('YYYY-MM-DD HH:MM:SS')
         var endTime = moment(this.timeLine[1]).format('YYYY-MM-DD HH:MM:SS')
         console.log(startTime, endTime)
-        // request
-        //   .post('http://')
-        //   .send({
-        //     "account": {
-        //       'franchiseeId': '123456',
-        //       'userId': 'admin'
-        //     },
-        //     'startDate': startTime,
-        //     'endDate': endTime
-        //   })
-        //   .end((error, res) => {
-        //     if (error) {
-        //       console.log('error:', error)
-        //     } else {
-        //       // console.log(JSON.parse(res.text))
-        //       var pagedata = (JSON.parse(res.text)).list
-        //       var arr2 = this.tableDataDel(pagedata)
-        //       this.$store.dispatch('earningsDate_action', { arr2 })
-        //       this.tableData = this.$store.state.earningsDate.arr2
-        //       var pageNumber = JSON.parse(res.text).totalPage
-        //       this.totalPage = pageNumber
-        //       if (pageNumber < 10) {
-        //         return
-        //       } else {
-        //         $('.M-box').pagination({
-        //           pageCount: pageNumber,
-        //           jump: true,
-        //           coping: true,
-        //           homePage: '首页',
-        //           endPage: '尾页',
-        //           prevContent: '«',
-        //           nextContent: '»'
-        //         })
-        //       }
-        //     }
-        //   })
+        request
+          .post('http://192.168.3.52:7099/franchisee/revenue/getRevenueDefine')
+          .send({
+            "account": {
+              'franchiseeId': '123456',
+              'userId': 'admin'
+            },
+            'startTime': startTime,
+            'endTime': endTime
+          })
+          .end((error, res) => {
+            if (error) {
+              console.log('error:', error)
+            } else {
+              console.log(JSON.parse(res.text))
+              var pagedata = (JSON.parse(res.text)).list
+              var arr2 = this.tableDataDel(pagedata)
+              this.$store.dispatch('earningsDate_action', { arr2 })
+              this.tableData = this.$store.state.earningsDate.arr2
+              var pageNumber = JSON.parse(res.text).totalPage
+              this.totalPage = pageNumber
+              if (pageNumber < 10) {
+                return
+              } else {
+                $('.M-box').pagination({
+                  pageCount: pageNumber,
+                  jump: true,
+                  coping: true,
+                  homePage: '首页',
+                  endPage: '尾页',
+                  prevContent: '«',
+                  nextContent: '»'
+                })
+              }
+            }
+          })
       }
     },
     handleClick (e) {
@@ -699,13 +790,29 @@ export default {
         elems[i].setAttribute('class', '')
       }
       e.target.setAttribute('class', 'active')
+    },
+    getCityList () {
+      request
+        .post('http://192.168.3.52:7099/franchisee/franchiseeManager/getFranchiseeCity')
+        .send({
+          'franchiseeId': '123456',
+          'userId': 'admin'
+        })
+        .end((error, res) => {
+          if (error) {
+            console.log('error:', error)
+          } else {
+            console.log(res)
+            this.cityList = JSON.parse(res.text)
+          }
+        })
     }
   },
   created () {
     this.dataUpdate()
   },
-  beforeRouteUpdate () {
-    this.dataUpdate()
+  beforeMount () {
+    this.$router.push('/index/earningsDetail?type=getRevenueCurDay')
   },
   watch: {
     '$route': 'dataUpdate'

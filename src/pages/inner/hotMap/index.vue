@@ -6,11 +6,8 @@
           <el-row class="city" style="margin-bottom: 10px;">
             <address class="joinArea">加盟区域：</address>
             <div class="citys">
-              <span @click="handleClick">全部地区</span>
-              <span @click="handleClick">芜湖</span>
-              <span @click="handleClick">郑州</span>
-              <span @click="handleClick">南京</span>
-              <span @click="handleClick" class="active">上海</span>
+              <span @click="handleClick" myId='0' class="active">全部地区</span>
+              <span @click="handleClick" :key='item.id' :myId='item.areaID' v-for="item in cityList">{{item.area}}</span>
             </div>
           </el-row>
           <div class="timeBtn">
@@ -342,6 +339,7 @@ export default {
       startDriving: '',
       endDriving: '',
       city: '北京',
+      cityList: [],
       value4: '',
       nowTime: '',
       arrowTimeType: 'now',
@@ -384,6 +382,7 @@ export default {
     }
   },
   mounted: function () {
+    this.getCityList()
     this.$router.push({ query: { type: 'curHour' } })
     // 加载实时热力图
     request
@@ -560,7 +559,6 @@ export default {
       switch (dateTimeType) {
         case 'day': {
           nums = --this.clickTimes
-          console.log('sssssssssss')
           var lastDay = new Date().getTime() + 24 * 60 * 60 * 1000 * nums
           this.nowTime = moment(lastDay).format('YYYY-MM-DD')
           this.$router.push({ query: { type: 'day', data: this.nowTime } })
@@ -703,6 +701,22 @@ export default {
         elems[i].setAttribute('class', '')
       }
       e.target.setAttribute('class', 'active')
+    },
+    getCityList () {
+      request
+        .post('http://192.168.3.52:7099/franchisee/franchiseeManager/getFranchiseeCity')
+        .send({
+          'franchiseeId': '123456',
+          'userId': 'admin'
+        })
+        .end((error, res) => {
+          if (error) {
+            console.log('error:', error)
+          } else {
+            console.log(res)
+            this.cityList = JSON.parse(res.text)
+          }
+        })
     }
   },
   created() {

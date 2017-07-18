@@ -7,11 +7,8 @@
           <el-row class="allDate_alliance">
             <address class="joinArea">加盟区域：</address>
             <div class="citys">
-              <span @click="handleClick">全部地区</span>
-              <span @click="handleClick">芜湖</span>
-              <span @click="handleClick">郑州</span>
-              <span @click="handleClick">南京</span>
-              <span @click="handleClick" class="active">上海</span>
+              <span @click="handleClick" myId='0' class="active">全部地区</span>
+              <span @click="handleClick" :key='item.id' :myId='item.areaID' v-for="item in cityList">{{item.area}}</span>
             </div>
           </el-row>
         </el-form>
@@ -19,7 +16,7 @@
           <el-button class="active" @click='handleChangeType'>今日</el-button>
           <el-button @click='handleChangeType'>本周</el-button>
           <el-button @click='handleChangeType'>本月</el-button>
-          <el-button @click='handleChangeType'>所有日期</el-button>
+          <el-button @click='handleChangeType'>最近六个月</el-button>
           <!-- <el-button @click='handleChangeType'>指定时间段</el-button> -->
         </div>
         <!-- <el-date-picker v-show="show" v-model="value4" type="datetimerange" :picker-options="pickerOptions2" placeholder="选择时间范围" align="right">
@@ -253,11 +250,44 @@ export default {
       nowTime: '',
       show: false,
       clickTimes: 0,
-      arrowTimeType: 'day'
+      arrowTimeType: 'day',
+      cityList: [],
     }
   },
   components: {
     highChart
+  },
+  mounted () {
+    this.getCityList()
+    this.nowTime = moment().format('YYYY-MM-DD')
+    this.$router.push({ query: { type:  '0'}})
+  },
+  beforeUpdate: function () {
+    var that = this
+    setTimeout( function () {
+      var id = $(this).attr('myid')
+      console.log(id)
+      $('.citys span').on('click', function () {
+        switch ($('.timeSelectBtn button.active')[0].innerText) {
+          case '今日': {
+            that.$router.push({ params: { cityCode: id }, query: { type:  '0'}})
+            break
+          }
+          case '本周': {
+            that.$router.push({ params: { cityCode: id }, query: { type:  '1'}})
+            break
+          }
+          case '本月': {
+            that.$router.push({ params: { cityCode: id }, query: { type:  '2'}})
+            break
+          }
+          case '最近6个月': {
+            that.$router.push({ params: { cityCode: id }, query: { type:  '3'}})
+            break
+          }
+        }
+      })
+    }, 200)
   },
   methods: {
     handleChangeType (e) {
@@ -378,11 +408,23 @@ export default {
         elems[i].setAttribute('class', '')
       }
       e.target.setAttribute('class', 'active')
+    },
+    getCityList () {
+      request
+        .post('http://192.168.3.52:7099/franchisee/franchiseeManager/getFranchiseeCity')
+        .send({
+          'franchiseeId': '123456',
+          'userId': 'admin'
+        })
+        .end((error, res) => {
+          if (error) {
+            console.log('error:', error)
+          } else {
+            console.log(res)
+            this.cityList = JSON.parse(res.text)
+          }
+        })
     }
-  },
-  mounted () {
-    this.nowTime = moment().format('YYYY-MM-DD')
-    this.$router.push({ query: { type:  '0'}})
   }
 }
 </script>

@@ -11,8 +11,8 @@
                     <el-row class="selectPlace">
                       <address class="joinArea">加盟区域</address>
                       <div class="citys">
-                        <span @click="handleClick" class="active">全部地区</span>
-                        <span @click="handleClick" :key='item.id' v-for="item in cityList"></span>
+                        <span @click="handleClick" myId='0' class="active">全部地区</span>
+                        <span @click="handleClick" :key='item.id' :myId='item.areaID' v-for="item in cityList">{{item.area}}</span>
                       </div>
                     </el-row>
                     <el-col>
@@ -20,11 +20,18 @@
                         <span class="labelAlign">关键字</span>
                         <input v-model="terminalNumber" class="carMan_bar" placeholder="车辆号\终端编号\车辆名称">
                       </el-form-item>
-                      <el-form-item class="filtercar">
+                      <el-form-item class="filtercar" style="width: 400px;">
                         <span class="labelAlign">状态</span>
-                        <el-radio class="radio" v-model="form.radio" label="使用中">使用中</el-radio>
-                        <el-radio class="radio" v-model="form.radio" label="维修中">维修中</el-radio>
-                        <el-radio class="radio" v-model="form.radio" label="已报废">已报废</el-radio>
+                        <!-- <el-radio class="radio" v-model="form.radio" label="待出租">待出租</el-radio>
+                        <el-radio class="radio" v-model="form.radio" label="已预订">已预订</el-radio>
+                        <el-radio class="radio" v-model="form.radio" label="已出租">已出租</el-radio>
+                        <el-radio class="radio" v-model="form.radio" label="维护中">维护中</el-radio> -->
+                        <el-checkbox-group v-model="checkList">
+                            <el-checkbox label="待出租">待出租</el-checkbox>
+                            <el-checkbox label="已预订">已预订</el-checkbox>
+                            <el-checkbox label="已出租">已出租</el-checkbox>
+                            <el-checkbox label="维护中">维护中</el-checkbox>
+                        </el-checkbox-group>
                       </el-form-item>
                     </el-col>
                   </el-row>
@@ -152,6 +159,7 @@
   </div>
 </template>
 <script>
+const cityOptions = ['上海', '北京', '广州', '深圳'];
 import request from 'superagent'
 import moment from 'moment'
 import {siblings} from '../../../../utils/index.js'
@@ -169,16 +177,19 @@ export default {
       },
       tableData: [],
       timer: null,
+      timer2: null,
       pagetotal: '',
+      checkList: [],
       terminalNumber: '',
       activeName: '已分配',
-      cityList: '',
+      cityList: [],
       noDate: false
     }
   },
   mounted: function () {
     this.getCityList()
     this.getDateByTabName('getAllotBikes')
+    var that = this
   },
   beforeUpdate: function () {
     if (this.tableData.length === 0) {
@@ -220,7 +231,8 @@ export default {
           .post('http://192.168.3.52:7099/franchisee/franchiseeManager/' + type + '?page=' + e.target.innerHTML)
           .send({
             'franchiseeId': '123456',
-            'userId': 'admin'
+            'userId': 'admin',
+            'cityCode': '0'
           })
           .end((error, res) => {
             if (error) {
@@ -231,6 +243,48 @@ export default {
               var pagedata = (JSON.parse(res.text)).list
               var newData = that.tableDataDel(pagedata)
               that.tableData = newData
+            }
+          })
+      }, 200)
+    })
+
+    var that = this
+    $('.citys span').on('click', function () {
+      clearTimeout(this.timer2)
+      var id = $(this).attr('myid')
+      this.timer2 = setTimeout(function () {
+        console.log('this is city')
+        request
+          .post('http://192.168.3.52:7099/franchisee/franchiseeManager/getAllotBikes')
+          .send({
+            'franchiseeId': '123456',
+            'userId': 'admin',
+            'cityCode': id
+          })
+          .end((error, res) => {
+            // console.log('this is entry')
+            if (error) {
+              console.log('error:', error)
+            } else {
+              console.log(res)
+              console.log((JSON.parse(res.text)).totalPage)
+              var data = (JSON.parse(res.text)).list
+              that.pagetotal = (JSON.parse(res.text)).totalPage
+              var newData = that.tableDataDel(data)
+              that.tableData = newData
+              if (that.pagetotal > 1) {
+                $('.M-box').pagination({
+                  pageCount: that.pagetotal,
+                  jump: true,
+                  coping: true,
+                  homePage: '首页',
+                  endPage: '尾页',
+                  prevContent: '«',
+                  nextContent: '»'
+                })
+              } else {
+                return
+              }
             }
           })
       }, 200)
@@ -259,20 +313,36 @@ export default {
         console.log(this.form.data1)
         console.log(this.form.data2)
         console.log(this.terminalNumber)
-        console.log(this.form.radio)
+
+        if (this.form.radio === '待出租') {
+          // 使用中的对应值待定
+          var radio = 4
+        } else if (this.form.radio === '已预定') {
+          var radio = 5
+        } else if (this.form.radio === '已出租') {
+          var radio = 6
+        } else if (this.form.radio === '已出租') {
+          var radio = 7
+        }
+
+        var startTime, endTime
+        if (this.form.data1 === '' || this.form.data2 === '') {
+          startTime = null
+          endTime = null
+        } else {
+          startTime = moment(this.form.data1).format('YYYY-MM-DD')
+          endTime = moment(this.form.data2).format('YYYY-MM-DD')
+        }
+
         var startTime = moment(this.form.data1).format('YYYY-MM-DD')
         var endTime = moment(this.form.data2).format('YYYY-MM-DD')
         request
           .post('http://192.168.3.52:7099/franchisee/queryBikes')
           .send({
-            "account": {
-              'franchiseeId': '123456',
-              'userId': 'admin'
-            },
-            'startDate': startTime,
-            'endDate': endTime,
-            'state': this.form.radio,
-            'number': this.terminalNumber
+            'start': startTime?startTime:null,
+            'end': endTime?endTime:null,
+            'state': radio?radio:[],
+            'name': this.terminalNumber?this.terminalNumber:null
           })
           .end((error, res) => {
             if (error) {
@@ -320,7 +390,8 @@ export default {
         .post('http://192.168.3.52:7099/franchisee/franchiseeManager/' + type)
         .send({
           'franchiseeId': '123456',
-          'userId': 'admin'
+          'userId': 'admin',
+          'cityCode': '0'
         })
         .end((error, res) => {
           // console.log('this is entry')
@@ -347,7 +418,7 @@ export default {
               return
             }
           }
-        })      
+        })
     },
     tableDataDel (arr) {
       var arrDeled = []
@@ -379,12 +450,11 @@ export default {
           'userId': 'admin'
         })
         .end((error, res) => {
-          // console.log('this is entry')
           if (error) {
             console.log('error:', error)
           } else {
             console.log(res)
-            console.log((JSON.parse(res.text)))
+            this.cityList = JSON.parse(res.text)
           }
         })
     }
@@ -597,5 +667,19 @@ div#carManager_page {
 .datashow p {
   text-align: center;
   color: #5e7382;
+}
+
+.el-checkbox__inner {
+  border-color: #ddd !important;
+}
+
+.el-checkbox__inner:hover {
+  border-color: #ddd !important;
+}
+
+.el-checkbox__input.is-checked .el-checkbox__inner {
+  background-color: #444;
+  border-color: #888;
+  color: #fff;
 }
 </style>

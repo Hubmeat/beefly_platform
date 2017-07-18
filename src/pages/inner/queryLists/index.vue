@@ -137,7 +137,7 @@ export default {
   },
   methods: {
     handeClick () {
-      this.$router.push('/index/consumeData/queryCharts')
+      this.$router.push('/index/incomingRank/queryCharts')
     },
     dataUpdate () {
       var flag = true
