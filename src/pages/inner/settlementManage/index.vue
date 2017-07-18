@@ -7,11 +7,11 @@
         <el-row class="selectPlace" style="padding: 0px 0 13px 0;">
           <address class="joinArea">加盟区域：</address>
           <div class="citys">
-            <span @click="handleClick">全部地区</span>
+            <span @click="handleClick" class="active">全部地区</span>
             <span @click="handleClick">芜湖</span>
             <span @click="handleClick">郑州</span>
             <span @click="handleClick">南京</span>
-            <span @click="handleClick" class="active">上海</span>
+            <span @click="handleClick">上海</span>
           </div>
         </el-row>
         <el-row class="table">
@@ -195,6 +195,7 @@ export default {
       if (this.activeName === '待结算') {
         this.getDateByTabName('getNotWithdrawals')
       } else {
+        this.pagetotal = ''
         this.getDateByTabName('getWithdrawals')
       }
     },
@@ -218,7 +219,6 @@ export default {
             if (type === 'getNotWithdrawals') {
               this.tableData = newData
             } else {
-              console.log('whaT fuck')
               this.tableData2 = newData
             }
             if (this.pagetotal > 1) {
@@ -270,6 +270,33 @@ export default {
       this.editAccount.applyPerson = row.apply_person
       this.editAccount.settleMoney = row.settle_money
       this.editAccount.settleRemark = row.remark
+    },
+    editConfim (row) {
+      this.$alert('请核对信息后确认结算', 'Warning', {
+        confirmButtonText: '确定',
+        callback: (row) => {
+        request
+          .post('http://')
+          .send({
+            'franchiseeId': '123456',
+            'userId': 'admin'
+          })
+          .end((error, res) => {
+            // console.log('this is entry')
+            if (error) {
+              console.log('error:', error)
+            } else {
+              console.log(res)
+              console.log(JSON.parse(res.text).list)
+            }
+        })
+          this.dialogVisible = false
+          this.$message({
+            type: 'success',
+            message: '合伙人将收到你的信息'
+          })
+        }
+      })
     }
   }
 }

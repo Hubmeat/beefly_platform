@@ -11,11 +11,8 @@
                     <el-row class="selectPlace">
                       <address class="joinArea">加盟区域</address>
                       <div class="citys">
-                        <span @click="handleClick">全部地区</span>
-                        <span @click="handleClick">芜湖</span>
-                        <span @click="handleClick">郑州</span>
-                        <span @click="handleClick">南京</span>
-                        <span @click="handleClick" class="active">上海</span>
+                        <span @click="handleClick" class="active">全部地区</span>
+                        <span @click="handleClick" :key='item.id' v-for="item in cityList"></span>
                       </div>
                     </el-row>
                     <el-col>
@@ -73,6 +70,9 @@
                   </tr>
                 </tbody>
               </table>
+              <div class="datashow" v-show="noDate">
+                <p>暂无数据</p>
+              </div>
             </div>
           
             <div id="carManager_page">
@@ -139,6 +139,9 @@
                   </tr>
                 </tbody>
               </table>
+              <div class="datashow" v-show="noDate">
+                <p>暂无数据</p>
+              </div>
             </div>
           
             <div id="carManager_page">
@@ -168,13 +171,22 @@ export default {
       timer: null,
       pagetotal: '',
       terminalNumber: '',
-      activeName: '已分配'
+      activeName: '已分配',
+      cityList: '',
+      noDate: false
     }
   },
   mounted: function () {
+    this.getCityList()
     this.getDateByTabName('getAllotBikes')
   },
   beforeUpdate: function () {
+    if (this.tableData.length === 0) {
+      this.noDate = true
+    } else {
+      this.noDate = false
+    }
+
     var type 
     if (this.activeName === '已分配') {
       type = 'getAllotBikes'
@@ -194,6 +206,9 @@ export default {
         } else if (e.target.innerHTML === '»') {
           console.log($('.M-box span.active')[0].innerHTML)
           e.target.innerHTML = Number($('.M-box span.active')[0].innerHTML) + 1
+        } else if (e.target.innerText === '跳转') {
+          var jumpPageNum = $('.M-box .active').text()
+          e.target.innerHTML = jumpPageNum
         } else if (e.target.innerHTML === '...') {
           return
         }
@@ -220,6 +235,11 @@ export default {
           })
       }, 200)
     })
+  },
+  beforeMount () {
+    if (this.tableData.length === 0) {
+      this.noDate = true
+    }
   },
   methods: {
     searchByTimeline () {
@@ -350,6 +370,23 @@ export default {
 
       // console.log('arrDeled:', arrDeled)
       return arrDeled
+    },
+    getCityList () {
+      request
+        .post('http://192.168.3.52:7099/franchisee/franchiseeManager/getFranchiseeCity')
+        .send({
+          'franchiseeId': '123456',
+          'userId': 'admin'
+        })
+        .end((error, res) => {
+          // console.log('this is entry')
+          if (error) {
+            console.log('error:', error)
+          } else {
+            console.log(res)
+            console.log((JSON.parse(res.text)))
+          }
+        })
     }
   }
 }
@@ -546,5 +583,19 @@ div#carManager_page {
 
 .el-button:focus, .el-button:hover {
   color: #fff;
+}
+
+
+.datashow {
+  /* width: 100%; */
+  height: 60px;
+  line-height: 60px;
+  border: 1px solid #dfe6ec;
+  border-top: none;
+}
+
+.datashow p {
+  text-align: center;
+  color: #5e7382;
 }
 </style>

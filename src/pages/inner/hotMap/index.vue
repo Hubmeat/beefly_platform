@@ -544,6 +544,14 @@ export default {
           this.clickTimes = 0
           break
         }
+        case '所有日期': {
+          nowTime = moment().format('YYYY年MM月')
+          this.$router.push({ query: { type:  'getAll'}})
+          this.nowTime = nowTime
+          // this.arrowTimeType = 'month'
+          this.clickTimes = 0
+          break
+        }
       }
     },
     dateMinus() {
@@ -610,13 +618,15 @@ export default {
     dataUpdate() {
       var flag = true
       console.log(this.$route.query.type)
-      if (this.$route.query.type === 'curHour') {
-        return
-      } else if (flag === true) {
-        this.requestWay(this.$route.query.type)
-      } else {
-        return
-      }
+      // if (this.$route.query.type === 'curHour') {
+      //   return
+      // } else if (flag === true) {
+      //   this.requestWay(this.$route.query.type)
+      // } else {
+      //   return
+      // }
+      
+      this.requestWay(this.$route.query.type)
     },
     searchByTimeline() {
       var startTime, endTime
