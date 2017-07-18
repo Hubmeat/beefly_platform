@@ -28,6 +28,7 @@
     display: inline-block;
     margin-right: 0px;
     border: 1px solid #444;
+    margin-left:2px;
 }
 
 .M-box span.active {

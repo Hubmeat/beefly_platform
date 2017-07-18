@@ -13,76 +13,71 @@
             <input type="text" class="account_my_input">
           </label>
       
-			<el-button class="my_btn">查询</el-button>
+          <el-button class="my_btn">查询</el-button>
+            </div>
+            <!-- account -->
+            <div class="account">
+          <h1>
+            <button type="button" @click="addAccount">添加新账号</button>
+          </h1>
+          <!-- 表单 -->
+          <el-table :data="platTableData" style="width: 100%; font-size:13px;" v-loading="loading" element-loading-text="正在删除中">
+            <el-table-column prop="userId" label="用户名" min-width="140"></el-table-column>
+            <el-table-column prop="phoneNo" label="手机号" min-width="140"></el-table-column>
+            <el-table-column prop="email" label="邮箱" min-width="170"></el-table-column>
+            <el-table-column prop="name" label="姓名" min-width="100"></el-table-column>
+            <el-table-column label="状态" min-width="120" style="font-size:12px;">
+              <template scope="scope">
+                <el-switch
+                    v-on:change="changeState(scope)"
+                    v-model="scope.row.state" 
+                    on-text="开启" 
+                    off-text="关闭" 
+                    on-color="#13ce66"
+                    off-color="#ff4949"
+                >
+                </el-switch>
+              </template>
+            </el-table-column>
+            <el-table-column prop="del" label="操作">
+              <template scope="scope">
+                <a href="javascript:;"></a>
+                <i class="el-icon-edit" @click="openEdit(scope)" title="修改" style="cursor:pointer;margin-right:10px;"></i>
+                </a>
+                <i class="el-icon-close" title="删除" style="cursor:pointer;" @click="openDelete(scope)"></i>
+                <!--dialog 弹窗开始-->
+                <el-dialog title="账号信息" :visible.sync="dialogVisible" :modal="true"
+                  :modal-append-to-body="false">
+                  <el-form :model="editAccount">
+                    <el-form-item label="用户名" :label-width="formLabelWidth">
+                      <el-input v-model="editAccount.userId" auto-complete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="手机号" :label-width="formLabelWidth">
+                      <el-input v-model="editAccount.phoneNo"></el-input>
+                    </el-form-item>
+                    <el-form-item label="邮箱" :label-width="formLabelWidth">
+                      <el-input v-model="editAccount.email" auto-complete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="姓名" :label-width="formLabelWidth">
+                      <el-input v-model="editAccount.name" auto-complete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="状态" :label-width="formLabelWidth">
+                      <el-radio-group v-model="editAccount.state">
+                        <el-radio v-bind:label="true">开启</el-radio>
+                        <el-radio v-bind:label="false">关闭</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+                  </el-form>
+                  <div slot="footer" class="dialog-footer editfooter">
+                    <el-button class="accountMangerBtn" type="primary" @click="handleEditAccount">确 定</el-button>
+                    <el-button class="accountMangerBtn" @click="dialogVisible = false">取 消</el-button>
+                  </div>
+                </el-dialog>
+                <!--dialog 弹窗结束-->
+              </template>
+            </el-table-column>
+          </el-table>
         </div>
-        <!-- account -->
-        <div class="account">
-      <h1>
-        <button type="button" @click="addAccount">添加新账号</button>
-      </h1>
-      <!-- 表单 -->
-      <el-table :data="platTableData" style="width: 100%; font-size:13px;" v-loading="loading" element-loading-text="正在删除中">
-        <el-table-column prop="userId" label="用户名" min-width="140"></el-table-column>
-        <el-table-column prop="phoneNo" label="手机号" min-width="140"></el-table-column>
-        <el-table-column prop="email" label="邮箱" min-width="170"></el-table-column>
-        <el-table-column prop="name" label="姓名" min-width="100"></el-table-column>
-        <el-table-column label="状态" min-width="120" style="font-size:12px;">
-          <template scope="scope">
-            <el-switch
-                v-on:change="changeState(scope)"
-                v-model="scope.row.state" 
-                on-text="开启" 
-                off-text="关闭" 
-                on-color="#13ce66"
-                off-color="#ff4949"
-            >
-            </el-switch>
-          </template>
-        </el-table-column>
-        <el-table-column prop="del" label="操作">
-          <template scope="scope">
-            <a href="javascript:;"></a>
-            <i class="el-icon-edit" @click="openEdit(scope)" title="修改" style="cursor:pointer;margin-right:10px;"></i>
-            </a>
-            <i class="el-icon-close" title="删除" style="cursor:pointer;" @click="openDelete(scope)"></i>
-            <!--dialog 弹窗开始-->
-             <el-dialog title="账号信息" :visible.sync="dialogVisible" :modal="true"
-              :modal-append-to-body="false">
-              <el-form :model="editAccount">
-                <el-form-item label="用户名" :label-width="formLabelWidth">
-                  <el-input v-model="editAccount.userId" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="手机号" :label-width="formLabelWidth">
-                  <el-input v-model="editAccount.phoneNo"></el-input>
-                </el-form-item>
-                <el-form-item label="邮箱" :label-width="formLabelWidth">
-                  <el-input v-model="editAccount.email" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="姓名" :label-width="formLabelWidth">
-                  <el-input v-model="editAccount.name" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="状态" :label-width="formLabelWidth">
-                  <el-radio-group v-model="editAccount.state">
-                    <el-radio v-bind:label="true">开启</el-radio>
-                    <el-radio v-bind:label="false">关闭</el-radio>
-                  </el-radio-group>
-                </el-form-item>
-              </el-form>
-              <div slot="footer" class="dialog-footer editfooter">
-                <el-button class="accountMangerBtn" type="primary" @click="handleEditAccount">确 定</el-button>
-                <el-button class="accountMangerBtn" @click="dialogVisible = false">取 消</el-button>
-              </div>
-            </el-dialog>
-            <!--dialog 弹窗结束-->
-          </template>
-        </el-table-column>
-      </el-table>
-    </div>
-  
-    <div id="account_page">
-      <div class="M-box">
-      </div>
-    </div>
       </el-tab-pane>
       <el-tab-pane label="加盟商" name="加盟商">
         <el-row class="selectPlace">
@@ -95,7 +90,7 @@
             <span @click="handleClick" class="active">上海</span>
           </div>
         </el-row>
-         <div id="am_search">
+        <div id="am_search">
           <label>
             <span>关键字 :</span>
             <input type="text" class="account_my_input">
@@ -104,92 +99,98 @@
             <span>联系方式 :</span>
             <input type="text" class="account_my_input">
           </label>
-      
           <button type="submit" class="my_btn">查询</button>
         </div>
         <!-- account -->
          <div class="account">
-      <h1>
-        <button type="button" @click="addAccount">添加新账号</button>
-      </h1>
-      <!-- 表单 -->
-      <el-table :data="joinTableData" style="width: 100%; font-size:13px;" v-loading="loading" element-loading-text="正在删除中">
-        <el-table-column prop="userId" label="用户名" min-width="15%"></el-table-column>
-        <el-table-column prop="phoneNo" label="手机号" min-width="15%"></el-table-column>
-        <el-table-column prop="email" label="邮箱" min-width="20%"></el-table-column>
-        <el-table-column prop="name" label="姓名" min-width="10%"></el-table-column>
-        <el-table-column label="所属加盟商" min-width="20%"></el-table-column>
-        <el-table-column label="状态" min-width="10%" style="font-size:12px;">
-          <template scope="scope">
-            <el-switch
-                v-on:change="changeState(scope)"
-                v-model="scope.row.state" 
-                on-text="开启" 
-                off-text="关闭" 
-                on-color="#13ce66"
-                off-color="#ff4949"
-            >
-            </el-switch>
-          </template>
-        </el-table-column>
-        <el-table-column prop="del" label="操作" min-width="10%">
-          <template scope="scope">
-            <a href="javascript:;"></a>
-            <i class="el-icon-edit"  @click="openEdit(scope)" title="修改" style="cursor:pointer;margin-right:10px;"></i>
-            </a>
-            <i class="el-icon-close" style="cursor:pointer;" title="删除" @click="openDelete(scope)"></i>
-            <!--dialog 弹窗开始-->
-             <el-dialog title="账号信息" :visible.sync="dialogVisible" :modal="true"
-              :modal-append-to-body="false">
-              <el-form :model="editAccount">
-                <el-form-item label="用户名" :label-width="formLabelWidth">
-                  <el-input v-model="editAccount.userId" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="手机号" :label-width="formLabelWidth">
-                  <el-input v-model="editAccount.phoneNo"></el-input>
-                </el-form-item>
-                <el-form-item label="邮箱" :label-width="formLabelWidth">
-                  <el-input v-model="editAccount.email" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="姓名" :label-width="formLabelWidth">
-                  <el-input v-model="editAccount.name" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="所属加盟商" :label-width="formLabelWidth">
-                  <el-radio-group v-model="editAccount.radio">
-                    <el-radio :label="3">上海</el-radio>
-                    <el-radio :label="6">北京</el-radio>
-                    <el-radio :label="9">芜湖</el-radio>
-                  </el-radio-group>
-                </el-form-item>
-                <el-form-item label="状态" :label-width="formLabelWidth">
-                  <el-radio-group v-model="editAccount.state">
-                    <el-radio v-bind:label="true">开启</el-radio>
-                    <el-radio v-bind:label="false">关闭</el-radio>
-                  </el-radio-group>
-                </el-form-item>
-              </el-form>
-              <div slot="footer" class="dialog-footer editfooter">
-                <el-button class="accountMangerBtn" type="primary" @click="handleEditAccount">确 定</el-button>
-                <el-button class="accountMangerBtn" @click="dialogVisible = false">取 消</el-button>
-              </div>
-            </el-dialog>
-            <!--dialog 弹窗结束-->
-          </template>
-        </el-table-column>
-      </el-table>
-    </div>
-  
-    <div id="account_page">
-      <div class="M-box">
-      </div>
-    </div>
+          <h1>
+            <button type="button" @click="addAccount">添加新账号</button>
+          </h1>
+          <!-- 表单 -->
+          <el-table :data="joinTableData" style="width: 100%; font-size:13px;" v-loading="loading" element-loading-text="正在删除中">
+            <el-table-column prop="userId" label="用户名" min-width="15%"></el-table-column>
+            <el-table-column prop="phoneNo" label="手机号" min-width="15%"></el-table-column>
+            <el-table-column prop="email" label="邮箱" min-width="20%"></el-table-column>
+            <el-table-column prop="name" label="姓名" min-width="10%"></el-table-column>
+            <el-table-column label="所属加盟商" min-width="20%"></el-table-column>
+            <el-table-column label="状态" min-width="10%" style="font-size:12px;">
+              <template scope="scope">
+                <el-switch
+                    v-on:change="changeState(scope)"
+                    v-model="scope.row.state" 
+                    on-text="开启" 
+                    off-text="关闭" 
+                    on-color="#13ce66"
+                    off-color="#ff4949"
+                >
+                </el-switch>
+              </template>
+            </el-table-column>
+            <el-table-column prop="del" label="操作" min-width="10%">
+              <template scope="scope">
+                <a href="javascript:;"></a>
+                <i class="el-icon-edit"  @click="openEdit(scope)" title="修改" style="cursor:pointer;margin-right:10px;"></i>
+                </a>
+                <i class="el-icon-close" style="cursor:pointer;" title="删除" @click="openDelete(scope)"></i>
+                <!--dialog 弹窗开始-->
+                <el-dialog title="账号信息" :visible.sync="dialogVisible" :modal="true"
+                  :modal-append-to-body="false">
+                  <el-form :model="editAccount">
+                    <el-form-item label="用户名" :label-width="formLabelWidth">
+                      <el-input v-model="editAccount.userId" auto-complete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="手机号" :label-width="formLabelWidth">
+                      <el-input v-model="editAccount.phoneNo"></el-input>
+                    </el-form-item>
+                    <el-form-item label="邮箱" :label-width="formLabelWidth">
+                      <el-input v-model="editAccount.email" auto-complete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="姓名" :label-width="formLabelWidth">
+                      <el-input v-model="editAccount.name" auto-complete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="所属加盟商" :label-width="formLabelWidth">
+                      <el-radio-group v-model="editAccount.radio">
+                        <el-radio :label="3">上海</el-radio>
+                        <el-radio :label="6">北京</el-radio>
+                        <el-radio :label="9">芜湖</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="状态" :label-width="formLabelWidth">
+                      <el-radio-group v-model="editAccount.state">
+                        <el-radio v-bind:label="true">开启</el-radio>
+                        <el-radio v-bind:label="false">关闭</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+                  </el-form>
+                  <div slot="footer" class="dialog-footer editfooter">
+                    <el-button class="accountMangerBtn" type="primary" @click="handleEditAccount">确 定</el-button>
+                    <el-button class="accountMangerBtn" @click="dialogVisible = false">取 消</el-button>
+                  </div>
+                </el-dialog>
+                <!--dialog 弹窗结束-->
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
       </el-tab-pane>
+      <div>
+        <el-pagination id="selfPage"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page.sync="currentPage"
+          :page-size="10"
+          layout="prev, pager, next, jumper"
+          :total="54">
+        </el-pagination>
+      </div>
+      <div id="account_page">
+        <div class="M-box">
+        </div>
+      </div>
     </el-tabs>
-    
-
-      <!--<div v-show='router_show' >-->
-        <router-view id="account_router"></router-view>
-      <!--</div>-->
+    <!--<div v-show='router_show' >-->
+      <router-view id="account_router"></router-view>
+    <!--</div>-->
   </div>
 </template>
 
@@ -230,6 +231,12 @@ export default {
     } 
   },
   methods: {
+    handleSizeChange(val) {
+     // console.log(`每页 ${val} 条`);
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val
+    },
     change (type) {
       this.$router.push('/index/accountManager/addaccount' + type)
       this.router_show = true
@@ -447,7 +454,7 @@ export default {
             var arr = JSON.parse(res.text).list
             that.platTableData = that.handleData(arr)
             that.$store.state.platTableData = arr
-            that.setPage(arr,that.totalPage)
+           // that.setPage(arr,that.totalPage)
           }
         })
       }else {
@@ -459,7 +466,7 @@ export default {
               var arr = JSON.parse(res.text).list
               that.joinTableData = that.handleData(arr)
               that.$store.state.joinTableData = that.handleData(arr)
-              that.setPage(arr,that.totalPage)
+              //that.setPage(arr,that.totalPage)
           }
         })
       }
@@ -523,7 +530,7 @@ export default {
           var arr = JSON.parse(res.text).list
           that.platTableData = that.handleData(arr)
           that.$store.state.platTableData = that.handleData(arr)
-          that.setPage(arr,that.totalPage)
+         // that.setPage(arr,that.totalPage)
         }
       })
     }
@@ -537,7 +544,6 @@ export default {
               if(err) {
                 console.log(err)
               }else {
-                that.totalPage = JSON.parse(res.text).totalPage || 20
                 var arr = JSON.parse(res.text).list
                 that.platTableData = that.handleData(arr)
                 that.$store.state.platTableData = arr
@@ -548,7 +554,6 @@ export default {
               if(error){
                 console.log(error)
               } else {
-                  that.totalPage = JSON.parse(res.text).totalPage || 20
                   var arr = JSON.parse(res.text).list
                   that.joinTableData = that.handleData(arr)
                   that.$store.state.joinTableData = that.handleData(arr)
@@ -751,5 +756,24 @@ color: #bfcbd9;
     outline: none;
     border: none;
     background: rgba(52,52,67,0.8);}
-#am_search button.my_btn:hover{background: rgba(52,52,67,1)}    
+#am_search button.my_btn:hover{background: rgba(52,52,67,1)}
+.el-pagination{
+  border: 1px solid #e7ecf1;
+  border-top: none;
+  border-bottom: none;
+  padding-left: 29px;
+}
+.el-pager li.number{
+  padding: 0 4px;
+  border-right: 0;
+  background: #272525;
+  font-size: 13px;
+  min-width: 34px;
+  height: 34px;
+  line-height: 34px;
+  text-align: center;
+  color: #fff;
+  margin-left: 8px;
+  border-radius: 2px;    
+}  
 </style>
