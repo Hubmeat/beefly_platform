@@ -21,7 +21,7 @@
             <button type="button" @click="addAccount">添加新账号</button>
           </h1>
           <!-- 表单 -->
-          <el-table :data="platTableData" style="width: 100%; font-size:13px;" v-loading="loading" element-loading-text="正在删除中">
+          <el-table  :data="platTableData" :empty-text='emptyText' style="width: 100%; font-size:13px;" v-loading="loading" :element-loading-text="loadingText">
             <el-table-column prop="userId" label="用户名" min-width="140"></el-table-column>
             <el-table-column prop="phoneNo" label="手机号" min-width="140"></el-table-column>
             <el-table-column prop="email" label="邮箱" min-width="170"></el-table-column>
@@ -39,14 +39,14 @@
                 </el-switch>
               </template>
             </el-table-column>
-            <el-table-column prop="del" label="操作">
+            <el-table-column  label="操作">
               <template scope="scope">
                 <a href="javascript:;"></a>
                 <i class="el-icon-edit" @click="openEdit(scope)" title="修改" style="cursor:pointer;margin-right:10px;"></i>
                 </a>
                 <i class="el-icon-close" title="删除" style="cursor:pointer;" @click="openDelete(scope)"></i>
                 <!--dialog 弹窗开始-->
-                <el-dialog title="账号信息" :visible.sync="dialogVisible" :modal="true"
+                <el-dialog title="平台账号信息" :visible.sync="dialogVisible" :modal="true"
                   :modal-append-to-body="false">
                   <el-form :model="editAccount">
                     <el-form-item label="用户名" :label-width="formLabelWidth">
@@ -61,12 +61,12 @@
                     <el-form-item label="姓名" :label-width="formLabelWidth">
                       <el-input v-model="editAccount.name" auto-complete="off"></el-input>
                     </el-form-item>
-                    <el-form-item label="状态" :label-width="formLabelWidth">
+                    <!-- <el-form-item label="状态" :label-width="formLabelWidth">
                       <el-radio-group v-model="editAccount.state">
                         <el-radio v-bind:label="true">开启</el-radio>
                         <el-radio v-bind:label="false">关闭</el-radio>
                       </el-radio-group>
-                    </el-form-item>
+                    </el-form-item> -->
                   </el-form>
                   <div slot="footer" class="dialog-footer editfooter">
                     <el-button class="accountMangerBtn" type="primary" @click="handleEditAccount">确 定</el-button>
@@ -126,14 +126,14 @@
                 </el-switch>
               </template>
             </el-table-column>
-            <el-table-column prop="del" label="操作" min-width="10%">
+            <el-table-column label="操作" min-width="10%">
               <template scope="scope">
                 <a href="javascript:;"></a>
                 <i class="el-icon-edit"  @click="openEdit(scope)" title="修改" style="cursor:pointer;margin-right:10px;"></i>
                 </a>
                 <i class="el-icon-close" style="cursor:pointer;" title="删除" @click="openDelete(scope)"></i>
                 <!--dialog 弹窗开始-->
-                <el-dialog title="账号信息" :visible.sync="dialogVisible" :modal="true"
+                <el-dialog title="加盟商账号信息" :visible.sync="dialogVisible" :modal="true"
                   :modal-append-to-body="false">
                   <el-form :model="editAccount">
                     <el-form-item label="用户名" :label-width="formLabelWidth">
@@ -155,12 +155,12 @@
                         <el-radio :label="9">芜湖</el-radio>
                       </el-radio-group>
                     </el-form-item>
-                    <el-form-item label="状态" :label-width="formLabelWidth">
+                    <!-- <el-form-item label="状态" :label-width="formLabelWidth">
                       <el-radio-group v-model="editAccount.state">
                         <el-radio v-bind:label="true">开启</el-radio>
                         <el-radio v-bind:label="false">关闭</el-radio>
                       </el-radio-group>
-                    </el-form-item>
+                    </el-form-item> -->
                   </el-form>
                   <div slot="footer" class="dialog-footer editfooter">
                     <el-button class="accountMangerBtn" type="primary" @click="handleEditAccount">确 定</el-button>
@@ -174,7 +174,8 @@
         </div>
       </el-tab-pane>
       <div>
-        <el-pagination id="selfPage"
+        <el-pagination
+          v-show="pageShow"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           :current-page.sync="currentPage"
@@ -199,14 +200,20 @@ import $ from 'jquery'
 import {siblings,checkPositiveNumber,setPage } from '../../../../utils/index.js'
 require('../../../assets/lib/js/jquery.pagination.js')
 import '../../../assets/css/pagination.css'
-import request from 'superagent'
 import {getAllAdminUser} from '../../../api/getAdminUser.api.js'
 import {getAllAccount} from '../../../api/getAllAccount.api'
+import {updateAdmin} from '../../../api/updateAdmin.api'
+import {updateAccountByAdmin} from '../../../api/updateAccountByAdmin.api'
+import {modifyAdminState} from '../../../api/modifyAdminState.api'
+import {modifyAccountStateByAdmin} from '../../../api/modifyAccountStateByAdmin.api'
+import {delAdminUser} from '../../../api/delAdminUser.api'
+import {delAccountByAdmin} from '../../../api/delAccountByAdmin.api'
 export default {
   data () {
     return {
       tableTitle:'平台',
       activeName: '平台',
+      pageShow: false,
       input: '',
       currentPage: 1,
       totalPage:1,
@@ -216,6 +223,8 @@ export default {
       dialogVisible: false,
       totalPage: '',
       loading: false,
+      loadingText:'',
+      emptyText:' ',
       formLabelWidth: '90px',
       editAccount: {
         userId: '',
@@ -283,31 +292,54 @@ export default {
         newAccountInfo.role = 1
       }
       newAccountInfo.id = this.editAccount.id
-      newAccountInfo.userId = this.editAccount.initUserId
+      newAccountInfo.userId = this.editAccount.userId
       newAccountInfo.email = this.editAccount.email
       newAccountInfo.phoneNo = this.editAccount.phoneNo
       newAccountInfo.name = this.editAccount.name
       newAccountInfo.state = (this.editAccount.state==true?0:1)
       var index = this.editAccount.index
       if(this.activeName === '平台') {
-        // this.platTableData.splice(index,1,newAccountInfo)
+        var AccountInfo = newAccountInfo
+        delete AccountInfo.role
+        updateAdmin(AccountInfo,function(error,res){
+          if(error) {
+            console.log(error)
+          } else {
+            var code =  JSON.parse(res.text).code
+            if(code === 0) {
+              that.$message({
+                type: 'success',
+                message: '恭喜您，修改成功！'
+              })
+              that.platTableData.splice(index,1,that.editAccount)
+            } else {
+              that.$message({
+                type: 'error',
+                message: 'sorry, 对不起修改失败！'
+              })
+            }
+          }
+        })
       } else{
-          request.post('http://192.168.3.52:7099/franchisee/account/modifyAccountStateByAdmin')
-            .send({
-              adminUser: {
-                id:0,
-                userId: 'root'
-              },
-              account: newAccountInfo
-            })
-            .end((err, res) =>{
-              if(err) {
-                console.log(err)
+          updateAccountByAdmin(newAccountInfo,function(error,res){
+            if(error) {
+              console.log(error)
+            } else {
+              var code =  JSON.parse(res.text).code
+              if(code === 0) {
+                that.$message({
+                  type: 'success',
+                  message: '恭喜您，修改成功！'
+                })
+                that.joinTableData.splice(index,1,that.editAccount)
               } else {
-                console.log(res)
+                that.$message({
+                  type: 'error',
+                  message: 'sorry, 对不起修改失败！'
+                })
               }
-            })
-         this.joinTableData.splice(index,1,newAccountInfo)
+            }
+          })
       }
     },
     openDelete (scope) {
@@ -319,8 +351,8 @@ export default {
             type: 'warning'
           }).then(() => {
               that.loading = true
-              request.post('http://192.168.3.52:7099/franchisee/account/delAdminUser')
-                .send({
+              delAdminUser(
+                {
                   curUser: {
                     id: 0,
                     role: 0,
@@ -330,10 +362,10 @@ export default {
                     id: scope.row.id,
                     userId: scope.row.userId
                   }
-                })
-                .end((err, res) => {
-                  if (err) {
-                    console.log(err)
+                },
+                function (error, res) {
+                  if(error) {
+                    console.log(error)
                   } else {
                     var code = JSON.parse(res.text).code
                     if (code === 1) {
@@ -349,9 +381,14 @@ export default {
                         message: '恭喜您，删除成功!'
                       })
                       that.platTableData.splice(scope.$index,1)
+                      if( that.platTableData.length===0) {
+                        that.pageShow = false
+                        that.emptyText = '暂无数据'
+                      }
                     }
                   }
-                })
+                }
+              )
             }).catch(() => {
               this.$message({
                 type: 'info',
@@ -365,8 +402,8 @@ export default {
             type: 'warning'
           }).then(() => {
               that.loading = true
-              request.post('http://192.168.3.52:7099/franchisee/account/delAccountByAdmin')
-                .send({
+              delAccountByAdmin(
+                {
                   adminUser: {
                     id: 0,
                     role: 0,
@@ -376,11 +413,14 @@ export default {
                     id: scope.row.id,
                     userId: scope.row.userId
                   }
-                })
-                .end((err, res) => {
-                  if (err) {
-                    console.log(err)
-                  } else {
+                },function(error,res){
+                  if(error) {
+                    console.log(error)
+                    that.$message({
+                      type: 'error',
+                      message: '对不起，删除失败!'
+                    })
+                  }else {
                     var code = JSON.parse(res.text).code
                     if (code === 1) {
                       that.loading = false
@@ -395,9 +435,14 @@ export default {
                         message: '恭喜您，删除成功!'
                       })
                       that.joinTableData.splice(scope.$index,1)
-                    }
+                      if( that.joinTableData.length===0) {
+                        that.pageShow = false
+                        that.emptyText = '暂无数据'
+                      }
+                    } 
                   }
-                })
+                }
+              )
             }).catch(() => {
               this.$message({
                 type: 'info',
@@ -408,26 +453,80 @@ export default {
     },
     changeState (scope) {
       if(this.activeName==='平台') {
-          
-      }else {
+          var that = this
+          var initObj = Object.assign({},scope.row, {state: scope.row.state})
           var obj = Object.assign({},scope.row, {state: !scope.row.state})
           var obj2 = Object.assign({},scope.row, {state: !scope.row.state?0:1})
-          request.post('http://192.168.3.52:7099/franchisee/account/modifyAccountStateByAdmin')
-              .send({
-                adminUser: {
-                  id:0,
-                  userId: 'root'
-                },
-                account: obj2
-              })
-              .end((err, res) =>{
-                if(err) {
-                  console.log(err)
+          modifyAdminState(
+            {
+              id: scope.row.id,
+              userId: scope.row.userId,
+              state: !scope.row.state?0:1
+            },function(error,res){
+                if(error) {
+                  console.log(error)
+                  that.$message({
+                    type:'error',
+                    message: '对不起，修改失败'
+                  })
+                  that.platTableData.splice(scope.$index,1,initObj)
                 } else {
-                  this.joinTableData.splice(scope.$index,1,obj)
+                  var code = JSON.parse(res.text).code
+                  if(code ===0 ){
+                    that.$message({
+                      type:'success',
+                      message: '恭喜你，修改成功'
+                    })
+                    that.platTableData.splice(scope.$index,1,obj)
+                  }else {
+                    that.$message({
+                      type:'error',
+                      message: '对不起，修改失败'
+                    })
+                    that.platTableData.splice(scope.$index,1,scope.row)
+                  }
                 }
-              })
             }
+          )
+      }else {
+          var that = this
+          var initObj = Object.assign({},scope.row, {state: scope.row.state})
+          var obj = Object.assign({},scope.row, {state: !scope.row.state})
+          var obj2 = Object.assign({},scope.row, {state: !scope.row.state?0:1})
+          modifyAccountStateByAdmin(
+            {
+              adminUser: {
+                id:0,
+                userId: 'root'
+              },
+              account: obj2
+            },function(error, res){
+                if(error) {
+                  console.log(error)
+                  that.$message({
+                    type:'error',
+                    message: '对不起，修改失败'
+                  })
+                  that.joinTableData.splice(scope.$index,1,initObj)
+                }else {
+                  var code = JSON.parse(res.text).code
+                  if(code ===0 ){
+                    that.$message({
+                      type:'success',
+                      message: '恭喜你，修改成功'
+                    })
+                    that.joinTableData.splice(scope.$index,1,obj)
+                  }else {
+                    that.$message({
+                      type:'error',
+                      message: '对不起，修改失败'
+                    })
+                    that.joinTableData.splice(scope.$index,1,scope.row)
+                  }
+                }
+              }
+            )
+          }
     },
     handleData (arr) {
       var res = arr.map((item) => {
@@ -446,26 +545,60 @@ export default {
     handleClickTab (tab, event) {
       var that = this
       if(this.activeName === '平台') {
+          this.currentPage = 1
+          this.loading = true
+          this.loadingText = '拼命加载中'
           getAllAdminUser({franchiseeId: '123456',userId: 'admin'}, 1, function(err,res){
           if(err) {
             console.log(err)
+             setTimeout(function(){
+              that.loading = false
+              that.loadingText = '服务器链接超时'
+            },5000)
+            setTimeout(function(){
+              that.emptyText = '暂无数据'
+            },6000)
           }else {
+            that.loading = false
             that.totalPage = JSON.parse(res.text).totalPage || 20
             var arr = JSON.parse(res.text).list
-            that.platTableData = that.handleData(arr)
-            that.$store.state.platTableData = arr
-           // that.setPage(arr,that.totalPage)
+             if(arr.length===0) {
+              that.emptyText = '暂无数据'
+               that.pageShow = false
+            } else {
+              that.emptyText = ' '
+              that.pageShow = true
+            }
+            that.$store.state.platTableData = that.handleData(arr)
+            that.platTableData = that.$store.state.platTableData
           }
         })
       }else {
+        this.currentPage = 1
         getAllAccount({franchiseeId: '123456',userId: 'admin'}, 1, function(error, res){
           if(error){
             console.log(error)
+            setTimeout(function(){
+              that.loading = false
+              that.loadingText = '服务器链接超时'
+            },5000)
+            setTimeout(function(){
+              that.emptyText = '暂无数据'
+            },6000)
           } else {
+              that.loading = false
               that.totalPage = JSON.parse(res.text).totalPage || 20
               var arr = JSON.parse(res.text).list
-              that.joinTableData = that.handleData(arr)
+              console.log(arr.length)
+              if(arr.length===0) {
+                that.emptyText = '暂无数据'
+                that.pageShow = false
+              } else {
+                that.emptyText = ' '
+                that.pageShow = true
+              }
               that.$store.state.joinTableData = that.handleData(arr)
+              that.joinTableData =  that.$store.state.joinTableData
               //that.setPage(arr,that.totalPage)
           }
         })
@@ -522,31 +655,69 @@ export default {
   mounted () {
     if(this.tableTitle==='平台') {
       var that = this
+      this.loading = true
+      this.loadingText = '拼命加载中'
       getAllAdminUser({franchiseeId: '123456',userId: 'admin'}, 1, function(err,res){
         if(err) {
           console.log(err)
+           setTimeout(function(){
+            that.loading = false
+            that.loadingText = '服务器链接超时'
+          },5000)
+          setTimeout(function(){
+            that.emptyText = '暂无数据'
+          },6000)
         }else {
+          that.loading = false
+          that.emptyText = ' '
           that.totalPage = JSON.parse(res.text).totalPage || 20
           var arr = JSON.parse(res.text).list
-          that.platTableData = that.handleData(arr)
+          if(arr.length===0) {
+            that.emptyText = '暂无数据'
+             that.pageShow = false
+          } else {
+            that.emptyText = ' '
+            that.pageShow = true
+          }
           that.$store.state.platTableData = that.handleData(arr)
-         // that.setPage(arr,that.totalPage)
+          that.platTableData = that.$store.state.platTableData
         }
       })
     }
   },
   watch: {
-      currentPage: {
+    '$store.state.platTableData': {
+      handler: function (val,oldVal){
+       if(val.length>0){
+         this.pageShow = true
+       }
+      },
+      deep: true
+    },
+    '$store.state.joinTableData': {
+      handler: function (val,oldVal){
+       if(val.length>0){
+         this.pageShow = true
+       }
+      },
+      deep: true
+    },
+    currentPage: {
         handler: function (val, oldVal) {
           var that = this
           if(this.activeName === '平台') {
-             getAllAdminUser({franchiseeId: '123456',userId: 'admin'}, val, function(err,res){
+              getAllAdminUser({franchiseeId: '123456',userId: 'admin'}, val, function(err,res){
               if(err) {
                 console.log(err)
               }else {
                 var arr = JSON.parse(res.text).list
-                that.platTableData = that.handleData(arr)
-                that.$store.state.platTableData = arr
+                if(arr.length===0) {
+                  that.emptyText = '暂无数据'
+                } else {
+                  that.emptyText = ' '
+                }
+                that.$store.state.platTableData = that.handleData(arr)
+                that.platTableData = that.$store.state.platTableData
               }
             })
           }else {
@@ -555,8 +726,13 @@ export default {
                 console.log(error)
               } else {
                   var arr = JSON.parse(res.text).list
-                  that.joinTableData = that.handleData(arr)
+                  if(arr.length===0) {
+                    that.emptyText = '暂无数据'
+                  } else {
+                    that.emptyText = ' '
+                  }
                   that.$store.state.joinTableData = that.handleData(arr)
+                  that.joinTableData = that.$store.state.joinTableData
               }
             })
           }

@@ -13,8 +13,8 @@
 							<el-form-item label="用户名" prop="username">
 								<el-input v-model="ruleForm.username" placeholder='请输入用户名'></el-input>
 							</el-form-item>
-							<el-form-item label="密码" prop="password">
-								<el-input v-model="ruleForm.password" placeholder='请输入密码'></el-input>
+							<el-form-item label="密码" prop="password" >
+								<el-input v-model="ruleForm.password" type="password" placeholder='请输入密码'></el-input>
 							</el-form-item>
 							<el-form-item label="所属角色" prop="role">
 								<el-select v-model="ruleForm.role" placeholder="选择角色类型">
