@@ -15,7 +15,6 @@
       }
     },
     mounted: function () {
-      console.log(this.$route.params)
       request
         .post('http://192.168.3.52:7099/franchisee/report/get24HourTrend?type=' + this.$route.query.type)
         .send({
@@ -122,13 +121,13 @@
         this.moneyList = order
       },
       dataUpdate () {
-        // console.log(this.$route.query)
         request
           .post('http://192.168.3.52:7099/franchisee/report/get24HourTrend?type=' + this.$route.query.type)
           .send({
             "account": {
               'franchiseeId': '123456',
-              'userId': 'admin'
+              'userId': 'admin',
+              'cityId': this.$route.query.cityId?this.$route.query.cityId:null
             },
             "date": this.$route.query.date
           })
@@ -149,13 +148,11 @@
       }
     },
     beforeUpdate () {
-      console.log(this.$route)
-      console.log(this.$route.params)
       this.dataUpdate()
     },
     watch: {
       '$route': 'dataUpdate',
-      '$route.params': 'getCityInfo'
+      '$router.params': 'getCityInfo'
     }
   }
 </script>

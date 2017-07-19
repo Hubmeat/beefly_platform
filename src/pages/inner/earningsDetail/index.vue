@@ -407,16 +407,16 @@ export default {
     })
 
     $('.citys span').on('click', function () {
-      clearTimeout(this.timer2)
-      var id = $(this).attr('myid')
-      this.timer2 = setTimeout(function () {
-        console.log('this is city')
+      clearTimeout(that.timer2)
+      var id = $(this).attr('myId')
+      var type = that.$route.query.type
+      that.timer2 = setTimeout(function () {
         request
-          .post('http://')
+          .post('http://192.168.3.52:7099/franchisee/revenue/' + type)
           .send({
             'franchiseeId': '123456',
             'userId': 'admin',
-            'cityCode': id
+            'cityId': id
           })
           .end((error, res) => {
             // console.log('this is entry')
@@ -424,13 +424,12 @@ export default {
               console.log('error:', error)
             } else {
               console.log(res)
-              console.log(res)
               var newArr = JSON.parse(res.text).list
               var pageNumber = JSON.parse(res.text).totalPage
-              var arr2 = this.tableDataDel(newArr)
-              this.totalPage = pageNumber
-              this.$store.dispatch('earningsDate_action', { arr2 })
-              this.tableData = this.$store.state.earningsDate.arr2
+              var arr2 = that.tableDataDel(newArr)
+              that.totalPage = pageNumber
+              that.$store.dispatch('earningsDate_action', { arr2 })
+              that.tableData = that.$store.state.earningsDate.arr2
               if (pageNumber > 1) {
                 $('.M-box').pagination({
                   pageCount: pageNumber,
@@ -448,9 +447,6 @@ export default {
           })
       }, 200)
     })
-  }, 
-  beforeMount () {
-    this.$router.push('/index/earningsDetail?type=getRevenueCurDay')
   },
   methods: {
     handleChangeType (e) {
@@ -517,10 +513,11 @@ export default {
               .send({
                 'account': {
                   'franchiseeId': '123456',
-                  'userId': 'admin'
+                  'userId': 'admin',
+                  'cityId': $('.citys span.active').attr('myId')
                 },
                 'startTime': startTime,
-                'endTime': endTime
+                'endTime': endTime,
               })
               .end((err, res) => {
                 if (err) {
@@ -547,10 +544,10 @@ export default {
           }, 1000)
         })
       }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消'
-        })
+        // this.$message({
+        //   type: 'info',
+        //   message: '已取消'
+        // })
       })
     },
     formatJson (filterVal, jsonData) {
@@ -671,7 +668,6 @@ export default {
     },
     pageUpdate (e) {
       var that = this
-      console.log(this.pagetotal)
       clearTimeout(this.timer)
       if (e.target.tagName === 'A' || e.target.tagName === 'SPAN') {
         if (e.target.innerHTML === '首页') {
@@ -695,7 +691,8 @@ export default {
           .post('http://192.168.3.52:7099/franchisee/revenue/' + type + '?page=' + e.target.innerHTML)
           .send({
             'franchiseeId': '123456',
-            'userId': 'admin'
+            'userId': 'admin',
+            'cityId': $('.citys span.active').attr('myId')
           })
           .end((error, res) => {
             if (error) {
@@ -767,7 +764,8 @@ export default {
               this.tableData = this.$store.state.earningsDate.arr2
               var pageNumber = JSON.parse(res.text).totalPage
               this.totalPage = pageNumber
-              if (pageNumber < 10) {
+              if (pageNumber < 10) { 
+                $('.M-box').html('')
                 return
               } else {
                 $('.M-box').pagination({
