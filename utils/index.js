@@ -127,3 +127,13 @@ export function getsec (str) {
     return str1 * 24 * 60 * 60 * 1000
   }
 }
+/**
+ * 判断表单是否为空
+ */
+export function IsEmpty (keyVal) {
+  if (keyVal.length === 0) {
+    return false
+  } else {
+    return true
+  }
+}

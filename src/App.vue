@@ -17,4 +17,5 @@ export default {
 <style rel="stylesheet/less" lang="less">
   *{margin:0;padding:0}
   @import "./assets/reset_elementUI_less/pagenation.less";
+  @import "./assets/rest_formItem_input_less/index.less";
 </style>

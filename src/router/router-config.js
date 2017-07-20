@@ -37,8 +37,11 @@ import addaccount2 from '../pages/inner/accountManager/addaccount2.vue'
 // [ ====== memberCenter ====== ]
 import memberCenter from '../pages/inner/memberCenter/index.vue'
 import bindEamil from '../pages/inner/memberCenter/bindEamil.vue'
+import updateEmail from '../pages/inner/memberCenter/updateEmail.vue'
 import bindTel from '../pages/inner/memberCenter/bindTel.vue'
+import updateTel from '../pages/inner/memberCenter/updateTel.vue'
 import amendPassword from '../pages/inner/memberCenter/amendPassword.vue'
+
 
 // [ ====== roleManager ====== ]
 import roleManager from '../pages/inner/roleManager/index.vue'
@@ -178,23 +181,35 @@ export default [
           component: addaccount2
         }]
       },
-      {
-        path: '/index/memberCenter',
-        name: '个人中心',
-        component: memberCenter,
-        children: [{
-          path: '/index/memberCenter/bindEamil',
-          name: '绑定邮箱',
-          component: bindEamil
-        }, {
-          path: '/index/memberCenter/bindTel',
-          name: '绑定手机号',
-          component: bindTel
-        }, {
-          path: '/index/memberCenter/amendPassword',
-          name: '修改密码',
-          component: amendPassword
-        }]
+       {
+          path: '/index/memberCenter',
+          name: '个人中心',
+          component: memberCenter,
+          children: [{
+              path: '/index/memberCenter/bindEamil',
+              name: '绑定邮箱',
+              component: bindEamil
+          }, 
+          {
+              path: '/index/memberCenter/updateEmail',
+              name: '绑定邮箱',
+              component: updateEmail
+          },
+          {
+              path: '/index/memberCenter/bindTel',
+              name: '绑定手机号',
+              component: bindTel
+          }, 
+          {
+              path: '/index/memberCenter/updateTel',
+              name: '修改手机号',
+              component: updateTel
+          }, 
+          {
+              path: '/index/memberCenter/amendPassword',
+              name: '修改密码',
+              component: amendPassword
+          }]
       },
       {
         path: '/index/roleManager',
