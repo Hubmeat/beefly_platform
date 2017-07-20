@@ -64,6 +64,7 @@ div.allDate_alliance address {
   font-style: normal;
   display: inline;
   font-size: 14px;
+  margin-right: -6px;
 }
 
 div.allDate_alliance div.citys {
@@ -80,6 +81,7 @@ div.allDate_alliance span {
 
 div.allDate_alliance span.active {
   border: 1px solid orange;
+  border-radius: 4px;
 }
 
 /*  加盟商样式  */
@@ -320,21 +322,21 @@ export default {
           nums = --this.clickTimes
           var lastDay = new Date().getTime() + 24 * 60 * 60 * 1000 * nums
           this.nowTime = moment(lastDay).format('YYYY-MM-DD')
-          this.$router.push({ query: {type:  '0', date: this.nowTime, cityId: $('.citys span.active').attr('myId')}})
+          this.$router.push({ query: {type:  '0', date: moment(lastDay).format('YYYY-MM-DD'), cityId: $('.citys span.active').attr('myId')}})
           break
         }
         case 'week': {
           nums = --this.clickTimes
           var lastweek = new Date().getTime() + 24 * 60 * 60 * 1000 * 7 * nums
           this.nowTime = moment(lastweek).format('YYYY-MM-DD')
-          this.$router.push({ query: {type:  '1', date: this.nowTime, cityId: $('.citys span.active').attr('myId')}})
+          this.$router.push({ query: {type:  '1', date: moment(lastweek).format('YYYY-MM-DD'), cityId: $('.citys span.active').attr('myId')}})
           break
         }
         case 'month': {
           nums = --this.clickTimes
           var lastmonth = new Date().getTime() + 24 * 60 * 60 * 1000 * 7 * 4 * nums
           this.nowTime = moment(lastmonth).format('YYYY-MM-DD')
-          this.$router.push({ query: {type:  '2', date: this.nowTime, cityId: $('.citys span.active').attr('myId')}})
+          this.$router.push({ query: {type:  '2', date: moment(lastmonth).format('YYYY-MM-DD'), cityId: $('.citys span.active').attr('myId')}})
           break
         }
       }
@@ -347,21 +349,21 @@ export default {
           nums = ++this.clickTimes
           var lastDay = new Date().getTime() + 24 * 60 * 60 * 1000 * nums
           this.nowTime = moment(lastDay).format('YYYY-MM-DD')
-          this.$router.push({ query: {type:  '0', date: this.nowTime, cityId: $('.citys span.active').attr('myId')}})
+          this.$router.push({ query: {type:  '0', date: moment(lastDay).format('YYYY-MM-DD'), cityId: $('.citys span.active').attr('myId')}})
           break
         }
         case 'week': {
           nums = ++this.clickTimes
           var lastweek = new Date().getTime() + 24 * 60 * 60 * 1000 * 7 * nums
           this.nowTime = moment(lastweek).format('YYYY年第WW周')
-          this.$router.push({ query: {type:  '1', date: this.nowTime, cityId: $('.citys span.active').attr('myId')}})
+          this.$router.push({ query: {type:  '1', date: moment(lastweek).format('YYYY-MM-DD'), cityId: $('.citys span.active').attr('myId')}})
           break
         }
         case 'month': {
           nums = ++this.clickTimes
           var lastmonth = new Date().getTime() + 24 * 60 * 60 * 1000 * 7 * 4 * nums
           this.nowTime = moment(lastmonth).format('YYYY年MM月')
-          this.$router.push({ query: {type:  '2', date: this.nowTime, cityId: $('.citys span.active').attr('myId')}})
+          this.$router.push({ query: {type:  '2', date: moment(lastmonth).format('YYYY-MM-DD'), cityId: $('.citys span.active').attr('myId')}})
           break
         }
       }

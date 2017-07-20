@@ -38,6 +38,8 @@
 		<div id="earD_body">
 			<el-table
       :data="tableData"
+      v-loading="loading2"
+      element-loading-text="拼命加载中"
       style="width: 100%">
       <el-table-column
         prop="money"
@@ -106,6 +108,7 @@
   display: inline;
   font-size: 14px;
   margin-left: 34px;
+  margin-right: -7px;
 }
 
 #earD_header div.citys {
@@ -121,6 +124,7 @@
 }
 #earD_header span.active {
   border: 1px solid orange;
+  border-radius: 4px;
 }
 
 /* 加盟商样式 */
@@ -352,13 +356,15 @@ export default {
       timeLine: '',
       cityList: [],
       show: false,
-      show2: false
+      show2: false,
+      loading2: false
     }
   },
   mounted () {
     this.getCityList()
     // console.log(this.$route.query)
     this.$router.push('/index/earningsDetail?type=getRevenueCurDay')
+    this.loading2 = true
     request
       .post('http://192.168.3.52:7099/franchisee/revenue/getRevenueCurDay')
       .send({
@@ -372,6 +378,8 @@ export default {
           // console.log(res)
           // console.log(JSON.parse(res.text).list)
           var newArr = JSON.parse(res.text).list
+          // 表单Loading
+          this.loading2 = false
           var pageNumber = JSON.parse(res.text).totalPage
           this.totalPage = pageNumber
           var arr2 = this.tableDataDel(newArr)
@@ -410,6 +418,7 @@ export default {
       clearTimeout(that.timer2)
       var id = $(this).attr('myId')
       var type = that.$route.query.type
+      this.loading2 = true
       that.timer2 = setTimeout(function () {
         request
           .post('http://192.168.3.52:7099/franchisee/revenue/' + type)
@@ -428,6 +437,8 @@ export default {
               var pageNumber = JSON.parse(res.text).totalPage
               var arr2 = that.tableDataDel(newArr)
               that.totalPage = pageNumber
+              // loading关闭
+              that.loading2 = false
               that.$store.dispatch('earningsDate_action', { arr2 })
               that.tableData = that.$store.state.earningsDate.arr2
               if (pageNumber > 1) {
@@ -573,6 +584,7 @@ export default {
     },
     getMonthDate () {
       this.$router.push('/index/earningsDetail?type=getRevenueCurMonth')
+      this.loading2 = true
       request
         .post('http://192.168.3.52:7099/franchisee/revenue/getRevenueCurMonth')
         .send({
@@ -587,6 +599,8 @@ export default {
             var newArr = JSON.parse(res.text).list
             var pageNumber = JSON.parse(res.text).totalPage
             var arr2 = this.tableDataDel(newArr)
+            // loading关闭
+            this.loading2 = false
             this.totalPage = pageNumber
             this.$store.dispatch('earningsDate_action', { arr2 })
             this.tableData = this.$store.state.earningsDate.arr2
@@ -608,6 +622,7 @@ export default {
     },
     getDailyDate () {
       this.$router.push('/index/earningsDetail?type=getRevenueCurDay')
+      this.loading2 = true
       request
         .post('http://192.168.3.52:7099/franchisee/revenue/getRevenueCurDay')
         .send({
@@ -620,6 +635,8 @@ export default {
           } else {
             var newArr = JSON.parse(res.text).list
             var pageNumber = JSON.parse(res.text).totalPage
+            // loading 关闭
+            this.loading2 = false
             var arr2 = this.tableDataDel(newArr)
             this.totalPage = pageNumber
             this.$store.dispatch('earningsDate_action', { arr2 })
@@ -638,6 +655,7 @@ export default {
     },
     getWeekDate () {
       this.$router.push('/index/earningsDetail?type=getRevenueCurWeek')
+      this.loading2 = true
       request
         .post('http://192.168.3.52:7099/franchisee/revenue/getRevenueCurWeek')
         .send({
@@ -652,6 +670,8 @@ export default {
             var pageNumber = JSON.parse(res.text).totalPage
             var arr2 = this.tableDataDel(newArr)
             this.totalPage = pageNumber
+            // loading关闭
+            this.loading2 = false
             this.$store.dispatch('earningsDate_action', { arr2 })
             this.tableData = this.$store.state.earningsDate.arr2
             $('.M-box').pagination({
@@ -687,6 +707,8 @@ export default {
       }
       var type = this.$route.query.type
       this.timer = setTimeout(function () {
+        // loading打开
+        that.loading2 = true
         request
           .post('http://192.168.3.52:7099/franchisee/revenue/' + type + '?page=' + e.target.innerHTML)
           .send({
@@ -701,6 +723,7 @@ export default {
               console.log(JSON.parse(res.text))
               var pagedata = (JSON.parse(res.text)).list
               var arr2 = that.tableDataDel(pagedata)
+              that.loading2 = false
               that.$store.dispatch('earningsDate_action', { arr2 })
               that.tableData = that.$store.state.earningsDate.arr2
             }
@@ -708,6 +731,7 @@ export default {
       }, 200)
     },
     dataUpdate () {
+      this.loading2 = true
       var type = this.$route.query.type
       if (type === 'getRevenueDefine') {
         return
@@ -725,6 +749,8 @@ export default {
               // console.log(JSON.parse(res.text))
               var pagedata = (JSON.parse(res.text)).list
               var pageNumber = JSON.parse(res.text).totalPage
+              // loading关闭
+              this.loading2 = false
               var arr2 = this.tableDataDel(pagedata)
               this.totalPage = pageNumber
               this.$store.dispatch('earningsDate_action', { arr2 })
@@ -743,6 +769,7 @@ export default {
         var startTime = moment(this.timeLine[0]).format('YYYY-MM-DD HH:MM:SS')
         var endTime = moment(this.timeLine[1]).format('YYYY-MM-DD HH:MM:SS')
         console.log(startTime, endTime)
+        this.loading2 = true
         request
           .post('http://192.168.3.52:7099/franchisee/revenue/getRevenueDefine')
           .send({
@@ -760,6 +787,8 @@ export default {
               console.log(JSON.parse(res.text))
               var pagedata = (JSON.parse(res.text)).list
               var arr2 = this.tableDataDel(pagedata)
+              // loading 关闭
+              this.loading2 = false
               this.$store.dispatch('earningsDate_action', { arr2 })
               this.tableData = this.$store.state.earningsDate.arr2
               var pageNumber = JSON.parse(res.text).totalPage

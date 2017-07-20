@@ -22,10 +22,6 @@
                       </el-form-item>
                       <el-form-item class="filtercar" style="width: 400px;">
                         <span class="labelAlign">状态</span>
-                        <!-- <el-radio class="radio" v-model="form.radio" label="待出租">待出租</el-radio>
-                        <el-radio class="radio" v-model="form.radio" label="已预订">已预订</el-radio>
-                        <el-radio class="radio" v-model="form.radio" label="已出租">已出租</el-radio>
-                        <el-radio class="radio" v-model="form.radio" label="维护中">维护中</el-radio> -->
                         <el-checkbox-group v-model="checkList">
                             <el-checkbox label="4">待出租</el-checkbox>
                             <el-checkbox label="5">已预订</el-checkbox>
@@ -481,6 +477,7 @@ div.selectPlace address {
   font-style: normal;
   display: inline;
   font-size: 14px;
+  margin-right: 8px;
 }
 
 div.selectPlace div.citys {
@@ -497,6 +494,7 @@ div.selectPlace span {
 
 div.selectPlace span.active {
   border: 1px solid orange;
+  border-radius: 4px;
 }
 
   /*  加盟端样式  */

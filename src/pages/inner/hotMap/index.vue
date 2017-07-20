@@ -58,6 +58,7 @@
   font-style: normal;
   display: inline;
   font-size: 14px;
+  margin-right: -4px;
 }
 
 #hotmap_controller .city div.citys {
@@ -76,6 +77,7 @@
 
 #hotmap_controller .city span.active {
   border: 1px solid orange;
+  border-radius: 4px;
 }
 
 
