@@ -121,7 +121,7 @@
 	}
 
   #partner_header .partner_my_input1 {
-    width: 300px;
+    /* width: 300px; */
     height: 30px;
     outline: none;
     margin-top: 4px;
