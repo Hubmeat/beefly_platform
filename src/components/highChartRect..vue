@@ -1,5 +1,9 @@
 <template>
-   <div id="container"></div>
+  <div style="position: relative;">
+      <div v-title>报表管理-消费数据-统计图</div>
+      <p class="my_noDate" style="position: absolute; min-height:40px; height: 40px;" v-show="noData">暂无数据</p>
+      <div id="container"></div>
+  </div>
 </template>
 <script>
   var Highcharts = require('highcharts')
@@ -13,7 +17,8 @@
       return {
         x_data: [],
         orderNumber: [],
-        consumeMoney: []
+        consumeMoney: [],
+        noData: false
       }
     },
     mounted: function () {
@@ -145,10 +150,7 @@
         this.consumeMoney = allMoney
       },
       getChartByRoute (arr) {
-        console.log('-----------')
-        console.log(arr)
         var res = arr.map((item) => {
-          console.log(item)
           return item.time
         })
 
@@ -159,8 +161,6 @@
         var allMoney = arr.map((item) => {
           return item.money
         })
-        console.log(res)
-        console.log(order)
         this.$set(res, this.x_data)
         this.x_data = res
         this.orderNumber = order
@@ -182,20 +182,27 @@
               if (error) {
                 console.log('error:', error)
               } else {
-                console.log(JSON.parse(res.text).list)
-                var arr = JSON.parse(res.text).list
-                var newArr = []
-                for (var i = 0; i < arr.length; i++) {
-                  var obj = {}
-                  obj.time = moment(arr[i].time).format('YYYY-MM-DD')
-                  obj.totalBill = arr[i].totalBill
-                  obj.money = arr[i].money
-                  newArr.push(obj)
-                }
+                // console.log(res)
+                // console.log(JSON.parse(res.text))
+                if (JSON.parse(res.text).list.length === 0) {
+                  $('#container').html('')
+                  this.noData = true
+                } else {
+                  this.noData = false
+                  var arr = JSON.parse(res.text).list
+                  var newArr = []
+                  for (var i = 0; i < arr.length; i++) {
+                    var obj = {}
+                    obj.time = moment(arr[i].time).format('YYYY-MM-DD')
+                    obj.totalBill = arr[i].totalBill
+                    obj.money = arr[i].money
+                    newArr.push(obj)
+                  }
 
-                this.getChartByRoute(newArr)
-                this.createChartsShap()
-                flag = false
+                  this.getChartByRoute(newArr)
+                  this.createChartsShap()
+                  flag = false
+                }
               }
             })
         } else {
@@ -229,17 +236,23 @@
                 if (error) {
                   console.log('error:', error)
                 } else {
-                  var arr = JSON.parse(res.text).list
-                  var newArr = []
-                  for (var i = 0; i < arr.length; i++) {
-                    var obj = {}
-                    obj.time = moment(arr[i].time).format('YYYY-MM-DD')
-                    obj.totalBill = arr[i].totalBill
-                    obj.money = arr[i].money
-                    newArr.push(obj)
+                  if (JSON.parse(res.text).list.length === 0) {
+                    $('#container').html('')
+                    this.noData = true
+                  } else {
+                    this.noData = false
+                    var arr = JSON.parse(res.text).list
+                    var newArr = []
+                    for (var i = 0; i < arr.length; i++) {
+                      var obj = {}
+                      obj.time = moment(arr[i].time).format('YYYY-MM-DD')
+                      obj.totalBill = arr[i].totalBill
+                      obj.money = arr[i].money
+                      newArr.push(obj)
+                    }
+                    this.getChartByRoute(newArr)
+                    this.createChartsShap()                    
                   }
-                  this.getChartByRoute(newArr)
-                  this.createChartsShap()
                 }
               })
 
@@ -260,4 +273,11 @@
 </script>
 <style>
   div#container g.highcharts-legend-item{display:none;}
+  .my_noDate {
+    width: 100%;
+    text-align: center;
+    font-size: 22px;
+    color: #f60;
+    /* left: 50%; */
+  }
 </style>

@@ -11,6 +11,14 @@ import Vuex from 'vuex'
 
 Vue.config.productionTip = false
 Vue.use(Element)
+
+Vue.directive('title', {
+  inserted: function (el, binding) {
+    document.title = el.innerText
+    el.remove()
+  }
+})
+
 /* eslint-disable no-new */
 new Vue({
   store,

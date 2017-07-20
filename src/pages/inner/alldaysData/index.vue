@@ -64,6 +64,7 @@ div.allDate_alliance address {
   font-style: normal;
   display: inline;
   font-size: 14px;
+  margin-right: -6px;
 }
 
 div.allDate_alliance div.citys {
@@ -80,6 +81,7 @@ div.allDate_alliance span {
 
 div.allDate_alliance span.active {
   border: 1px solid orange;
+  border-radius: 4px;
 }
 
 /*  加盟商样式  */
@@ -263,31 +265,10 @@ export default {
     this.$router.push({ query: { type:  '0'}})
   },
   beforeUpdate: function () {
-    var that = this
-    setTimeout( function () {
-      var id = $(this).attr('myid')
-      console.log(id)
-      $('.citys span').on('click', function () {
-        switch ($('.timeSelectBtn button.active')[0].innerText) {
-          case '今日': {
-            that.$router.push({ params: { cityCode: id }, query: { type:  '0'}})
-            break
-          }
-          case '本周': {
-            that.$router.push({ params: { cityCode: id }, query: { type:  '1'}})
-            break
-          }
-          case '本月': {
-            that.$router.push({ params: { cityCode: id }, query: { type:  '2'}})
-            break
-          }
-          case '最近6个月': {
-            that.$router.push({ params: { cityCode: id }, query: { type:  '3'}})
-            break
-          }
-        }
-      })
-    }, 200)
+    // setTimeout( function () {
+      // console.log(id)
+
+    // }, 200)
   },
   methods: {
     handleChangeType (e) {
@@ -305,30 +286,30 @@ export default {
       switch (e.currentTarget.innerText) {
         case '今日': {
           nowTime = moment().format('YYYY-MM-DD')
-          this.$router.push({ query: { type:  '0'}})
+          this.$router.push({ query: { type:  '0', 'cityId': $('.citys span.active').attr('myId')}})
           this.nowTime = nowTime
           this.arrowTimeType = 'day'
           this.clickTimes = 0
           break
         }
         case '本周': {
-          nowTime = moment().format('YYYY年第ww周')
-          this.$router.push({ query: { type:  '1'}})
+          nowTime = moment().format('YYYY-MM-DD')
+          this.$router.push({ query: { type:  '1', 'cityId': $('.citys span.active').attr('myId')}})
           this.nowTime = nowTime
           this.arrowTimeType = 'week'
           this.clickTimes = 0
           break
         }
         case '本月': {
-          nowTime = moment().format('YYYY年MM月')
-          this.$router.push({ query: { type:  '2'}})
+          nowTime = moment().format('YYYY-MM-DD')
+          this.$router.push({ query: { type:  '2', 'cityId': $('.citys span.active').attr('myId')}})
           this.nowTime = nowTime
           this.arrowTimeType = 'month'
           this.clickTimes = 0
           break
         }
         case '最近六个月': {
-          this.$router.push({ query: { type:  '3'}})
+          this.$router.push({ query: { type:  '3', 'cityId': $('.citys span.active').attr('myId')}})
           break
         }
       }
@@ -341,21 +322,21 @@ export default {
           nums = --this.clickTimes
           var lastDay = new Date().getTime() + 24 * 60 * 60 * 1000 * nums
           this.nowTime = moment(lastDay).format('YYYY-MM-DD')
-          this.$router.push({ query: {type:  '0', date: this.nowTime}})
+          this.$router.push({ query: {type:  '0', date: moment(lastDay).format('YYYY-MM-DD'), cityId: $('.citys span.active').attr('myId')}})
           break
         }
         case 'week': {
           nums = --this.clickTimes
           var lastweek = new Date().getTime() + 24 * 60 * 60 * 1000 * 7 * nums
-          this.nowTime = moment(lastweek).format('YYYY年第WW周')
-          this.$router.push({ query: {type:  '1', date: this.nowTime}})
+          this.nowTime = moment(lastweek).format('YYYY-MM-DD')
+          this.$router.push({ query: {type:  '1', date: moment(lastweek).format('YYYY-MM-DD'), cityId: $('.citys span.active').attr('myId')}})
           break
         }
         case 'month': {
           nums = --this.clickTimes
           var lastmonth = new Date().getTime() + 24 * 60 * 60 * 1000 * 7 * 4 * nums
-          this.nowTime = moment(lastmonth).format('YYYY年MM月')
-          this.$router.push({ query: {type:  '2', date: this.nowTime}})
+          this.nowTime = moment(lastmonth).format('YYYY-MM-DD')
+          this.$router.push({ query: {type:  '2', date: moment(lastmonth).format('YYYY-MM-DD'), cityId: $('.citys span.active').attr('myId')}})
           break
         }
       }
@@ -368,21 +349,21 @@ export default {
           nums = ++this.clickTimes
           var lastDay = new Date().getTime() + 24 * 60 * 60 * 1000 * nums
           this.nowTime = moment(lastDay).format('YYYY-MM-DD')
-          this.$router.push({ query: {type:  '0', date: this.nowTime}})
+          this.$router.push({ query: {type:  '0', date: moment(lastDay).format('YYYY-MM-DD'), cityId: $('.citys span.active').attr('myId')}})
           break
         }
         case 'week': {
           nums = ++this.clickTimes
           var lastweek = new Date().getTime() + 24 * 60 * 60 * 1000 * 7 * nums
           this.nowTime = moment(lastweek).format('YYYY年第WW周')
-          this.$router.push({ query: {type:  '1', date: this.nowTime}})
+          this.$router.push({ query: {type:  '1', date: moment(lastweek).format('YYYY-MM-DD'), cityId: $('.citys span.active').attr('myId')}})
           break
         }
         case 'month': {
           nums = ++this.clickTimes
           var lastmonth = new Date().getTime() + 24 * 60 * 60 * 1000 * 7 * 4 * nums
           this.nowTime = moment(lastmonth).format('YYYY年MM月')
-          this.$router.push({ query: {type:  '2', date: this.nowTime}})
+          this.$router.push({ query: {type:  '2', date: moment(lastmonth).format('YYYY-MM-DD'), cityId: $('.citys span.active').attr('myId')}})
           break
         }
       }
@@ -408,6 +389,29 @@ export default {
         elems[i].setAttribute('class', '')
       }
       e.target.setAttribute('class', 'active')
+      var id = e.target.getAttribute('myId')
+      // console.log(id)
+      switch ($('.timeSelectBtn button.active')[0].innerText) {
+        case '今日': {
+          this.$router.push({ query: { type:  '0', 'cityId': id}})
+          break
+        }
+        case '本周': {
+          // this.$router.push({ params: { cityCode: id }, query: { type:  '1'}})
+          this.$router.push({ query: { type:  '1', 'cityId': id}})
+          break
+        }
+        case '本月': {
+          // this.$router.push({ params: { cityCode: id }, query: { type:  '2'}})
+          this.$router.push({ query: { type:  '2', 'cityId': id}})
+          break
+        }
+        case '最近6个月': {
+          // this.$router.push({ params: { cityCode: id }, query: { type:  '3'}})
+          this.$router.push({ query: { type:  '3', 'cityId': id}})
+          break
+        }
+      }
     },
     getCityList () {
       request

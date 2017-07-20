@@ -1,5 +1,9 @@
 <template>
-   <div id="container"></div>
+  <div style="position: relative;">
+      <div v-title>报表管理-消费数据-统计图</div>
+      <p class="my_noDate" style="position: absolute; min-height:40px; height: 40px;" v-show="noData">暂无数据</p>
+      <div id="container" style="position: relative;"></div>
+  </div>
 </template>
 <script>
   import moment from 'moment'
@@ -11,11 +15,11 @@
     data () {
       return {
         orderlist: '',
-        moneyList: ''
+        moneyList: '',
+        noData: false
       }
     },
     mounted: function () {
-      console.log(this.$route.params)
       request
         .post('http://192.168.3.52:7099/franchisee/report/get24HourTrend?type=' + this.$route.query.type)
         .send({
@@ -28,10 +32,14 @@
           if (err) {
             console.log('err:' + err)
           } else {
-            // console.log(res)
-            var data = JSON.parse(res.text)
-            this.getChartByRoute(data)
-            this.initHighCharDate()
+            if (res.text === '') {
+              $('#container').html('')
+              this.noData = true
+            } else {
+              var data = JSON.parse(res.text)
+              this.getChartByRoute(data)
+              this.initHighCharDate()
+            }
           }
         })
     },
@@ -122,13 +130,13 @@
         this.moneyList = order
       },
       dataUpdate () {
-        // console.log(this.$route.query)
         request
           .post('http://192.168.3.52:7099/franchisee/report/get24HourTrend?type=' + this.$route.query.type)
           .send({
             "account": {
               'franchiseeId': '123456',
-              'userId': 'admin'
+              'userId': 'admin',
+              'cityId': this.$route.query.cityId?this.$route.query.cityId:null
             },
             "date": this.$route.query.date
           })
@@ -137,10 +145,15 @@
             if (error) {
               console.log('error:', error)
             } else {
-              console.log(res)
-              var data = JSON.parse(res.text)
-              this.getChartByRoute(data)
-              this.initHighCharDate()
+              if (res.text === '') {
+                $('#container').html('')
+                this.noData = true
+                return
+              } else {
+                var data = JSON.parse(res.text)
+                this.getChartByRoute(data)
+                this.initHighCharDate()
+              }
             }
           })
       },
@@ -149,16 +162,21 @@
       }
     },
     beforeUpdate () {
-      console.log(this.$route)
-      console.log(this.$route.params)
       this.dataUpdate()
     },
     watch: {
       '$route': 'dataUpdate',
-      '$route.params': 'getCityInfo'
+      '$router.params': 'getCityInfo'
     }
   }
 </script>
 <style>
   div#container g.highcharts-legend-item{display:none;}
+  .my_noDate {
+    width: 100%;
+    text-align: center;
+    font-size: 22px;
+    color: #f60;
+    /* left: 50%; */
+  }
 </style>

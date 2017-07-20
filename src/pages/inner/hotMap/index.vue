@@ -58,6 +58,7 @@
   font-style: normal;
   display: inline;
   font-size: 14px;
+  margin-right: -4px;
 }
 
 #hotmap_controller .city div.citys {
@@ -76,6 +77,7 @@
 
 #hotmap_controller .city span.active {
   border: 1px solid orange;
+  border-radius: 4px;
 }
 
 
@@ -385,25 +387,29 @@ export default {
     this.getCityList()
     this.$router.push({ query: { type: 'curHour' } })
     // 加载实时热力图
-    request
-      .post('http://192.168.3.52:7099/franchisee/report/hot/curHour')
-      .send({
-        'franchiseeId': '123456',
-        'userId': 'admin'
-      })
-      .end((err, res) => {
-        if (err) {
-          console.log('err:' + err)
-        } else {
-          // console.log(JSON.parse(res.text))
-          var arr = JSON.parse(res.text)
-          this.init(arr)
-        }
-      })
+    this.mountedWay()
 
     this.nowTime = moment().format('YYYY-MM-DD')
   },
   methods: {
+    mountedWay () {
+      request
+        .post('http://192.168.3.52:7099/franchisee/report/hot/curHour')
+        .send({
+          'franchiseeId': '123456',
+          'userId': 'admin',
+          'cityId': $('.citys span.active').attr('myId')?$('.citys span.active').attr('myId'):0
+        })
+        .end((err, res) => {
+          if (err) {
+            console.log('err:' + err)
+          } else {
+            // console.log(JSON.parse(res.text))
+            var arr = JSON.parse(res.text)
+            this.init(arr)
+          }
+        })
+    },
     init(arr) {
       map = new AMap.Map('map-container', {
         zoom: 13,
@@ -680,7 +686,8 @@ export default {
         .send({
           "account": {
             'franchiseeId': '123456',
-            'userId': 'admin'
+            'userId': 'admin',
+            'cityId': $('.citys span.active').attr('myId')?$('.citys span.active').attr('myId'):0
           },
           "date": this.$route.query.date
         })
@@ -701,6 +708,7 @@ export default {
         elems[i].setAttribute('class', '')
       }
       e.target.setAttribute('class', 'active')
+      this.mountedWay()
     },
     getCityList () {
       request

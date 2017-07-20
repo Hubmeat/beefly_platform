@@ -22,15 +22,11 @@
                       </el-form-item>
                       <el-form-item class="filtercar" style="width: 400px;">
                         <span class="labelAlign">状态</span>
-                        <!-- <el-radio class="radio" v-model="form.radio" label="待出租">待出租</el-radio>
-                        <el-radio class="radio" v-model="form.radio" label="已预订">已预订</el-radio>
-                        <el-radio class="radio" v-model="form.radio" label="已出租">已出租</el-radio>
-                        <el-radio class="radio" v-model="form.radio" label="维护中">维护中</el-radio> -->
                         <el-checkbox-group v-model="checkList">
-                            <el-checkbox label="待出租">待出租</el-checkbox>
-                            <el-checkbox label="已预订">已预订</el-checkbox>
-                            <el-checkbox label="已出租">已出租</el-checkbox>
-                            <el-checkbox label="维护中">维护中</el-checkbox>
+                            <el-checkbox label="4">待出租</el-checkbox>
+                            <el-checkbox label="5">已预订</el-checkbox>
+                            <el-checkbox label="6">已出租</el-checkbox>
+                            <el-checkbox label="7">维护中</el-checkbox>
                         </el-checkbox-group>
                       </el-form-item>
                     </el-col>
@@ -96,11 +92,14 @@
                         <span class="labelAlign">关键字</span>
                         <input v-model="terminalNumber" class="carMan_bar" placeholder="车辆号\终端编号\车辆名称">
                       </el-form-item>
-                      <el-form-item class="filtercar">
+                      <el-form-item class="filtercar" style="width: 400px;">
                         <span class="labelAlign">状态</span>
-                        <el-radio class="radio" v-model="form.radio" label="使用中">使用中</el-radio>
-                        <el-radio class="radio" v-model="form.radio" label="维修中">维修中</el-radio>
-                        <el-radio class="radio" v-model="form.radio" label="已报废">已报废</el-radio>
+                        <el-checkbox-group v-model="checkList">
+                            <el-checkbox label="4">待出租</el-checkbox>
+                            <el-checkbox label="5">已预订</el-checkbox>
+                            <el-checkbox label="6">已出租</el-checkbox>
+                            <el-checkbox label="7">维护中</el-checkbox>
+                        </el-checkbox-group>
                       </el-form-item>
                     </el-col>
                   </el-row>
@@ -159,7 +158,6 @@
   </div>
 </template>
 <script>
-const cityOptions = ['上海', '北京', '广州', '深圳'];
 import request from 'superagent'
 import moment from 'moment'
 import {siblings} from '../../../../utils/index.js'
@@ -183,10 +181,14 @@ export default {
       terminalNumber: '',
       activeName: '已分配',
       cityList: [],
-      noDate: false
+      noDate: false,
+      signForQuery: false
     }
   },
   mounted: function () {
+    // 更改搜索sign标识
+    this.signForQuery = false
+
     this.getCityList()
     this.getDateByTabName('getAllotBikes')
     var that = this
@@ -197,13 +199,19 @@ export default {
     } else {
       this.noDate = false
     }
-
-    var type 
-    if (this.activeName === '已分配') {
-      type = 'getAllotBikes'
+    var type
+    console.log('beforeUpdata:' + this.signForQuery)
+    if (this.signForQuery === true) {
+      type = 'queryBikes'
     } else {
-      type = 'getNotAllotBikes'
+      if (this.activeName === '已分配') {
+        type = 'getAllotBikes'
+      } else {
+        type = 'getNotAllotBikes'
+      } 
+      this.signForQuery = false
     }
+
     var that = this
     $('.M-box').click('a', function (e) {
       clearTimeout(this.timer)
@@ -232,7 +240,7 @@ export default {
           .send({
             'franchiseeId': '123456',
             'userId': 'admin',
-            'cityCode': '0'
+            'cityCode': $('.citys span.active').attr('myId')
           })
           .end((error, res) => {
             if (error) {
@@ -251,7 +259,9 @@ export default {
     var that = this
     $('.citys span').on('click', function () {
       clearTimeout(this.timer2)
-      var id = $(this).attr('myid')
+      // 更换城市搜索。
+      that.signForQuery = false
+      var id = $(this).attr('myId')
       this.timer2 = setTimeout(function () {
         console.log('this is city')
         request
@@ -299,32 +309,17 @@ export default {
     searchByTimeline () {
       var type 
       if (this.activeName === '已分配') {
-        type = 'getAllotBikes'
+        type = '0'
       } else {
-        type = 'getNotAllotBikes'
+        type = '1'
       }
 
-      if (this.terminalNumber === '' && this.form.data1 === '' && this.form.data2 === '' && this.form.radio === '') {
+      if (this.terminalNumber === '' && this.form.data1 === '' && this.form.data2 === '' &&  this.checkList === '') {
         this.$message({
           message: '请输入查询条件',
           type: 'warning'
         })
       } else {
-        console.log(this.form.data1)
-        console.log(this.form.data2)
-        console.log(this.terminalNumber)
-
-        if (this.form.radio === '待出租') {
-          // 使用中的对应值待定
-          var radio = 4
-        } else if (this.form.radio === '已预定') {
-          var radio = 5
-        } else if (this.form.radio === '已出租') {
-          var radio = 6
-        } else if (this.form.radio === '已出租') {
-          var radio = 7
-        }
-
         var startTime, endTime
         if (this.form.data1 === '' || this.form.data2 === '') {
           startTime = null
@@ -334,15 +329,17 @@ export default {
           endTime = moment(this.form.data2).format('YYYY-MM-DD')
         }
 
-        var startTime = moment(this.form.data1).format('YYYY-MM-DD')
-        var endTime = moment(this.form.data2).format('YYYY-MM-DD')
+        // 根据用户选择不同状态进行数据的筛选
+        var radio = this.checkList
         request
-          .post('http://192.168.3.52:7099/franchisee/queryBikes')
+          .post('http://192.168.3.52:7099/franchisee/bikeManager/queryBikes')
           .send({
             'start': startTime?startTime:null,
             'end': endTime?endTime:null,
-            'state': radio?radio:[],
-            'name': this.terminalNumber?this.terminalNumber:null
+            'state': radio?radio:null,
+            'name': this.terminalNumber?this.terminalNumber:null,
+            'cityCode': $('.citys span.active').attr('myId')? $('.citys span.active').attr('myId'):null,
+            'type': type
           })
           .end((error, res) => {
             if (error) {
@@ -354,6 +351,7 @@ export default {
               this.pagetotal = (JSON.parse(res.text)).totalPage
               this.tableData = newData
               if (this.pagetotal > 1) {
+                this.signForQuery = true
                 $('.M-box').pagination({
                   pageCount: this.pagetotal,
                   jump: true,
@@ -381,8 +379,10 @@ export default {
       console.log(this.activeName)
       if (this.activeName === '未分配') {
         this.getDateByTabName('getNotAllotBikes')
+        this.checkList = []
       } else {
         this.getDateByTabName('getAllotBikes')
+        this.checkList = []
       }
     },
     getDateByTabName (type) {
@@ -458,6 +458,12 @@ export default {
           }
         })
     }
+  },
+  // created  () {
+  //   this.searchByTimeline()
+  // },
+  watch: {
+    'checkList': 'searchByTimeline'
   }
 }
 </script>
@@ -471,6 +477,7 @@ div.selectPlace address {
   font-style: normal;
   display: inline;
   font-size: 14px;
+  margin-right: 8px;
 }
 
 div.selectPlace div.citys {
@@ -487,6 +494,7 @@ div.selectPlace span {
 
 div.selectPlace span.active {
   border: 1px solid orange;
+  border-radius: 4px;
 }
 
   /*  加盟端样式  */
