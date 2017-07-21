@@ -6,14 +6,14 @@
         <div id="am_search">
           <label>
             <span>关键字 :</span>
-            <input type="text" class="account_my_input">
+            <input placeholder="姓名/用户名" @blur="initQuery" v-model="name" type="text" class="account_my_input">
           </label>
           <label>
             <span>联系方式 :</span>
-            <input type="text" class="account_my_input">
+            <input placeholder="手机号/邮箱" @blur="initQuery" v-model="phone" type="text" class="account_my_input">
           </label>
       
-          <el-button class="my_btn">查询</el-button>
+          <el-button class="my_btn" @click="queryInfo">查询</el-button>
             </div>
             <!-- account -->
             <div class="account">
@@ -93,13 +93,13 @@
         <div id="am_search">
           <label>
             <span>关键字 :</span>
-            <input type="text" class="account_my_input">
+            <input type="text" placeholder="姓名/用户名" @blur="initQuery" class="account_my_input">
           </label>
           <label>
             <span>联系方式 :</span>
-            <input type="text" class="account_my_input">
+            <input type="text" placeholder="邮箱/手机号" @blur="initQuery" class="account_my_input">
           </label>
-          <button type="submit" class="my_btn">查询</button>
+          <button type="submit" class="my_btn" @click="queryInfo">查询</button>
         </div>
         <!-- account -->
          <div class="account">
@@ -155,12 +155,6 @@
                         <el-radio :label="9">芜湖</el-radio>
                       </el-radio-group>
                     </el-form-item>
-                    <!-- <el-form-item label="状态" :label-width="formLabelWidth">
-                      <el-radio-group v-model="editAccount.state">
-                        <el-radio v-bind:label="true">开启</el-radio>
-                        <el-radio v-bind:label="false">关闭</el-radio>
-                      </el-radio-group>
-                    </el-form-item> -->
                   </el-form>
                   <div slot="footer" class="dialog-footer editfooter">
                     <el-button class="accountMangerBtn" type="primary" @click="handleEditAccount">确 定</el-button>
@@ -197,6 +191,7 @@
 
 <script>
 import $ from 'jquery'
+import request from 'superagent'
 import {siblings,checkPositiveNumber,setPage } from '../../../../utils/index.js'
 require('../../../assets/lib/js/jquery.pagination.js')
 import '../../../assets/css/pagination.css'
@@ -211,6 +206,8 @@ import {delAccountByAdmin} from '../../../api/delAccountByAdmin.api'
 export default {
   data () {
     return {
+      name:'',
+      phone: '',
       tableTitle:'平台',
       activeName: '平台',
       pageShow: false,
@@ -219,6 +216,7 @@ export default {
       totalPage:1,
       platTableData:[],
       joinTableData: [],
+      initData: [],
       router_show: false,
       dialogVisible: false,
       totalPage: '',
@@ -240,6 +238,42 @@ export default {
     } 
   },
   methods: {
+    initQuery(){
+      var name = this.name.trim()
+      var phone = this.phone.trim()
+      if(this.activeName==='平台'){
+        if(name.length===0&&phone.length===0){
+          this.platTableData = this.initData
+        }
+      }else {
+        if(name.length===0&&phone.length===0){
+          this.platTableData = this.initData
+        }
+      }
+      
+    },
+    queryInfo(){
+      var name = this.name.trim()
+      var phone = this.phone.trim()
+      var that = this
+      if(name.length>0||phone.length>0) {
+        request.post('http://192.168.3.52:7099/franchisee/account/queryAccount').
+        send({
+          name: this.name.trim(),
+          phone: this.phone.trim(),
+          type:0
+        }).end(function(error,res){
+          if(error){
+            console.log(error)
+          }else {
+            console.log(res)
+            that.name = ''
+            that.phone = ''
+            // 返回未空值，有问题
+          }
+        })
+      }
+    },
     handleSizeChange(val) {
      // console.log(`每页 ${val} 条`);
     },
@@ -571,6 +605,7 @@ export default {
             }
             that.$store.state.platTableData = that.handleData(arr)
             that.platTableData = that.$store.state.platTableData
+            that.initData = that.platTableData
           }
         })
       }else {
@@ -599,6 +634,7 @@ export default {
               }
               that.$store.state.joinTableData = that.handleData(arr)
               that.joinTableData =  that.$store.state.joinTableData
+              that.initData = that.joinTableData
               //that.setPage(arr,that.totalPage)
           }
         })
@@ -681,6 +717,7 @@ export default {
           }
           that.$store.state.platTableData = that.handleData(arr)
           that.platTableData = that.$store.state.platTableData
+          that.initData = that.platTableData
         }
       })
     }

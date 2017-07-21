@@ -5,37 +5,6 @@
         <el-button class="selectAll" id="msgCenterBtn" type="primary" @click="selectAll">全部设为已读</el-button>
       </el-col>
       <el-col>
-        <!-- <table>
-          <thead>
-            <tr>
-              <th>标题</th>
-              <th>消息内容</th>
-              <th>接收日期</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-bind:key="msg.title" v-for="msg of tableData">
-              <td>
-                <el-checkbox v-model="msg.isChecked"></el-checkbox>
-                <span class="title">{{msg.title}}</span>
-              </td>
-              <td class="showAllMessage">
-                <span class="detail" ref="tdShow">{{msg.content}}</span>
-                <span class="open" @click="showMordWords(msg)" v-show="msg.tdshow">{{msg.changeText}}</span>
-              </td>
-              <td>
-                {{msg.createTime}}
-              </td>
-              <td>
-                <i class="icon iconfont icon-xinfeng"></i>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="hasData" v-show="hasMsgData">
-              暂无数据
-        </div> -->
         <el-table
           :data="tableData"
           style="width:100%"
@@ -241,23 +210,24 @@ div.hasData{line-height: 60px;text-align: center;height: 60px;color:#9e9090;widt
         })
       },
       handleClick(row, column, cell, event){
-        //console.log(row)
-        if(row.isRead===0){
-          this.msgList.push({id:row.id})
-          row.isRead=1
-           request.post('http://192.168.3.52:7099/franchisee/msg/read')
-            .send({
-              list: this.msgList
-            })
-            .end(function(error,res){
-              if(error) {
-                console.log(error)
-              }else {
-                console.log(res)
-              }
-            })
-        }else {
-           return false
+        if(event.target.tagName==='I'){
+          if(row.isRead===0){
+            this.msgList.push({id:row.id})
+            row.isRead=1
+            request.post('http://192.168.3.52:7099/franchisee/msg/read')
+              .send({
+                list: this.msgList
+              })
+              .end(function(error,res){
+                if(error) {
+                  console.log(error)
+                }else {
+                  console.log(res)
+                }
+              })
+          }else {
+            return false
+          }
         }
       },
       selectAll () {

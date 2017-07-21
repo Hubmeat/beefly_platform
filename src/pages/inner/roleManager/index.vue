@@ -2,11 +2,11 @@
   <div style="margin-right:20px;">
     <div id="am_search">
       <label>
-        <span>角色查询</span>
-        <input type="text" class="account_my_input">
+        <span>角色名称</span>
+        <input type="text" v-model="roleName" v-on:blur="initRole" class="account_my_input">
       </label>
   
-      <el-button id="roleSearchBtn">查询</el-button>
+      <el-button @click="queryRole" id="roleSearchBtn">查询</el-button>
     </div>
   
     <!-- account -->
@@ -128,6 +128,7 @@ export default {
         }
       }
     return {
+      roleName: '',
       loading: false,
       loading2: false,
       input: '',
@@ -136,6 +137,7 @@ export default {
       currentPage: 1,
       totalPage:1,
       tableData: [],
+      initData: [],
       fathCode: [],
       childrenCode: [],
       router_show: false,
@@ -327,6 +329,30 @@ export default {
     }
   },
   methods: {
+    initRole(){
+      if(this.roleName.trim().length===0){
+        this.tableData = this.initData
+      }
+    },
+    queryRole () {
+      var that = this
+      if(this.roleName.trim().length!==0){
+        request.post('http://192.168.3.52:7099/franchisee/account/queryRole')
+          .send({
+            roleName: this.roleName.trim(),
+            belong:0
+          })
+          .end(function(error,res){
+            if(error){
+              console.log(error)
+            }else {
+              var res = JSON.parse(res.text)
+              that.tableData = res
+              $('.M-box').hide()
+            }
+          })
+      }
+    },
     openAddRole () {
       this.dialogFormVisible = true
     },
@@ -519,6 +545,7 @@ export default {
          console.log(err)
        } else {
          var result = JSON.parse(res.text).list
+         console.log(result)
          if (result.length>0 ) {
             $('.M-box').pagination({
               pageCount: that.totalPage,
@@ -531,6 +558,7 @@ export default {
             })
          }
         var newArr = result.map(function(item, index) {
+            console.log(item)
             var res = item.auth.split('-')
             var fathCode = []
             var childrenCode = []
@@ -545,6 +573,7 @@ export default {
             return obj
           })
          that.tableData  = newArr
+         that.initData = that.tableData
        }
      })
   }
@@ -704,7 +733,6 @@ div.account>h1 button:hover {
 #am_search button:hover {
   color: #20a0ff;
   border-color: #20a0ff;
-  background:rgba(52,52,67,1)
 }
 
 .el-table__body,
