@@ -5,14 +5,14 @@
         <span slot="label"><i class="el-icon-date"></i>平台</span>
        <el-row class="querybar">
          <el-form :inline="true" v-bind:model="form_plat">
-           <el-form-item label="关键字：">
+           <el-form-item label="关键字">
              <el-input v-model="form_plat.keyword"></el-input>
            </el-form-item>
            <el-form-item class="operatortime" label="操作日期">
             <el-col :span="11">
               <el-date-picker type="date" placeholder="选择开始日期" v-model="form_plat.startTime" style="width: 100%;"></el-date-picker>
             </el-col>
-            <el-col class="line" :span="2">-</el-col>
+            <el-col class="line" :span="2" style="padding-left:9px;">-</el-col>
             <el-col :span="11">
               <el-date-picker type="date" placeholder="选择结束日期" v-model="form_plat.endTime" style="width: 100%;"></el-date-picker>
             </el-col>
@@ -21,27 +21,6 @@
          </el-form>
        </el-row>
        <el-row class="table">
-         <!-- <table>
-            <thead>
-              <tr>
-                <th>用户名</th>
-                <th>姓名</th>
-                <th>操作内容</th>
-                <th>操作日期</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-bind:key="item.username" v-for="item of form_plat.tableData">
-                <td>{{item.userId}}</td>
-                <td>{{item.name}}</td>
-                <td>{{item.content}}</td>
-                <td>{{item.operationTime}}</td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="hasData" v-show="form_plat.hasPlatData">
-            暂无数据
-          </div> -->
           <el-table
             :data="form_plat.tableData"
             style="width:100%"
@@ -86,14 +65,14 @@
               </div>
            </el-row>
            <el-form-item class="keywords">
-             <span class="keywords">关键字:</span>
+             <span class="keywords">关键字</span>
              <el-input v-model="form_join.keyword"></el-input>
            </el-form-item>
            <el-form-item class="operatortime" label="操作日期">
             <el-col :span="11">
               <el-date-picker type="date" placeholder="选择开始日期" v-model="form_join.startTime" style="width: 100%;"></el-date-picker>
             </el-col>
-            <el-col class="line" :span="2">-</el-col>
+            <el-col class="line" :span="2" style="padding-left:9px;">-</el-col>
             <el-col :span="11">
               <el-date-picker type="date" placeholder="选择结束日期" v-model="form_join.endTime" style="width: 100%;"></el-date-picker>
             </el-col>
@@ -102,27 +81,6 @@
          </el-form>
        </el-row>
        <el-row class="table">
-         <!-- <table>
-            <thead>
-              <tr>
-                <th>用户名</th>
-                <th>姓名</th>
-                <th>操作内容</th>
-                <th>操作日期</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-bind:key="item.username" v-for="item of form_join.tableData">
-                <td>{{item.userId}}</td>
-                <td>{{item.name}}</td>
-                <td>{{item.content}}</td>
-                <td>{{item.operationTime}}</td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="hasData" v-show="form_join.hasJoinData">
-                暂无数据
-          </div> -->
           <el-table
             :data="form_join.tableData"
             style="width:100%"

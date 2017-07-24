@@ -5,43 +5,22 @@
         <span slot="label"><i class="el-icon-date"></i>平台</span>
        <el-row class="querybar">
          <el-form :inline="true" v-bind:model="form_plat">
-           <el-form-item label="关键字：">
-             <el-input v-model="form_plat.keyword"></el-input>
+           <el-form-item label="关键字">
+             <el-input v-model="keyword" placeholder="姓名/用户名"></el-input>
            </el-form-item>
            <el-form-item class="operatortime" label="操作日期">
             <el-col :span="11">
-              <el-date-picker type="date" placeholder="选择开始日期" v-model="form_plat.startTime" style="width: 100%;"></el-date-picker>
+              <el-date-picker type="date" placeholder="选择开始日期" v-model="startTime" style="width: 100%;"></el-date-picker>
             </el-col>
-            <el-col class="line" :span="2">-</el-col>
+            <el-col class="line" :span="2" style="padding-left:9px;" >-</el-col>
             <el-col :span="11">
-              <el-date-picker type="date" placeholder="选择结束日期" v-model="form_plat.endTime" style="width: 100%;"></el-date-picker>
+              <el-date-picker type="date" placeholder="选择结束日期" v-model="endTime" style="width: 100%;"></el-date-picker>
             </el-col>
            </el-form-item>
            <el-button id="platSearchBtn" type="primary">查询</el-button>
          </el-form>
        </el-row>
        <el-row class="table">
-          <!-- <table>
-              <thead>
-                <tr>
-                  <th>用户名</th>
-                  <th>姓名</th>
-                  <th>操作类别</th>
-                  <th>操作日期</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-bind:key="item.username" v-for="item of form_plat.tableData">
-                  <td>{{item.userId}}</td>
-                  <td>{{item.name}}</td>
-                  <td>{{item.type===0?'登录':'注销'}}</td>
-                  <td>{{item.loginTime}}</td>
-                </tr>
-              </tbody>
-          </table>
-          <div class="hasData" v-show="form_plat.hasPlatData">
-            暂无数据
-          </div> -->
           <el-table :data="form_plat.tableData" style="width:100%">
             <el-table-column
               prop="userId"
@@ -85,43 +64,22 @@
               </div>
            </el-row>
            <el-form-item class="keywords">
-             <span class="keywords">关键字:</span>
-             <el-input v-model="form_join.keyword"></el-input>
+             <span class="keywords">关键字</span>
+             <el-input v-model="keyword" placeholder="用户名/姓名"></el-input>
            </el-form-item>
            <el-form-item class="operatortime" label="操作日期">
             <el-col :span="11">
-              <el-date-picker type="date" placeholder="选择开始日期" v-model="form_join.startTime" style="width: 100%;"></el-date-picker>
+              <el-date-picker type="date" placeholder="选择开始日期" v-model="startTime" style="width: 100%;"></el-date-picker>
             </el-col>
-            <el-col class="line" :span="2">-</el-col>
+            <el-col class="line" :span="2" style="padding-left:9px;">-</el-col>
             <el-col :span="11">
-              <el-date-picker type="date" placeholder="选择结束日期" v-model="form_join.endTime" style="width: 100%;"></el-date-picker>
+              <el-date-picker type="date" placeholder="选择结束日期" v-model="endTime" style="width: 100%;"></el-date-picker>
             </el-col>
            </el-form-item>
            <el-button id="logSearchBtn" type="primary">查询</el-button>
          </el-form>
        </el-row>
        <el-row class="table">
-         <!-- <table>
-            <thead>
-              <tr>
-                <th>用户名</th>
-                <th>姓名</th>
-                <th>操作类别</th>
-                <th>操作日期</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-bind:key="item.username" v-for="item of form_join.tableData">
-                <td>{{item.userId}}</td>
-                <td>{{item.name}}</td>
-                <td>{{item.type===0?'登录':'注销'}}</td>
-                <td>{{item.loginTime}}</td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="hasData" v-show="form_join.hasJoinData">
-                暂无数据
-          </div> -->
            <el-table :data="form_join.tableData" style="width:100%">
             <el-table-column
               prop="userId"
@@ -173,14 +131,12 @@
   div.el-form-item__content div.el-input{display:inline-block;width: 192px;}
   div.keywords span.keywords{width: 62px;display: inline-block;text-align: right;margin-right: 10px;}
   button#logSearchBtn,button#platSearchBtn{width: 80px;
-    /* float: right; */
     height: 36px;
     line-height: 11px;
     margin-right: 30px;
     color: #fff;
     outline: none;
     border: none;
-    /* border-radius: 4px; */
     background: rgba(52,52,67, 0.8);}
 </style>
 <script>
@@ -194,19 +150,14 @@
     data: function () {
       return {
         tabTitle: '平台',
+        keyword: '',
+        startTime: moment(),
+        endTime: moment(),
         form_plat: {
-          keyword: '姓名/用户名',
-          startTime: moment(),
-          endTime: moment(),
           tableData: [],
-          hasPlatData: true
         },
         form_join: {
-          keyword: '姓名/用户名',
-          startTime: moment(),
-          endTime: moment(),
-          tableData: [],
-          hasJoinData: true
+          tableData: []
         },
         plat_totalPage: '',
         join_totalPage: '',

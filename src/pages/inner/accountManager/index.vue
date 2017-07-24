@@ -61,12 +61,6 @@
                     <el-form-item label="姓名" :label-width="formLabelWidth">
                       <el-input v-model="editAccount.name" auto-complete="off"></el-input>
                     </el-form-item>
-                    <!-- <el-form-item label="状态" :label-width="formLabelWidth">
-                      <el-radio-group v-model="editAccount.state">
-                        <el-radio v-bind:label="true">开启</el-radio>
-                        <el-radio v-bind:label="false">关闭</el-radio>
-                      </el-radio-group>
-                    </el-form-item> -->
                   </el-form>
                   <div slot="footer" class="dialog-footer editfooter">
                     <el-button class="accountMangerBtn" type="primary" @click="handleEditAccount">确 定</el-button>
@@ -93,11 +87,11 @@
         <div id="am_search">
           <label>
             <span>关键字 :</span>
-            <input type="text" placeholder="姓名/用户名" @blur="initQuery" class="account_my_input">
+            <input type="text" v-model="name" placeholder="姓名/用户名" @blur="initQuery" class="account_my_input">
           </label>
           <label>
             <span>联系方式 :</span>
-            <input type="text" placeholder="邮箱/手机号" @blur="initQuery" class="account_my_input">
+            <input type="text" v-model="phone" placeholder="邮箱/手机号" @blur="initQuery" class="account_my_input">
           </label>
           <button type="submit" class="my_btn" @click="queryInfo">查询</button>
         </div>
@@ -247,7 +241,7 @@ export default {
         }
       }else {
         if(name.length===0&&phone.length===0){
-          this.platTableData = this.initData
+          this.joinTableData = this.initData
         }
       }
       
@@ -256,22 +250,51 @@ export default {
       var name = this.name.trim()
       var phone = this.phone.trim()
       var that = this
-      if(name.length>0||phone.length>0) {
-        request.post('http://192.168.3.52:7099/franchisee/account/queryAccount').
-        send({
-          name: this.name.trim(),
-          phone: this.phone.trim(),
-          type:0
-        }).end(function(error,res){
-          if(error){
-            console.log(error)
-          }else {
-            console.log(res)
-            that.name = ''
-            that.phone = ''
-            // 返回未空值，有问题
-          }
-        })
+      var type = null
+      if(this.activeName==='平台'){
+        alert('平台')
+        type = 0
+        if(name.length>0||phone.length>0) {
+          request.post('http://192.168.3.52:7099/franchisee/account/queryAccount').
+          send({
+            name: this.name.trim(),
+            phone: this.phone.trim(),
+            type:type
+          }).end(function(error,res){
+            if(error){
+              console.log(error)
+            }else {
+              that.platTableData = JSON.parse(res.text)
+              that.name = ''
+              that.phone = ''
+              that.pageShow = false
+              // 返回未空值，有问题
+            }
+          })
+        }
+      }else {
+        alert('加盟商')
+        type =1
+        console.log(name)
+        if(name.length>0||phone.length>0) {
+          alert('222')
+          request.post('http://192.168.3.52:7099/franchisee/account/queryAccount').
+          send({
+            name: this.name.trim(),
+            phone: this.phone.trim(),
+            type:type
+          }).end(function(error,res){
+            if(error){
+              console.log(error)
+            }else {
+              that.joinTableData = JSON.parse(res.text)
+              that.name = ''
+              that.phone = ''
+              that.pageShow = false
+              // 返回未空值，有问题
+            }
+          })
+        }
       }
     },
     handleSizeChange(val) {
