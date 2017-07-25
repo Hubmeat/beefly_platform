@@ -17,10 +17,10 @@
 								<el-input v-model="ruleForm.password" placeholder='请输入密码'></el-input>
 							</el-form-item>
               <el-form-item label="所属加盟商">
-                <el-radio-group v-model="radio2">
-                  <el-radio :label="3">上海</el-radio>
-                  <el-radio :label="6">北京</el-radio>
-                  <el-radio :label="9">芜湖</el-radio>
+                <el-radio-group v-model="ruleForm.radio2">
+                  <el-radio label="上海">上海</el-radio>
+                  <el-radio label="北京">北京</el-radio>
+                  <el-radio label="芜湖">芜湖</el-radio>
                 </el-radio-group>
               </el-form-item>
 							<el-form-item label="所属角色" prop="role">
@@ -136,17 +136,19 @@
 </style>
       
 <script>
+import request from 'superagent'
+import {host} from '../../../config/index.js'
 export default {
   data () {
     return {
-      radio2: 3,
       ruleForm: {
         username: '',
         password: '',
         role: '',
         name: '',
         tel: '',
-        eamil: ''
+        eamil: '',
+        radio2: '上海'
       },
       rules: {
         username: [
@@ -174,7 +176,14 @@ export default {
     }
   },
   methods: {
-    submitForm (formName) {
+     submitForm (formName) {
+      var that = this
+      var roleType =  null
+      if(this.ruleForm.role==='管理员'){
+        roleType= 0
+      }else {
+        roleType = 1
+      }
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.$confirm('确认添加吗?', '提示', {
@@ -183,17 +192,41 @@ export default {
             type: 'warning'
           })
         .then(() => {
-          this.$router.push('/index/accountManager')
-          this.$message({
-            type: 'success',
-            message: '添加成功'
+          request.post(host + 'franchisee/account/addAccountByAdmin')
+            .send( {
+                state: 0,
+                role: roleType,
+                phoneNo:that.ruleForm.tel, 
+                userId: that.ruleForm.username,
+                name: that.ruleForm.name,
+                cityName:that.ruleForm.radio2
+                })
+            .end(function(err,res){
+              if(err){
+                console.log(err)
+              }else{
+                var code = JSON.parse(res.text).code
+                var data = JSON.parse(JSON.parse(res.text).data)
+                var newData = Object.assign({},data,{state: true})
+                if(code === 0 ){
+                  that.$message({
+                    type: 'success',
+                    message: '恭喜您!添加账号成功'
+                  })
+                  that.$store.commit({
+                    type:'addJoinAcount',
+                    obj: newData
+                  })
+                  that.$router.push('/index/accountManager')
+                }
+              }
+            })
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消添加'
+            })
           })
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消添加'
-          })
-        })
         } else {
           console.log('error submit!!')
           return false

@@ -129,6 +129,7 @@
       
 <script>
 import request from 'superagent'
+import {host} from '../../../config/index.js'
 export default {
   data () {
     return {
@@ -182,7 +183,7 @@ export default {
             type: 'warning'
           })
         .then(() => {
-          request.post('http://192.168.3.52:7099/franchisee/account/addAdminUser')
+          request.post(host + 'franchisee/account/addAdminUser')
             .send({
               curUser:{id: 0,auth: 0,role:0,userId:"jjjj"},
               user: {state: 0, role: roleType,phoneNo:that.ruleForm.tel, userId: that.ruleForm.username,name: that.ruleForm.name}
@@ -207,17 +208,12 @@ export default {
                 }
               }
             })
-          // this.$router.push('/index/accountManager')
-          // this.$message({
-          //   type: 'success',
-          //   message: '添加成功'
-          // })
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消添加'
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消添加'
+            })
           })
-        })
         } else {
           console.log('error submit!!')
           return false

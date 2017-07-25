@@ -142,13 +142,13 @@
                     <el-form-item label="姓名" :label-width="formLabelWidth">
                       <el-input v-model="editAccount.name" auto-complete="off"></el-input>
                     </el-form-item>
-                    <el-form-item label="所属加盟商" :label-width="formLabelWidth">
+                    <!--<el-form-item label="所属加盟商" :label-width="formLabelWidth">
                       <el-radio-group v-model="editAccount.radio">
                         <el-radio :label="3">上海</el-radio>
                         <el-radio :label="6">北京</el-radio>
                         <el-radio :label="9">芜湖</el-radio>
                       </el-radio-group>
-                    </el-form-item>
+                    </el-form-item>-->
                   </el-form>
                   <div slot="footer" class="dialog-footer editfooter">
                     <el-button class="accountMangerBtn" type="primary" @click="handleEditAccount">确 定</el-button>
@@ -169,7 +169,7 @@
           :current-page.sync="currentPage"
           :page-size="10"
           layout="prev, pager, next, jumper"
-          :total="54">
+          :total="totalItems">
         </el-pagination>
       </div>
       <div id="account_page">
@@ -197,13 +197,15 @@ import {modifyAdminState} from '../../../api/modifyAdminState.api'
 import {modifyAccountStateByAdmin} from '../../../api/modifyAccountStateByAdmin.api'
 import {delAdminUser} from '../../../api/delAdminUser.api'
 import {delAccountByAdmin} from '../../../api/delAccountByAdmin.api'
+import {host} from '../../../config/index.js'
 export default {
   data () {
     return {
       name:'',
       phone: '',
-      tableTitle:'平台',
+      activeName:'平台',
       activeName: '平台',
+      totalItems:1,
       pageShow: false,
       input: '',
       currentPage: 1,
@@ -232,19 +234,101 @@ export default {
     } 
   },
   methods: {
-    initQuery(){
-      var name = this.name.trim()
-      var phone = this.phone.trim()
-      if(this.activeName==='平台'){
-        if(name.length===0&&phone.length===0){
-          this.platTableData = this.initData
-        }
-      }else {
-        if(name.length===0&&phone.length===0){
-          this.joinTableData = this.initData
-        }
+    loadData(){
+      if(this.activeName==='平台') {
+        var that = this
+        this.loading = true
+        this.loadingText = '拼命加载中'
+        getAllAdminUser({franchiseeId: '123456',userId: 'admin'}, 1, function(err,res){
+          if(err) {
+            console.log(err)
+            setTimeout(function(){
+              that.loading = false
+              that.loadingText = '服务器链接超时'
+            },5000)
+            setTimeout(function(){
+              that.emptyText = '暂无数据'
+            },6000)
+          }else {
+            that.loading = false
+            that.emptyText = ' '
+            that.totalPage = JSON.parse(res.text).totalPage
+            var arr = JSON.parse(res.text).list
+            if(that.totalPage>1) {
+              alert(2)
+              that.emptyText = ' '
+              that.pageShow = true
+            } else {
+              that.emptyText = '暂无数据'
+              that.pageShow = false
+            }
+            that.totalItems = JSON.parse(res.text).totalItems          
+            that.$store.state.platTableData = that.handleData(arr)
+            that.platTableData = that.$store.state.platTableData
+            that.initData = that.platTableData
+          }
+        })
       }
-      
+    },
+    initQuery(){
+      var that = this
+     if (this.activeName==='平台'){
+       if(this.name.trim().length===0&&this.phone.trim().length===0){
+          getAllAdminUser({franchiseeId: '123456',userId: 'admin'}, 1, function(err,res){
+            if(err) {
+              console.log(err)
+              setTimeout(function(){
+                that.loading = false
+                that.loadingText = '服务器链接超时'
+              },5000)
+              setTimeout(function(){
+                that.emptyText = '暂无数据'
+              },6000)
+            }else {
+              that.loading = false
+              that.totalPage = JSON.parse(res.text).totalPage || 20
+              that.totalItems = JSON.parse(res.text).totalItems
+              var arr = JSON.parse(res.text).list
+              if(that.totalPage>1) {
+                that.emptyText = ' '
+                that.pageShow = true
+              } else {
+                that.emptyText = '暂无数据'
+                that.pageShow = false
+              }
+              that.$store.state.platTableData = that.handleData(arr)
+              that.platTableData = that.$store.state.platTableData
+              that.initData = that.platTableData
+            }
+          })
+       }else {
+         return false
+       }
+     }else {
+        if(this.name.trim().length===0&&this.phone.trim().length===0){
+          getAllAccount({franchiseeId: '123456',userId: 'admin'}, 1, function(error, res){
+                if(error){
+                  console.log(error)
+                } else {
+                  that.loading = false
+                  that.totalPage = JSON.parse(res.text).totalPage || 20
+                  that.totalItems = JSON.parse(res.text).totalItems
+                  var arr = JSON.parse(res.text).list
+                  if(that.totalPage>1) {
+                    that.emptyText = ' '
+                    that.pageShow = true
+                  } else {
+                    that.emptyText = '暂无数据'
+                    that.pageShow = false
+                  }
+                  that.$store.state.joinTableData = that.handleData(arr)
+                  that.joinTableData = that.$store.state.joinTableData
+                }
+              })
+        }else {
+          return false
+        }
+     }
     },
     queryInfo(){
       var name = this.name.trim()
@@ -252,10 +336,10 @@ export default {
       var that = this
       var type = null
       if(this.activeName==='平台'){
-        alert('平台')
+        this.currentPage = 1
         type = 0
         if(name.length>0||phone.length>0) {
-          request.post('http://192.168.3.52:7099/franchisee/account/queryAccount').
+          request.post(host + 'franchisee/account/queryAccount').
           send({
             name: this.name.trim(),
             phone: this.phone.trim(),
@@ -264,21 +348,23 @@ export default {
             if(error){
               console.log(error)
             }else {
-              that.platTableData = JSON.parse(res.text)
-              that.name = ''
-              that.phone = ''
-              that.pageShow = false
-              // 返回未空值，有问题
+              var arr = JSON.parse(res.text).list
+              that.platTableData = that.handleData(arr)
+              that.totalItems = JSON.parse(res.text).totalItems
+              var totalPage = JSON.parse(res.text).totalPage
+              if(totalPage>1){
+                that.pageShow = true
+              }else {
+                that.pageShow = false
+              }
             }
           })
         }
       }else {
-        alert('加盟商')
         type =1
-        console.log(name)
+        this.currentPage = 1
         if(name.length>0||phone.length>0) {
-          alert('222')
-          request.post('http://192.168.3.52:7099/franchisee/account/queryAccount').
+          request.post(host + 'franchisee/account/queryAccount').
           send({
             name: this.name.trim(),
             phone: this.phone.trim(),
@@ -287,11 +373,15 @@ export default {
             if(error){
               console.log(error)
             }else {
-              that.joinTableData = JSON.parse(res.text)
-              that.name = ''
-              that.phone = ''
-              that.pageShow = false
-              // 返回未空值，有问题
+              var arr = JSON.parse(res.text).list
+              that.joinTableData = that.handleData(arr)
+              that.totalItems = JSON.parse(res.text).totalItems
+              var totalPage = JSON.parse(res.text).totalPage
+              if(totalPage>1){
+                that.pageShow = true
+              }else {
+                that.pageShow = false
+              }
             }
           })
         }
@@ -601,36 +691,39 @@ export default {
     },
     handleClickTab (tab, event) {
       var that = this
+      this.name = ''
+      this.phone = ''
       if(this.activeName === '平台') {
           this.currentPage = 1
           this.loading = true
           this.loadingText = '拼命加载中'
           getAllAdminUser({franchiseeId: '123456',userId: 'admin'}, 1, function(err,res){
-          if(err) {
-            console.log(err)
-             setTimeout(function(){
+            if(err) {
+              console.log(err)
+              setTimeout(function(){
+                that.loading = false
+                that.loadingText = '服务器链接超时'
+              },5000)
+              setTimeout(function(){
+                that.emptyText = '暂无数据'
+              },6000)
+            }else {
               that.loading = false
-              that.loadingText = '服务器链接超时'
-            },5000)
-            setTimeout(function(){
-              that.emptyText = '暂无数据'
-            },6000)
-          }else {
-            that.loading = false
-            that.totalPage = JSON.parse(res.text).totalPage || 20
-            var arr = JSON.parse(res.text).list
-             if(arr.length===0) {
-              that.emptyText = '暂无数据'
-               that.pageShow = false
-            } else {
-              that.emptyText = ' '
-              that.pageShow = true
+              that.totalPage = JSON.parse(res.text).totalPage
+              var arr = JSON.parse(res.text).list
+              if(that.totalPage>1) {
+                  that.emptyText = ' '
+                  that.pageShow = true
+              } else {
+                that.emptyText = '暂无数据'
+                that.pageShow = false
+              }
+              that.totalItems = JSON.parse(res.text).totalItems
+              that.$store.state.platTableData = that.handleData(arr)
+              that.platTableData = that.$store.state.platTableData
+              that.initData = that.platTableData
             }
-            that.$store.state.platTableData = that.handleData(arr)
-            that.platTableData = that.$store.state.platTableData
-            that.initData = that.platTableData
-          }
-        })
+          })
       }else {
         this.currentPage = 1
         getAllAccount({franchiseeId: '123456',userId: 'admin'}, 1, function(error, res){
@@ -647,13 +740,13 @@ export default {
               that.loading = false
               that.totalPage = JSON.parse(res.text).totalPage || 20
               var arr = JSON.parse(res.text).list
-              console.log(arr.length)
-              if(arr.length===0) {
-                that.emptyText = '暂无数据'
-                that.pageShow = false
-              } else {
+              that.totalItems = JSON.parse(res.text).totalItems
+              if(that.totalPage>1) {
                 that.emptyText = ' '
                 that.pageShow = true
+              } else {
+                that.emptyText = '暂无数据'
+                that.pageShow = false
               }
               that.$store.state.joinTableData = that.handleData(arr)
               that.joinTableData =  that.$store.state.joinTableData
@@ -712,89 +805,92 @@ export default {
     }
   },
   mounted () {
-    if(this.tableTitle==='平台') {
-      var that = this
-      this.loading = true
-      this.loadingText = '拼命加载中'
-      getAllAdminUser({franchiseeId: '123456',userId: 'admin'}, 1, function(err,res){
-        if(err) {
-          console.log(err)
-           setTimeout(function(){
-            that.loading = false
-            that.loadingText = '服务器链接超时'
-          },5000)
-          setTimeout(function(){
-            that.emptyText = '暂无数据'
-          },6000)
-        }else {
-          that.loading = false
-          that.emptyText = ' '
-          that.totalPage = JSON.parse(res.text).totalPage || 20
-          var arr = JSON.parse(res.text).list
-          if(arr.length===0) {
-            that.emptyText = '暂无数据'
-             that.pageShow = false
-          } else {
-            that.emptyText = ' '
-            that.pageShow = true
-          }
-          that.$store.state.platTableData = that.handleData(arr)
-          that.platTableData = that.$store.state.platTableData
-          that.initData = that.platTableData
-        }
-      })
-    }
+   this.loadData()
   },
   watch: {
-    '$store.state.platTableData': {
-      handler: function (val,oldVal){
-       if(val.length>0){
-         this.pageShow = true
-       }
-      },
-      deep: true
-    },
-    '$store.state.joinTableData': {
-      handler: function (val,oldVal){
-       if(val.length>0){
-         this.pageShow = true
-       }
-      },
-      deep: true
-    },
     currentPage: {
         handler: function (val, oldVal) {
           var that = this
           if(this.activeName === '平台') {
-              getAllAdminUser({franchiseeId: '123456',userId: 'admin'}, val, function(err,res){
-              if(err) {
-                console.log(err)
-              }else {
-                var arr = JSON.parse(res.text).list
-                if(arr.length===0) {
-                  that.emptyText = '暂无数据'
-                } else {
-                  that.emptyText = ' '
-                }
-                that.$store.state.platTableData = that.handleData(arr)
-                that.platTableData = that.$store.state.platTableData
-              }
-            })
-          }else {
-            getAllAccount({franchiseeId: '123456',userId: 'admin'}, val, function(error, res){
-              if(error){
-                console.log(error)
-              } else {
-                  var arr = JSON.parse(res.text).list
-                  if(arr.length===0) {
-                    that.emptyText = '暂无数据'
-                  } else {
-                    that.emptyText = ' '
+              if(this.name.trim().length===0&&this.phone.trim().length===0){
+                getAllAdminUser({franchiseeId: '123456',userId: 'admin'}, val, function(err,res){
+                  if(err) {
+                    console.log(err)
+                  }else {
+                    var arr = JSON.parse(res.text).list
+                    var totalPage = JSON.parse(res.text).totalPage
+                    if(totalPage>1) {
+                       that.emptyText = ' '
+                       that.pageShow = true
+                    } else {
+                      that.pageShow = false
+                      that.emptyText = '暂无数据'
+                    }
+                    that.$store.state.platTableData = that.handleData(arr)
+                    that.platTableData = that.$store.state.platTableData
                   }
-                  that.$store.state.joinTableData = that.handleData(arr)
-                  that.joinTableData = that.$store.state.joinTableData
+                })
+              }else {
+                request.post(host + 'franchisee/account/queryAccount?page=' + val).
+                  send({
+                    name: this.name.trim(),
+                    phone: this.phone.trim(),
+                    type:0
+                  }).end(function(error,res){
+                    if(error){
+                      console.log(error)
+                    }else {
+                      var arr = JSON.parse(res.text).list
+                      that.platTableData = that.handleData(arr)
+                      that.totalItems = JSON.parse(res.text).totalItems
+                      var totalPage = JSON.parse(res.text).totalPage
+                      if(totalPage>1){
+                        that.pageShow = true
+                      }else {
+                        that.pageShow = false
+                      }
+                    }
+                  })
               }
-            })
+          }else {
+            if(this.name.trim().length===0&&this.phone.trim().length===0){
+              getAllAccount({franchiseeId: '123456',userId: 'admin'}, val, function(error, res){
+                if(error){
+                  console.log(error)
+                } else {
+                    var arr = JSON.parse(res.text).list
+                    if(arr.length===0) {
+                      that.emptyText = '暂无数据'
+                    } else {
+                      that.emptyText = ' '
+                    }
+                    that.$store.state.joinTableData = that.handleData(arr)
+                    that.joinTableData = that.$store.state.joinTableData
+                }
+              })
+            }else {
+              request.post(host + 'franchisee/account/queryAccount?page=' + val).
+                send({
+                  name: this.name.trim(),
+                  phone: this.phone.trim(),
+                  type:1
+                })
+                .end(function(error,res){
+                  if(error){
+                    console.log(error)
+                  }else {
+                    var arr = JSON.parse(res.text).list
+                    that.joinTableData = that.handleData(arr)
+                    that.totalItems = JSON.parse(res.text).totalItems
+                    var totalPage = JSON.parse(res.text).totalPage
+                    if(totalPage>1){
+                      that.pageShow = true
+                    }else {
+                      that.pageShow = false
+                    }
+                  }
+                })
+            }
           }
         },
         deep: true

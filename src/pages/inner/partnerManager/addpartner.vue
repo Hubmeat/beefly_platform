@@ -8,7 +8,7 @@
 						</a>
 					</span>
 				</h1>
-			<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+			<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="110px" class="demo-ruleForm">
 				  <el-form-item label="企业名称" prop="company_name">
 				    <el-input v-model="ruleForm.company_name" placeholder='长度不超过100字符'></el-input>
 				  </el-form-item>

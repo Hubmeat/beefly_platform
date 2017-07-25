@@ -6,7 +6,7 @@
        <el-row class="querybar">
          <el-form :inline="true" v-bind:model="form_plat">
            <el-form-item label="关键字">
-             <el-input v-model="form_plat.keyword"></el-input>
+             <el-input v-model="form_plat.keyword" placeholder="用户名/姓名"></el-input>
            </el-form-item>
            <el-form-item class="operatortime" label="操作日期">
             <el-col :span="11">
@@ -66,7 +66,7 @@
            </el-row>
            <el-form-item class="keywords">
              <span class="keywords">关键字</span>
-             <el-input v-model="form_join.keyword"></el-input>
+             <el-input v-model="form_join.keyword" placeholder="用户名/姓名"></el-input>
            </el-form-item>
            <el-form-item class="operatortime" label="操作日期">
             <el-col :span="11">
@@ -155,14 +155,14 @@
         active: 'first',
         tabTitle: '平台',
         form_plat: {
-          keyword: '姓名/用户名',
+          keyword: '',
           startTime: moment(),
           endTime: moment(),
           tableData: [],
           hasPlatData: true
         },
         form_join: {
-          keyword: '姓名/用户名',
+          keyword: '',
           startTime: moment(),
           endTime: moment(),
           tableData: [],
