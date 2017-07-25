@@ -75,15 +75,15 @@
             color: '#74f7af',
             data: [
               {
-                color: 'red',
+                color: 'rgba(153,102,0,1)',
                 y: 200
               },
               {
-                color: 'green',
+                color: 'rgba(0,204,0,1)',
                 y: 300
               },
               {
-                color: 'blue',
+                color: 'rgba(0,204,204,1)',
                 y: 1300
               }
             ],

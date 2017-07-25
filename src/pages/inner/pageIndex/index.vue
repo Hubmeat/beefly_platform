@@ -3,7 +3,7 @@
     <div class="incomming module">
       <el-row>
         <el-col class="incomeTitle">
-          <span class="title">今日营收<small>每10分钟自动刷新</small></span><span class="detail_right">&gt;&gt;</span>
+          <span class="title">今日营收<small>每10分钟自动刷新数据</small></span><span class="detail_right">&gt;&gt;</span>
         </el-col>
         <el-col>
           <incomingVueChart></incomingVueChart>
@@ -38,17 +38,18 @@
           <div class="mapTitle">
             <el-row>
               <el-col :span="10">
-                <span>运营热力图
+                <span class="motionMap">运营热力图
                   <small>每十分钟自动刷新</small>
                 </span>
               </el-col>
-              <el-col :span="14">
-                <el-col :span="6">车辆总数2000辆</el-col>
-                <el-col :span="6">使用中1900辆</el-col>
-                <el-col :span="6">维修中99辆</el-col>
-                <el-col :span="6">已报废1辆</el-col>
-              </el-col>
+              <span class="arrow" style="float:right;margin-right:20px;">&gt;&gt;</span>
             </el-row>
+            <div class="citySelect" style="padding-left:0;margin-top:10px;margin-bottom:0;">
+              <span @click="handleClick" class="city">芜湖</span>
+              <span @click="handleClick" class="city">郑州</span>
+              <span @click="handleClick" class="city">南京</span>
+              <span @click="handleClick" class="city active">上海</span>
+            </div>
           </div>
         </div>
         <div class="mapWrap">
@@ -67,7 +68,7 @@ div.module {
 }
 div.incomming{
   background: #fff;
-  border: 1px solid #e7ecf1;
+  // border: 1px solid #e7ecf1;
   margin-right: 20px;
 }
 div.incomming div.incomeTitle{margin-bottom: 20px}
@@ -85,11 +86,12 @@ div.dayIncoming {
 }
 
 div.statuAndData {
-  padding: 20px;
+  padding: 20px 15px 20px 15px;
   background: #fff;
   margin-right: 20px;
-  border: 1px solid #e7ecf1;
+  // border: 1px solid #e7ecf1;
   border-bottom: none;
+  margin-bottom:20px;
 }
 
 span.income_time {
@@ -107,7 +109,7 @@ div.status {
 
 div.status_title,
 div.datas_title {
-  background: #f7f7f7;
+  background: #fff;
   line-height: 40px;
   font-weight: normal;
   color: #000
@@ -117,10 +119,14 @@ div.status_title span,
 div.datas_title span {
   margin-left: 10px;
 }
-
+div.datas_title span.data_display{
+  font-weight:bold;
+  margin-left:0;
+}
 div.datas_title span.data_display small {
   margin-left: 5px;
   color: #9e9696;
+  font-weight:normal;
 }
 
 div.status_title span.arrow,
@@ -158,7 +164,6 @@ div.datas {
 }
 
 div.Histogram {
-  height: 244px;
   width: 100%;
   background: #ff4949;
 }
@@ -185,18 +190,18 @@ div.mapHeader_content {
   padding: 20px 20px 0 20px;
   background: #fff;
   margin-right: 20px;
-  border-left: 1px solid #e7ecf1;
-  border-right: 1px solid #e7ecf1;
+  // border-left: 1px solid #e7ecf1;
+  // border-right: 1px solid #e7ecf1;
 }
 
 div.mapTitle {
-  line-height: 40px;
-  height: 40px;
-  background: #f7f7f7;
+  
+  background: #fff;
   color: #444;
-  padding-left: 20px;
 }
-div.citySelect{padding-left:10px;margin-bottom: 20px;margin-top: 20px;}
+div.mapTitle span.motionMap{font-weight:bold}
+div.mapTitle span.motionMap small{font-weight:normal;}
+div.citySelect{margin-bottom: 20px;margin-left:-2px;}
 div.citySelect span{cursor:pointer;border:1px solid transparent;display:inline-block;padding:4px 8px;font-size:14px;}
 div.citySelect span.active{border:1px solid #ff4949;}
 </style>

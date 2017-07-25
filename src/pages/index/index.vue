@@ -84,8 +84,7 @@
   }
   .Grid .GridEntry .entryInner{
     position: absolute;
-    top: 10px;
-    /*top: 20px;*/
+    top: 30px;
     right: 0;
     /*left: 0;*/
     left: 20px;
@@ -112,18 +111,11 @@
   }*/
   .Grid .GridEntry .entryInner .workspace .scrollArea .editcontainer .documentedit {
     user-select: text;
-    /*max-width: 900px;*/
-    /*min-height: 1056px;*/
-    /*max-width: 1200px;*/
     min-height: 845px;
     margin-left: auto!important;
     margin-right: auto!important;
-    /*background: #fff;border: 1px solid #e8eaed;*/
     border-radius: 2px;
-    /*padding: 30px;*/
-    margin-top: 20px;
+    margin-top:0;
     cursor: text;position: relative;
-    /*padding:10px;
-    background:#fff;*/
   }
 </style>

@@ -46,7 +46,8 @@ div.gmap{
     padding: 20px 20px 20px 20px;
     background: #fff;
     margin-right: 20px;
-    border: 1px solid #e7ecf1;
+    // border: 1px solid #e7ecf1;
+    border: 1px solid #fff;
     border-top: none;
 }
 
