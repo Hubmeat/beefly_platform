@@ -263,6 +263,7 @@
 
 <script>
 import {updateEmail} from '../../../api/modifyEmail.api'
+import { host } from '../../../config/index.js'
 export default {
 	name: 'HomePage',
 	data: function (){

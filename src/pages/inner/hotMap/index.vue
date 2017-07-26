@@ -329,6 +329,7 @@ import AMap from 'AMap'
 import { siblings } from '../../../../utils/index.js'
 import moment from 'moment'
 import request from 'superagent'
+import { host } from '../../../config/index.js'
 var map, auto, placeSearch, heatmap, driving, citysearch
 // 输入提示
 var autoOptions = {
@@ -394,7 +395,7 @@ export default {
   methods: {
     mountedWay () {
       request
-        .post('http://192.168.3.52:7099/franchisee/report/hot/curHour')
+        .post(host + 'franchisee/report/hot/curHour')
         .send({
           'franchiseeId': '123456',
           'userId': 'admin',
@@ -644,7 +645,7 @@ export default {
         endTime = moment(this.value4[1]).format('YYYY-MM-DD HH:MM:SS')
         console.log(startTime, endTime)
         request
-          .post('http://192.168.3.52:7099/franchisee/report/hot/defineTime')
+          .post(host + 'franchisee/report/hot/defineTime')
           .send({
             "account": {
               'franchiseeId': '123456',
@@ -682,7 +683,7 @@ export default {
     },
     requestWay(type) {
       request
-        .post('http://192.168.3.52:7099/franchisee/report/hot/' + type)
+        .post(host + 'franchisee/report/hot/' + type)
         .send({
           "account": {
             'franchiseeId': '123456',
@@ -712,7 +713,7 @@ export default {
     },
     getCityList () {
       request
-        .post('http://192.168.3.52:7099/franchisee/franchiseeManager/getFranchiseeCity')
+        .post(host + 'franchisee/franchiseeManager/getFranchiseeCity')
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'

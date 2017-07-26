@@ -110,6 +110,7 @@ import $ from 'jquery'
 import { siblings } from '../../../../utils/index.js'
 require('../../../assets/lib/js/jquery.pagination.js')
 import '../../../assets/css/pagination.css'
+import { host } from '../../../config/index.js'
 export default {
   data: function () {
     return {
@@ -169,7 +170,7 @@ export default {
       }
       this.timer = setTimeout(function () {
         request
-          .post('http://192.168.3.52:7099/franchisee/withdrawal/' + type + '?page=' + e.target.innerHTML)
+          .post(host + 'franchisee/withdrawal/' + type + '?page=' + e.target.innerHTML)
           .send({
             'franchiseeId': '123456',
             'userId': 'admin',
@@ -222,7 +223,7 @@ export default {
         type = 'getWithdrawals'
       }
       request
-        .post('http://192.168.3.52:7099/franchisee/withdrawal/' + type)
+        .post(host + 'franchisee/withdrawal/' + type)
         .send({
           'franchiseeId': '123456',
           'userId': 'admin',
@@ -263,7 +264,7 @@ export default {
     },
     getCityList () {
       request
-        .post('http://192.168.3.52:7099/franchisee/franchiseeManager/getFranchiseeCity')
+        .post(host + 'franchisee/franchiseeManager/getFranchiseeCity')
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'
@@ -288,7 +289,7 @@ export default {
     getDateByTabName (type) {
       this.loading2 = true
       request
-        .post('http://192.168.3.52:7099/franchisee/withdrawal/' + type)
+        .post(host + 'franchisee/withdrawal/' + type)
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'
@@ -365,7 +366,7 @@ export default {
         confirmButtonText: '确定',
         callback: () => {
         request
-          .post('http://192.168.3.52:7099/franchisee/withdrawal/confirmWithdrawal')
+          .post(host + 'franchisee/withdrawal/confirmWithdrawal')
           .send({
             'franchiseeId': '123456',
             'userId': 'admin',

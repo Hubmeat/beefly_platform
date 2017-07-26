@@ -316,6 +316,7 @@ import { siblings } from '../../../../utils/index.js'
 require('../../../assets/lib/js/Blob.js')
 import '../../../assets/css/pagination.css'
 require('../../../assets/lib/js/jquery.pagination.js')
+import { host } from '../../../config/index.js'
 export default {
   data () {
     return {
@@ -366,7 +367,7 @@ export default {
     this.$router.push('/index/earningsDetail?type=getRevenueCurDay')
     this.loading2 = true
     request
-      .post('http://192.168.3.52:7099/franchisee/revenue/getRevenueCurDay')
+      .post(host + 'franchisee/revenue/getRevenueCurDay')
       .send({
         'franchiseeId': '123456',
         'userId': 'admin'
@@ -421,7 +422,7 @@ export default {
       this.loading2 = true
       that.timer2 = setTimeout(function () {
         request
-          .post('http://192.168.3.52:7099/franchisee/revenue/' + type)
+          .post(host + 'franchisee/revenue/' + type)
           .send({
             'franchiseeId': '123456',
             'userId': 'admin',
@@ -520,7 +521,7 @@ export default {
               }
             }
             request
-              .post('http://192.168.3.52:7099/franchisee/revenue/exportRevenueData?type=' + newType)
+              .post(host + 'franchisee/revenue/exportRevenueData?type=' + newType)
               .send({
                 'account': {
                   'franchiseeId': '123456',
@@ -586,7 +587,7 @@ export default {
       this.$router.push('/index/earningsDetail?type=getRevenueCurMonth')
       this.loading2 = true
       request
-        .post('http://192.168.3.52:7099/franchisee/revenue/getRevenueCurMonth')
+        .post(host + 'franchisee/revenue/getRevenueCurMonth')
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'
@@ -624,7 +625,7 @@ export default {
       this.$router.push('/index/earningsDetail?type=getRevenueCurDay')
       this.loading2 = true
       request
-        .post('http://192.168.3.52:7099/franchisee/revenue/getRevenueCurDay')
+        .post(host + 'franchisee/revenue/getRevenueCurDay')
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'
@@ -657,7 +658,7 @@ export default {
       this.$router.push('/index/earningsDetail?type=getRevenueCurWeek')
       this.loading2 = true
       request
-        .post('http://192.168.3.52:7099/franchisee/revenue/getRevenueCurWeek')
+        .post(host + 'franchisee/revenue/getRevenueCurWeek')
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'
@@ -710,7 +711,7 @@ export default {
         // loading打开
         that.loading2 = true
         request
-          .post('http://192.168.3.52:7099/franchisee/revenue/' + type + '?page=' + e.target.innerHTML)
+          .post(host + 'franchisee/revenue/' + type + '?page=' + e.target.innerHTML)
           .send({
             'franchiseeId': '123456',
             'userId': 'admin',
@@ -737,7 +738,7 @@ export default {
         return
       } else {
         request
-          .post('http://192.168.3.52:7099/franchisee/revenue/' + type)
+          .post(host + 'franchisee/revenue/' + type)
           .send({
             'franchiseeId': '123456',
             'userId': 'admin'
@@ -771,7 +772,7 @@ export default {
         console.log(startTime, endTime)
         this.loading2 = true
         request
-          .post('http://192.168.3.52:7099/franchisee/revenue/getRevenueDefine')
+          .post(host + 'franchisee/revenue/getRevenueDefine')
           .send({
             "account": {
               'franchiseeId': '123456',
@@ -820,7 +821,7 @@ export default {
     },
     getCityList () {
       request
-        .post('http://192.168.3.52:7099/franchisee/franchiseeManager/getFranchiseeCity')
+        .post(host + 'franchisee/franchiseeManager/getFranchiseeCity')
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'

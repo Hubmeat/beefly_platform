@@ -214,6 +214,7 @@ import request from 'superagent'
 import highChart from '../../../components/highChart.vue'
 import { siblings } from '../../../../utils/index.js'
 import moment from 'moment'
+import { host } from '../../../config/index.js'
 export default {
   data () {
     return {
@@ -415,7 +416,7 @@ export default {
     },
     getCityList () {
       request
-        .post('http://192.168.3.52:7099/franchisee/franchiseeManager/getFranchiseeCity')
+        .post(host + 'franchisee/franchiseeManager/getFranchiseeCity')
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'

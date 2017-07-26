@@ -56,6 +56,7 @@ import $ from 'jquery'
 // import Vue from 'vue'
 require('../../../assets/lib/js/jquery.pagination.js')
 import '../../../assets/css/pagination.css'
+import { host } from '../../../config/index.js'
 export default {
   data () {
     return {

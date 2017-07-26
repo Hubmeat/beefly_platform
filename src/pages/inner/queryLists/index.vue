@@ -127,6 +127,7 @@ import request from 'superagent'
 import moment from 'moment'
 import '../../../assets/css/pagination.css'
 require('../../../assets/lib/js/jquery.pagination.js')
+import { host } from '../../../config/index.js'
 export default {
   data () {
     return {
@@ -145,7 +146,7 @@ export default {
         return
       } else if (flag === true) {
         request
-          .post('http://192.168.3.52:7099/franchisee/report/consume/' + this.$route.query.type)
+          .post(host + 'franchisee/report/consume/' + this.$route.query.type)
           .send({
             'franchiseeId': '123456',
             'userId': 'admin'
@@ -190,7 +191,7 @@ export default {
     },
     getDateMount () {
       request
-        .post('http://192.168.3.52:7099/franchisee/report/consume/day')
+        .post(host + 'franchisee/report/consume/day')
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'
@@ -243,7 +244,7 @@ export default {
         console.log(type)
         var that = this
           request
-            .post('http://192.168.3.52:7099/franchisee/report/consume/userDefine')
+            .post(host + 'franchisee/report/consume/userDefine')
             .send({
               'franchiseeId': '123456',
               'userId': 'admin',

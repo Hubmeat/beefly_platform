@@ -1,7 +1,10 @@
 <template>
   <div style="position: relative;">
-      <div v-title>报表管理-消费数据-统计图</div>
-      <p class="my_noDate" style="position: absolute; min-height:40px; height: 40px;" v-show="noData">暂无数据</p>
+      <div v-title>报表管理-消费数据-走势图</div>
+      <div class="my_noDate" style="position: absolute; min-height:40px; height: 40px;" v-show="noData">
+        <img src="../assets/img/1.png" />
+        <p>暂无数据</p>
+      </div>
       <div id="container" style="position: relative;"></div>
   </div>
 </template>
@@ -11,6 +14,7 @@
   var Highcharts = require('highcharts')
   // 在 Highcharts 加载之后加载功能模块
   require('highcharts/modules/exporting')(Highcharts)
+  import { host } from '../config/index.js'
   export default {
     data () {
       return {
@@ -21,7 +25,7 @@
     },
     mounted: function () {
       request
-        .post('http://192.168.3.52:7099/franchisee/report/get24HourTrend?type=' + this.$route.query.type)
+        .post(host + 'franchisee/report/get24HourTrend?type=' + this.$route.query.type)
         .send({
           "account": {
             'franchiseeId': '123456',
@@ -131,7 +135,7 @@
       },
       dataUpdate () {
         request
-          .post('http://192.168.3.52:7099/franchisee/report/get24HourTrend?type=' + this.$route.query.type)
+          .post(host + 'franchisee/report/get24HourTrend?type=' + this.$route.query.type)
           .send({
             "account": {
               'franchiseeId': '123456',
@@ -151,6 +155,7 @@
                 return
               } else {
                 var data = JSON.parse(res.text)
+                this.noData = false
                 this.getChartByRoute(data)
                 this.initHighCharDate()
               }
@@ -162,6 +167,11 @@
       }
     },
     beforeUpdate () {
+      if (this.moneyList === '') {
+        this.noData = true
+      } else {
+        this.noData = false
+      }
       this.dataUpdate()
     },
     watch: {

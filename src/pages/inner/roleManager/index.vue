@@ -118,6 +118,7 @@ import $ from 'jquery'
 require('../../../assets/lib/js/jquery.pagination.js')
 import '../../../assets/css/pagination.css'
 import request from 'superagent'
+import { host } from '../../../config/index.js'
 export default {
   data () {
     var validateRoleName = (rule, value, callback) => {
@@ -337,7 +338,7 @@ export default {
     queryRole () {
       var that = this
       if(this.roleName.trim().length!==0){
-        request.post('http://192.168.3.52:7099/franchisee/account/queryRole')
+        request.post(host + 'franchisee/account/queryRole')
           .send({
             roleName: this.roleName.trim(),
             belong:0
@@ -374,7 +375,7 @@ export default {
         return {code: item}
       })
       request
-        .post('http://192.168.3.52:7099/franchisee/account/updateRole')
+        .post(host + 'franchisee/account/updateRole')
         .send({
           oldRole: {
             id: that.editForm.id
@@ -418,7 +419,7 @@ export default {
         }).then(() => {
           this.loading = true
           request
-            .post('http://192.168.3.52:7099/franchisee/account/delRole')
+            .post(host + 'franchisee/account/delRole')
             .send({
               id: scope.row.id,
               roleType: scope.row.roleType,
@@ -465,7 +466,7 @@ export default {
           if(valid){
               this.dialogFormVisible = false
               request
-                .post('http://192.168.3.52:7099/franchisee/account/addRole')
+                .post(host + 'franchisee/account/addRole')
                 .send({
                   des: that.form.des,
                   roleName: that.form.roleName,
@@ -484,7 +485,7 @@ export default {
                       })
                       // 
                        request
-                        .post('http://192.168.3.52:7099/franchisee/account/getRole')
+                        .post(host + 'franchisee/account/getRole')
                         .end(function(err,res){
                           if(err){
                             console.log(err)
@@ -539,7 +540,7 @@ export default {
   mounted () {
     var that = this
     request
-     .post('http://192.168.3.52:7099/franchisee/account/getRole')
+     .post(host + 'franchisee/account/getRole')
      .end((err, res) => {
        if (err) {
          console.log(err)

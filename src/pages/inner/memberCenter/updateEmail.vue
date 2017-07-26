@@ -167,6 +167,7 @@
 <script>
 import {isEmail} from '../../../../utils/index.js'
 import request from 'superagent'
+import { host } from '../../../config/index.js'
 export default {
   data () {
     var validateMail = (rule, value, callback) => {
@@ -208,7 +209,7 @@ export default {
               confirmButtonText: '我知道了',
               callback: function (action) {
                 that.loading = true
-                request.post('http://192.168.3.52:7099/franchisee/account/updateEmail4Admin')
+                request.post(host + 'franchisee/account/updateEmail4Admin')
                 .send({id:1123339, email: that.ruleForm.maiAccount,pwd: that.ruleForm.account_password})
                 .end((err, res) => {
                   if (err) {
