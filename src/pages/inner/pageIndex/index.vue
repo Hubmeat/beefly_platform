@@ -3,7 +3,7 @@
     <div class="incomming module">
       <el-row>
         <el-col class="incomeTitle">
-          <span class="title">今日营收<small>每10分钟自动刷新数据</small></span><span class="detail_right">&gt;&gt;</span>
+          <span class="title">今日营收<small>每10分钟自动刷新数据</small></span><span @click="handlePush" class="detail_right">&gt;&gt;</span>
         </el-col>
         <el-col>
           <incomingVueChart></incomingVueChart>
@@ -68,7 +68,6 @@ div.module {
 }
 div.incomming{
   background: #fff;
-  // border: 1px solid #e7ecf1;
   margin-right: 20px;
 }
 div.incomming div.incomeTitle{margin-bottom: 20px}
@@ -89,7 +88,6 @@ div.statuAndData {
   padding: 20px 15px 20px 15px;
   background: #fff;
   margin-right: 20px;
-  // border: 1px solid #e7ecf1;
   border-bottom: none;
   margin-bottom:20px;
 }
@@ -190,8 +188,6 @@ div.mapHeader_content {
   padding: 20px 20px 0 20px;
   background: #fff;
   margin-right: 20px;
-  // border-left: 1px solid #e7ecf1;
-  // border-right: 1px solid #e7ecf1;
 }
 
 div.mapTitle {
