@@ -165,6 +165,7 @@ import $ from 'jquery'
 // import Vue from 'vue'
 require('../../../assets/lib/js/jquery.pagination.js')
 import '../../../assets/css/pagination.css'
+import { host } from '../../../config/index.js'
 export default {
   data: function () {
     return {
@@ -236,7 +237,7 @@ export default {
       }
       this.timer = setTimeout(function () {
         request
-          .post('http://192.168.3.52:7099/franchisee/franchiseeManager/' + type + '?page=' + e.target.innerHTML)
+          .post(host + 'franchisee/franchiseeManager/' + type + '?page=' + e.target.innerHTML)
           .send({
             'franchiseeId': '123456',
             'userId': 'admin',
@@ -265,7 +266,7 @@ export default {
       this.timer2 = setTimeout(function () {
         console.log('this is city')
         request
-          .post('http://192.168.3.52:7099/franchisee/franchiseeManager/getAllotBikes')
+          .post(host + 'franchisee/franchiseeManager/getAllotBikes')
           .send({
             'franchiseeId': '123456',
             'userId': 'admin',
@@ -332,7 +333,7 @@ export default {
         // 根据用户选择不同状态进行数据的筛选
         var radio = this.checkList
         request
-          .post('http://192.168.3.52:7099/franchisee/bikeManager/queryBikes')
+          .post(host + 'franchisee/bikeManager/queryBikes')
           .send({
             'start': startTime?startTime:null,
             'end': endTime?endTime:null,
@@ -387,7 +388,7 @@ export default {
     },
     getDateByTabName (type) {
       request
-        .post('http://192.168.3.52:7099/franchisee/franchiseeManager/' + type)
+        .post(host + 'franchisee/franchiseeManager/' + type)
         .send({
           'franchiseeId': '123456',
           'userId': 'admin',
@@ -444,7 +445,7 @@ export default {
     },
     getCityList () {
       request
-        .post('http://192.168.3.52:7099/franchisee/franchiseeManager/getFranchiseeCity')
+        .post(host + 'franchiseeManager/getFranchiseeCity')
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'

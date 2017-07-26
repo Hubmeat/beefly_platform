@@ -124,6 +124,7 @@
       
 <script>
 import request from 'superagent'
+import { host } from '../../../config/index.js'
 export default {
   data () {
     var validatePass = (rule, value, callback) => {
@@ -175,7 +176,7 @@ export default {
         .then(() => {
           that.loading = true
           setTimeout(() => {
-            request.post('http://192.168.3.52:7099/franchisee/userCenter/modifyPwd')
+            request.post(host + 'franchisee/userCenter/modifyPwd')
               .send({id:50, oldPwd: this.ruleForm.pass, newPwd: this.ruleForm.checkPass})
               .end((err, res) => {
                 if (err) {

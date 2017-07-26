@@ -166,6 +166,7 @@
       
 <script>
 import {isEmail} from '../../../../utils/index.js'
+import { host } from '../../../config/index.js'
 import request from 'superagent'
 export default {
   data () {
@@ -208,7 +209,7 @@ export default {
               confirmButtonText: '我知道了',
               callback: function (action) {
                 that.loading = true
-                request.post('http://192.168.3.52:7099/franchisee/userCenter/bindingEmail')
+                request.post(host + 'franchisee/userCenter/bindingEmail')
                 .send({id:1123339, email: that.ruleForm.maiAccount, password: that.ruleForm.account_password})
                 .end((err, res) => {
                   if (err) {

@@ -146,6 +146,7 @@
   import moment from 'moment'
   import request from 'superagent'
   import {siblings, checkPositiveNumber} from '../../../../utils/index.js'
+  import { host } from '../../../config/index.js'
   export default {
     data: function () {
       return {
@@ -177,7 +178,7 @@
         var that = this
         this.tabTitle = event.target.innerText
          if(this.tabTitle === '平台') {
-          request.post('http://192.168.3.52:7099/franchisee/log/allLog')
+          request.post(host + 'franchisee/log/allLog')
           .send({
             franchiseeId: '123456',
             userId: 'jjjj'
@@ -240,7 +241,7 @@
             }
           })
         }else {
-          request.post('http://192.168.3.52:7099/franchisee/log/getLoginLog')
+          request.post(host + 'franchisee/log/getLoginLog')
           .send({
             franchiseeId: '123456',
             userId: 'jjjj'
@@ -308,7 +309,7 @@
     mounted: function () {
       var that = this
       if(this.tabTitle === '平台') {
-         request.post('http://192.168.3.52:7099/franchisee/log/allLog')
+         request.post(host + 'franchisee/log/allLog')
         .send({
           franchiseeId: '123456',
           userId: 'jjjj'
@@ -376,7 +377,7 @@
       plat_currentPage: {
         handler: function (val, oldVal) {
           var that = this
-          request.post('http://192.168.3.52:7099/franchisee/log/allLog?page=' + that.plat_currentPage)
+          request.post(host + 'franchisee/log/allLog?page=' + that.plat_currentPage)
             .send({
               franchiseeId: '123456',
               userId: 'jjjj'
@@ -394,7 +395,7 @@
       join_currentPage: {
         handler: function (val, oldVal) {
           var that = this
-          request.post('http://192.168.3.52:7099/franchisee/log/getLoginLog?page=' + that.join_currentPage)
+          request.post(host + 'franchisee/log/getLoginLog?page=' + that.join_currentPage)
             .send({
               franchiseeId: '123456',
               userId: 'jjjj'

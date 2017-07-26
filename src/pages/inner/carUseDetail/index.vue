@@ -125,6 +125,7 @@ import moment from 'moment'
 import request from 'superagent'
 require('../../../assets/lib/js/jquery.pagination.js')
 import '../../../assets/css/pagination.css'
+import { host } from '../../../config/index.js'
 export default {
   data: function () {
     return {
@@ -151,7 +152,7 @@ export default {
   methods: {
     getBikeEarnings (page) {
       request
-        .post('http://192.168.3.52:7099/franchisee/bikeManager/bikeRevenueRecord?page=' + page)
+        .post(host + 'franchisee/bikeManager/bikeRevenueRecord?page=' + page)
         .send({
           'franchiseeId': '123456',
           'userId': 'admin',
@@ -194,7 +195,7 @@ export default {
     },
     // getReplaceBatteryRecord (page) {
     //   request
-    //     .post('http://192.168.3.52:7099/franchisee/bikeManager/replaceBatteryRecord?page=' + page)
+    //     .post(host + 'franchisee/bikeManager/replaceBatteryRecord?page=' + page)
     //     .send({
     //       'franchiseeId': '123456',
     //       'userId': 'admin',
@@ -237,7 +238,7 @@ export default {
     // },
     // getRepareRecord (page) {
     //   request
-    //     .post('http://192.168.3.52:7099/franchisee/bikeManager/mendRecord?page=' + page)
+    //     .post(host + 'franchisee/bikeManager/mendRecord?page=' + page)
     //     .send({
     //       'franchiseeId': '123456',
     //       'userId': 'admin',

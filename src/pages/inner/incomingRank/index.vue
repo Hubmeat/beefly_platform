@@ -24,6 +24,7 @@
 // import $ from 'jquery'
 import { siblings } from '../../../../utils/index.js'
 import moment from 'moment'
+import { host } from '../../../config/index.js'
 export default {
   data: function () {
     return {

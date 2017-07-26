@@ -230,6 +230,7 @@ import moment from 'moment'
 require('../../../assets/lib/js/Blob.js')
 import '../../../assets/css/pagination.css'
 require('../../../assets/lib/js/jquery.pagination.js')
+import { host } from '../../../config/index.js'
 export default {
   data () {
     return {
@@ -275,7 +276,7 @@ export default {
     // console.log(this.$route.query)
     this.$router.push('/index/earningsDetail?type=getAllRevenue')
     request
-      .post('http://192.168.3.52:7099/franchisee/revenue/getAllRevenue')
+      .post(host + 'franchisee/revenue/getAllRevenue')
       .send({
         'franchiseeId': '123456',
         'userId': 'admin'
@@ -401,7 +402,7 @@ export default {
     getMonthDate () {
       this.$router.push('/index/earningsDetail?type=getRevenueCurMonth')
       request
-        .post('http://192.168.3.52:7099/franchisee/revenue/getRevenueCurMonth')
+        .post(host + 'franchisee/revenue/getRevenueCurMonth')
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'
@@ -432,7 +433,7 @@ export default {
     getDailyDate () {
       this.$router.push('/index/earningsDetail?type=getRevenueCurDay')
       request
-        .post('http://192.168.3.52:7099/franchisee/revenue/getRevenueCurDay')
+        .post(host + 'franchisee/revenue/getRevenueCurDay')
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'
@@ -482,7 +483,7 @@ export default {
       var type = this.$route.query.type
       this.timer = setTimeout(function () {
         request
-          .post('http://192.168.3.52:7099/franchisee/revenue/' + type + '?page=' + e.target.innerHTML)
+          .post(host + 'franchisee/revenue/' + type + '?page=' + e.target.innerHTML)
           .send({
             'franchiseeId': '123456',
             'userId': 'admin'
@@ -503,7 +504,7 @@ export default {
     dataUpdate () {
       var type = this.$route.query.type
       request
-        .post('http://192.168.3.52:7099/franchisee/revenue/' + type)
+        .post(host + 'franchisee/revenue/' + type)
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'

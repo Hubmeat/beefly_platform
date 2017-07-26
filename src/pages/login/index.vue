@@ -64,6 +64,7 @@
   import request from 'superagent'
   import $ from 'jquery'
   import {checkMobile, IsEmpty} from '../../../utils/index.js'
+  import { host } from '../../config/index.js'
   export default {
     data () {
       var validateTel = (rule, value, callback) => {
@@ -160,7 +161,7 @@
           var initTime = 60
           if(checkMobile(val)){
             // 像后台发送 手机号，确认手机号是否已经注册，如果注册 则 发送验证码，否则返回 该手机号未注册
-            request.post('http://192.168.3.52:7099/franchisee/account/checkPhone')
+            request.post(host + 'franchisee/account/checkPhone')
             .send({
               phoneNo:this.findForm.tel
             })
@@ -191,7 +192,7 @@
                       type: 'success'
                     })
                   },1000)
-                  request.post('http://192.168.3.52:7099/franchisee/userCenter/getVerCode')
+                  request.post(host + 'franchisee/userCenter/getVerCode')
                     .send({
                       mobileNo: that.findForm.tel
                     })
@@ -224,7 +225,7 @@
           })
         } else {
             request
-              .post('http://192.168.3.52:7099/franchisee/franchiseeLogin')
+              .post(host + 'franchisee/franchiseeLogin')
               .send({ 
                 'name': this.formLabelAlign.username,
                 'password': this.formLabelAlign.password })
@@ -261,7 +262,7 @@
         this.$refs.findPsd.validate((valid) => {
           if (valid) {
             // 这里 还需要 对验证码进行验证 若验证 通过 则可以 找回密码
-            request.post('http://192.168.3.52:7099/franchisee/account/checkPhoneAndVerCode')
+            request.post(host + 'franchisee/account/checkPhoneAndVerCode')
             .send({
                 phoneNo: that.findForm.tel,
               	verCode: that.findForm.verificationCode
@@ -294,7 +295,7 @@
           var that = this
           if (valid) {
             // 像服务器发送 重置密码的请求
-            request.post('http://192.168.3.52:7099/franchisee/account/resetPwd')
+            request.post(host + 'franchisee/account/resetPwd')
             .send({
               	password: that.resetForm.pass
             })

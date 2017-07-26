@@ -135,6 +135,7 @@
 import {checkMobile, IsEmpty} from '../../../../utils/index.js'
 import $ from 'jquery'
 import request from 'superagent'
+import { host } from '../../../config/index.js'
 export default {
   data () {
     var validateTel = (rule, value, callback) => {
@@ -212,7 +213,7 @@ export default {
               type: 'success'
             })
           },1000)
-          request.post('http://192.168.3.52:7099/franchisee/userCenter/getVerCode')
+          request.post(host + 'franchisee/userCenter/getVerCode')
             .send({
               mobileNo: this.ruleForm.tel
             })
@@ -236,7 +237,7 @@ export default {
           })
         .then(() => {
           that.loading = true
-          request.post('http://192.168.3.52:7099/franchisee/account/updatePhone4Admin')
+          request.post(host + 'franchisee/account/updatePhone4Admin')
               .send({
                 	id:1123339,
                   phoneNo: that.ruleForm.tel,

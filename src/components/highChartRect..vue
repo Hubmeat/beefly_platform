@@ -1,8 +1,11 @@
 <template>
   <div style="position: relative;">
       <div v-title>报表管理-消费数据-统计图</div>
-      <p class="my_noDate" style="position: absolute; min-height:40px; height: 40px;" v-show="noData">暂无数据</p>
-      <div id="container"></div>
+      <div class="my_noDate" style="position: absolute; min-height:40px; height: 40px;" v-show="noData">
+        <img src="../assets/img/2.png" />
+        <p>暂无数据</p>
+      </div>
+      <div id="container" style="position: relative;"></div>
   </div>
 </template>
 <script>
@@ -11,6 +14,7 @@
   require('highcharts/modules/exporting')(Highcharts)
   import request from 'superagent'
   import moment from 'moment'
+  import { host } from '../config/index.js'
   // import Vue from 'vue'
   export default {
     data () {
@@ -26,7 +30,7 @@
       console.log(this.$store.state.consumeData.length)
       if (this.$store.state.consumeData.length === 0) {
         request
-          .post('http://192.168.3.52:7099/franchisee/report/consume/day')
+          .post(host + 'franchisee/report/consume/day')
           .send({
             'franchiseeId': '123456',
             'userId': 'admin'
@@ -172,7 +176,7 @@
           return
         } else if (flag === true) {
           request
-            .post('http://192.168.3.52:7099/franchisee/report/consume/' + this.$route.query.type)
+            .post(host + 'franchisee/report/consume/' + this.$route.query.type)
             .send({
               'franchiseeId': '123456',
               'userId': 'admin'
@@ -224,7 +228,7 @@
           }
           console.log(type)
             request
-              .post('http://192.168.3.52:7099/franchisee/report/consume/userDefine')
+              .post(host + 'franchisee/report/consume/userDefine')
               .send({
                 'franchiseeId': '123456',
                 'userId': 'admin',
@@ -264,6 +268,9 @@
     },
     beforeMount () {
       this.time()
+      if (this.consumeMoney.length === 0) {
+        this.noData = true
+      }
     },
     watch: {
       '$route': 'dataUpdate',
@@ -277,7 +284,19 @@
     width: 100%;
     text-align: center;
     font-size: 22px;
-    color: #f60;
+    color: rgba(243, 243, 245, 1);
+    position: relative;
+    text-align: center;
     /* left: 50%; */
+  }
+
+  .my_noDate img {
+    display: inline-block;
+    width: 500px;
+    height: 200px;
+  }
+
+  .my_noDate p {
+    color: #ccc;
   }
 </style>
