@@ -876,9 +876,9 @@ export default {
         })
     }
   },
-  created () {
-    this.dataUpdate()
-  },
+  // created () {
+  //   this.dataUpdate()
+  // },
   beforeMount () {
     this.$router.push('/index/earningsDetail?type=getRevenueCurDay')
   },

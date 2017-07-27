@@ -238,7 +238,10 @@ export default {
       this.timer = setTimeout(function () {
         request
           .post(host + 'franchisee/franchiseeManager/' + type + '?page=' + e.target.innerHTML)
-          .set('header','application/x-www-form-urlencoded')
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
           .send({
             'franchiseeId': '123456',
             'userId': 'admin',
@@ -271,7 +274,10 @@ export default {
         console.log('this is city')
         request
           .post(host + 'franchisee/franchiseeManager/getAllotBikes')
-          .set('header','application/x-www-form-urlencoded')
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
           .send({
             'franchiseeId': '123456',
             'userId': 'admin',
@@ -339,7 +345,10 @@ export default {
         var radio = this.checkList
         request
           .post(host + 'franchisee/bikeManager/queryBikes')
-          .set('header','application/x-www-form-urlencoded')
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
           .send({
             'start': startTime?startTime:null,
             'end': endTime?endTime:null,
@@ -383,7 +392,6 @@ export default {
       e.target.setAttribute('class', 'active')
     },
     getTabName (tab, event) {
-      console.log(this.activeName)
       if (this.activeName === '未分配') {
         this.getDateByTabName('getNotAllotBikes')
         this.checkList = []
@@ -395,7 +403,10 @@ export default {
     getDateByTabName (type) {
       request
         .post(host + 'franchisee/franchiseeManager/' + type)
-        .set('header','application/x-www-form-urlencoded')
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
         .send({
           'franchiseeId': '123456',
           'userId': 'admin',
@@ -406,8 +417,6 @@ export default {
           if (error) {
             console.log('error:', error)
           } else {
-            console.log(res)
-            console.log((JSON.parse(res.text)).totalPage)
             var data = (JSON.parse(res.text)).list
             this.pagetotal = (JSON.parse(res.text)).totalPage
             var newData = this.tableDataDel(data)
@@ -475,7 +484,19 @@ export default {
   //   this.searchByTimeline()
   // },
   watch: {
-    'checkList': 'searchByTimeline'
+    'checkList': {
+        handler:(val,oldVal) => {
+          console.log(this.default.data)
+          console.log(this.default.data.checkList)
+          // if (this.checkList === '') {
+          //   console.log(this.checkList)
+          //   console.log(this.checkList.length)
+          //   console.log('this is checklist by watch')
+          // } else {
+          //   this.searchByTimeline()
+          // }
+        }
+    }
   }
 }
 </script>
