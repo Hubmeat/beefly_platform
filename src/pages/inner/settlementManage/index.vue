@@ -171,6 +171,10 @@ export default {
       this.timer = setTimeout(function () {
         request
           .post(host + 'franchisee/withdrawal/' + type + '?page=' + e.target.innerHTML)
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
           .send({
             'franchiseeId': '123456',
             'userId': 'admin',
@@ -224,6 +228,10 @@ export default {
       }
       request
         .post(host + 'franchisee/withdrawal/' + type)
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
         .send({
           'franchiseeId': '123456',
           'userId': 'admin',
@@ -265,6 +273,10 @@ export default {
     getCityList () {
       request
         .post(host + 'franchisee/franchiseeManager/getFranchiseeCity')
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'
@@ -290,6 +302,10 @@ export default {
       this.loading2 = true
       request
         .post(host + 'franchisee/withdrawal/' + type)
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'
@@ -367,6 +383,10 @@ export default {
         callback: () => {
         request
           .post(host + 'franchisee/withdrawal/confirmWithdrawal')
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
           .send({
             'franchiseeId': '123456',
             'userId': 'admin',

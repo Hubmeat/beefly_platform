@@ -179,6 +179,10 @@
         this.tabTitle = event.target.innerText
          if(this.tabTitle === '平台') {
           request.post(host + 'franchisee/log/allLog')
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
           .send({
             franchiseeId: '123456',
             userId: 'jjjj'
@@ -242,6 +246,10 @@
           })
         }else {
           request.post(host + 'franchisee/log/getLoginLog')
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
           .send({
             franchiseeId: '123456',
             userId: 'jjjj'
@@ -309,7 +317,11 @@
     mounted: function () {
       var that = this
       if(this.tabTitle === '平台') {
-         request.post(host + 'franchisee/log/allLog')
+      request.post(host + 'franchisee/log/allLog')
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
         .send({
           franchiseeId: '123456',
           userId: 'jjjj'
@@ -378,6 +390,10 @@
         handler: function (val, oldVal) {
           var that = this
           request.post(host + 'franchisee/log/allLog?page=' + that.plat_currentPage)
+            .withCredentials()
+            .set({
+              'content-type': 'application/x-www-form-urlencoded'
+            })
             .send({
               franchiseeId: '123456',
               userId: 'jjjj'
@@ -396,6 +412,10 @@
         handler: function (val, oldVal) {
           var that = this
           request.post(host + 'franchisee/log/getLoginLog?page=' + that.join_currentPage)
+            .withCredentials()
+            .set({
+              'content-type': 'application/x-www-form-urlencoded'
+            })
             .send({
               franchiseeId: '123456',
               userId: 'jjjj'

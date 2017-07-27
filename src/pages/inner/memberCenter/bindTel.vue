@@ -215,6 +215,10 @@ export default {
           },1000)
          
           request.post(host + 'franchisee/userCenter/getVerCode')
+            .withCredentials()
+            .set({
+              'content-type': 'application/x-www-form-urlencoded'
+            })
             .send({
               mobileNo: this.ruleForm.tel
             })
@@ -239,6 +243,10 @@ export default {
         .then(() => {
           that.loading = true
           request.post(host + 'franchisee/userCenter/bindingPhone')
+              .withCredentials()
+              .set({
+                'content-type': 'application/x-www-form-urlencoded'
+              })
               .send({
                 phoneNo: that.ruleForm.tel,
                 verCode: that.ruleForm.verCode,

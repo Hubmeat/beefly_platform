@@ -417,6 +417,10 @@ export default {
     getCityList () {
       request
         .post(host + 'franchisee/franchiseeManager/getFranchiseeCity')
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'

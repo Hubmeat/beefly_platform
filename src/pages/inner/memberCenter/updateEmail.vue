@@ -210,6 +210,10 @@ export default {
               callback: function (action) {
                 that.loading = true
                 request.post(host + 'franchisee/account/updateEmail4Admin')
+                .withCredentials()
+                .set({
+                  'content-type': 'application/x-www-form-urlencoded'
+                })
                 .send({id:1123339, email: that.ruleForm.maiAccount,pwd: that.ruleForm.account_password})
                 .end((err, res) => {
                   if (err) {

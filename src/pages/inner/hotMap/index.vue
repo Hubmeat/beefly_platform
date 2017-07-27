@@ -396,6 +396,10 @@ export default {
     mountedWay () {
       request
         .post(host + 'franchisee/report/hot/curHour')
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
         .send({
           'franchiseeId': '123456',
           'userId': 'admin',
@@ -646,6 +650,10 @@ export default {
         console.log(startTime, endTime)
         request
           .post(host + 'franchisee/report/hot/defineTime')
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
           .send({
             "account": {
               'franchiseeId': '123456',
@@ -684,6 +692,10 @@ export default {
     requestWay(type) {
       request
         .post(host + 'franchisee/report/hot/' + type)
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
         .send({
           "account": {
             'franchiseeId': '123456',
@@ -714,6 +726,10 @@ export default {
     getCityList () {
       request
         .post(host + 'franchisee/franchiseeManager/getFranchiseeCity')
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'

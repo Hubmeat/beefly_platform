@@ -444,6 +444,10 @@ export default {
   mounted() {
     request
       .post('http://192.168.3.52:7099/franchisee/franchiseeManager/getPartners')
+      .withCredentials()
+      .set({
+        'content-type': 'application/x-www-form-urlencoded'
+      })
       .send({
         'franchiseeId': '123456',
         'userId': 'admin'
@@ -501,6 +505,10 @@ export default {
       this.timer = setTimeout(function () {
         request
           .post('http://192.168.3.52:7099/franchisee/franchiseeManager/getPartners?page=' + e.target.innerHTML)
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
           .send({
             'franchiseeId': '123456',
             'userId': 'admin'
@@ -527,6 +535,10 @@ export default {
       }).then(() => {
         request
           .post('http://192.168.3.52:7099/franchisee/partner/delPartner')
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
           .send({
             'franchiseeId': '123456',
             'userId': 'admin',
@@ -603,6 +615,10 @@ export default {
         console.log(this.value)
           request
             .post('http://192.168.3.52:7099/franchisee/partner/queryPartner？type=' + this.value)
+            .withCredentials()
+            .set({
+              'content-type': 'application/x-www-form-urlencoded'
+            })
             .send({
               'franchiseeId': '123456',
               'userId': 'admin',

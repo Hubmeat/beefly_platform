@@ -368,6 +368,10 @@ export default {
     this.loading2 = true
     request
       .post(host + 'franchisee/revenue/getRevenueCurDay')
+      .withCredentials()
+      .set({
+        'content-type': 'application/x-www-form-urlencoded'
+      })
       .send({
         'franchiseeId': '123456',
         'userId': 'admin'
@@ -423,6 +427,10 @@ export default {
       that.timer2 = setTimeout(function () {
         request
           .post(host + 'franchisee/revenue/' + type)
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
           .send({
             'franchiseeId': '123456',
             'userId': 'admin',
@@ -522,6 +530,10 @@ export default {
             }
             request
               .post(host + 'franchisee/revenue/exportRevenueData?type=' + newType)
+              .withCredentials()
+              .set({
+                'content-type': 'application/x-www-form-urlencoded'
+              })
               .send({
                 'account': {
                   'franchiseeId': '123456',
@@ -588,6 +600,10 @@ export default {
       this.loading2 = true
       request
         .post(host + 'franchisee/revenue/getRevenueCurMonth')
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'
@@ -626,6 +642,10 @@ export default {
       this.loading2 = true
       request
         .post(host + 'franchisee/revenue/getRevenueCurDay')
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'
@@ -659,6 +679,10 @@ export default {
       this.loading2 = true
       request
         .post(host + 'franchisee/revenue/getRevenueCurWeek')
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'
@@ -712,6 +736,10 @@ export default {
         that.loading2 = true
         request
           .post(host + 'franchisee/revenue/' + type + '?page=' + e.target.innerHTML)
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
           .send({
             'franchiseeId': '123456',
             'userId': 'admin',
@@ -739,6 +767,10 @@ export default {
       } else {
         request
           .post(host + 'franchisee/revenue/' + type)
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
           .send({
             'franchiseeId': '123456',
             'userId': 'admin'
@@ -773,6 +805,10 @@ export default {
         this.loading2 = true
         request
           .post(host + 'franchisee/revenue/getRevenueDefine')
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
           .send({
             "account": {
               'franchiseeId': '123456',
@@ -822,6 +858,10 @@ export default {
     getCityList () {
       request
         .post(host + 'franchisee/franchiseeManager/getFranchiseeCity')
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'

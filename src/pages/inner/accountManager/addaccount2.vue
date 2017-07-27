@@ -193,6 +193,10 @@ export default {
           })
         .then(() => {
           request.post(host + 'franchisee/account/addAccountByAdmin')
+            .withCredentials()
+            .set({
+              'content-type': 'application/x-www-form-urlencoded'
+            })
             .send( {
                 state: 0,
                 role: roleType,

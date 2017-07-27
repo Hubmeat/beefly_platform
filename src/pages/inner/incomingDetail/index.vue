@@ -277,6 +277,10 @@ export default {
     this.$router.push('/index/earningsDetail?type=getAllRevenue')
     request
       .post(host + 'franchisee/revenue/getAllRevenue')
+      .withCredentials()
+      .set({
+        'content-type': 'application/x-www-form-urlencoded'
+      })
       .send({
         'franchiseeId': '123456',
         'userId': 'admin'
@@ -403,6 +407,10 @@ export default {
       this.$router.push('/index/earningsDetail?type=getRevenueCurMonth')
       request
         .post(host + 'franchisee/revenue/getRevenueCurMonth')
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'
@@ -434,6 +442,14 @@ export default {
       this.$router.push('/index/earningsDetail?type=getRevenueCurDay')
       request
         .post(host + 'franchisee/revenue/getRevenueCurDay')
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'
@@ -484,6 +500,10 @@ export default {
       this.timer = setTimeout(function () {
         request
           .post(host + 'franchisee/revenue/' + type + '?page=' + e.target.innerHTML)
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
           .send({
             'franchiseeId': '123456',
             'userId': 'admin'
@@ -505,6 +525,10 @@ export default {
       var type = this.$route.query.type
       request
         .post(host + 'franchisee/revenue/' + type)
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'

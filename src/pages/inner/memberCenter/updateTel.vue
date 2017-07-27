@@ -214,6 +214,10 @@ export default {
             })
           },1000)
           request.post(host + 'franchisee/userCenter/getVerCode')
+            .withCredentials()
+            .set({
+              'content-type': 'application/x-www-form-urlencoded'
+            })
             .send({
               mobileNo: this.ruleForm.tel
             })
@@ -238,6 +242,10 @@ export default {
         .then(() => {
           that.loading = true
           request.post(host + 'franchisee/account/updatePhone4Admin')
+              .withCredentials()
+              .set({
+                'content-type': 'application/x-www-form-urlencoded'
+              })
               .send({
                 	id:1123339,
                   phoneNo: that.ruleForm.tel,

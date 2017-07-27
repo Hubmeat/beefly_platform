@@ -26,6 +26,10 @@
     mounted: function () {
       request
         .post(host + 'franchisee/report/get24HourTrend?type=' + this.$route.query.type)
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
         .send({
           "account": {
             'franchiseeId': '123456',
@@ -136,6 +140,10 @@
       dataUpdate () {
         request
           .post(host + 'franchisee/report/get24HourTrend?type=' + this.$route.query.type)
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
           .send({
             "account": {
               'franchiseeId': '123456',

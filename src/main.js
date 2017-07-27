@@ -8,6 +8,16 @@ import './assets/font/iconfont.css'
 import router from './router/index.js'
 import store from './store/store'
 import Vuex from 'vuex'
+import axios from 'axios'
+
+
+Vue.prototype.$axios = axios
+
+axios.defaults.withCredentials = true
+
+var instance = axios.create({
+    headers: {'content-type': 'application/x-www-form-urlencoded'}
+});
 
 Vue.config.productionTip = false
 Vue.use(Element)

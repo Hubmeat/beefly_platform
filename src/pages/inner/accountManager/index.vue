@@ -339,8 +339,12 @@ export default {
         this.currentPage = 1
         type = 0
         if(name.length>0||phone.length>0) {
-          request.post(host + 'franchisee/account/queryAccount').
-          send({
+          request.post(host + 'franchisee/account/queryAccount')
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
+          .send({
             name: this.name.trim(),
             phone: this.phone.trim(),
             type:type
@@ -360,12 +364,16 @@ export default {
             }
           })
         }
-      }else {
+      } else {
         type =1
         this.currentPage = 1
         if(name.length>0||phone.length>0) {
-          request.post(host + 'franchisee/account/queryAccount').
-          send({
+          request.post(host + 'franchisee/account/queryAccount')
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
+          .send({
             name: this.name.trim(),
             phone: this.phone.trim(),
             type:type

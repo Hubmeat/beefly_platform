@@ -354,6 +354,10 @@ export default {
         var that = this
         request
         .post(host + 'franchisee/account/getRole')
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
         .end((err, res) => {
           if (err) {
             console.log(err)
@@ -392,6 +396,10 @@ export default {
       if(this.roleName.trim().length!==0){
         this.isQuery = true
         request.post(host + 'franchisee/account/queryRole')
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
           .send({
             roleName: this.roleName.trim()
           })
@@ -449,6 +457,10 @@ export default {
       })
       request
         .post('http://192.168.3.52:7099/franchisee/account/updateRole')
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
         .send({
           oldRole: {
             id: that.editForm.id
@@ -493,6 +505,10 @@ export default {
           this.loading = true
           request
             .post('http://192.168.3.52:7099/franchisee/account/delRole')
+            .withCredentials()
+            .set({
+              'content-type': 'application/x-www-form-urlencoded'
+            })
             .send({
               id: scope.row.id,
               roleType: scope.row.roleType,
@@ -540,6 +556,10 @@ export default {
               this.dialogFormVisible = false
               request
                 .post(host + 'franchisee/account/addRole')
+                .withCredentials()
+                .set({
+                  'content-type': 'application/x-www-form-urlencoded'
+                })
                 .send({
                   des: that.form.des,
                   roleName: that.form.roleName,
@@ -579,6 +599,10 @@ export default {
     var that = this
     request
      .post(host + 'franchisee/account/getRole')
+      .withCredentials()
+      .set({
+        'content-type': 'application/x-www-form-urlencoded'
+      })
      .end((err, res) => {
        if (err) {
          console.log(err)
@@ -618,6 +642,10 @@ export default {
           // 初始化查询
            request
             .post(host + 'franchisee/account/getRole?page=' + val)
+            .withCredentials()
+            .set({
+              'content-type': 'application/x-www-form-urlencoded'
+            })
             .end((err, res) => {
               if (err) {
                 console.log(err)
@@ -651,6 +679,10 @@ export default {
         }else {
           // 筛选查询
           request.post(host + 'franchisee/account/queryRole?page=' + val)
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
           .send({
             roleName: this.roleName.trim()
           })

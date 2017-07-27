@@ -153,6 +153,10 @@ export default {
     getBikeEarnings (page) {
       request
         .post(host + 'franchisee/bikeManager/bikeRevenueRecord?page=' + page)
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
         .send({
           'franchiseeId': '123456',
           'userId': 'admin',

@@ -177,6 +177,10 @@ export default {
           that.loading = true
           setTimeout(() => {
             request.post(host + 'franchisee/userCenter/modifyPwd')
+              .withCredentials()
+              .set({
+                'content-type': 'application/x-www-form-urlencoded'
+              })
               .send({id:50, oldPwd: this.ruleForm.pass, newPwd: this.ruleForm.checkPass})
               .end((err, res) => {
                 if (err) {

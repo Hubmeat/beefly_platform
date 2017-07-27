@@ -147,6 +147,10 @@ export default {
       } else if (flag === true) {
         request
           .post(host + 'franchisee/report/consume/' + this.$route.query.type)
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
           .send({
             'franchiseeId': '123456',
             'userId': 'admin'
@@ -192,6 +196,10 @@ export default {
     getDateMount () {
       request
         .post(host + 'franchisee/report/consume/day')
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'
@@ -245,6 +253,10 @@ export default {
         var that = this
           request
             .post(host + 'franchisee/report/consume/userDefine')
+            .withCredentials()
+            .set({
+              'content-type': 'application/x-www-form-urlencoded'
+            })
             .send({
               'franchiseeId': '123456',
               'userId': 'admin',

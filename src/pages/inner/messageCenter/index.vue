@@ -94,6 +94,10 @@ div.hasData{line-height: 60px;text-align: center;height: 60px;color:#9e9090;widt
     mounted: function () {
       var that = this
       request.post(host + 'franchisee/msg/getAllMsg')
+      .withCredentials()
+      .set({
+        'content-type': 'application/x-www-form-urlencoded'
+      })
       .send({
         franchiseeId: '123456',
         userId: 'jjjj'
@@ -162,6 +166,10 @@ div.hasData{line-height: 60px;text-align: center;height: 60px;color:#9e9090;widt
         handler: function (val, oldVal) {
           var that = this
           request.post(host + 'franchisee/msg/getAllMsg?page=' + that.msg_currentPage)
+            .withCredentials()
+            .set({
+              'content-type': 'application/x-www-form-urlencoded'
+            })
             .send({
               franchiseeId: '123456',
               userId: 'jjjj'
@@ -216,6 +224,10 @@ div.hasData{line-height: 60px;text-align: center;height: 60px;color:#9e9090;widt
             this.msgList.push({id:row.id})
             row.isRead=1
             request.post(host + 'franchisee/msg/read')
+              .withCredentials()
+              .set({
+                'content-type': 'application/x-www-form-urlencoded'
+              })
               .send({
                 list: this.msgList
               })
@@ -238,6 +250,10 @@ div.hasData{line-height: 60px;text-align: center;height: 60px;color:#9e9090;widt
         })
         this.tableData = newArr
         request.post(host + 'franchisee/msg/read')
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
           .send({
             list: newArr
           })

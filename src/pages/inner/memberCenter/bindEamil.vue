@@ -210,6 +210,10 @@ export default {
               callback: function (action) {
                 that.loading = true
                 request.post(host + 'franchisee/userCenter/bindingEmail')
+                .withCredentials()
+                .set({
+                  'content-type': 'application/x-www-form-urlencoded'
+                })
                 .send({id:1123339, email: that.ruleForm.maiAccount, password: that.ruleForm.account_password})
                 .end((err, res) => {
                   if (err) {

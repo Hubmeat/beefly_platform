@@ -31,6 +31,10 @@
       if (this.$store.state.consumeData.length === 0) {
         request
           .post(host + 'franchisee/report/consume/day')
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
           .send({
             'franchiseeId': '123456',
             'userId': 'admin'
@@ -177,6 +181,10 @@
         } else if (flag === true) {
           request
             .post(host + 'franchisee/report/consume/' + this.$route.query.type)
+            .withCredentials()
+            .set({
+              'content-type': 'application/x-www-form-urlencoded'
+            })
             .send({
               'franchiseeId': '123456',
               'userId': 'admin'
@@ -229,6 +237,10 @@
           console.log(type)
             request
               .post(host + 'franchisee/report/consume/userDefine')
+              .withCredentials()
+              .set({
+                'content-type': 'application/x-www-form-urlencoded'
+              })
               .send({
                 'franchiseeId': '123456',
                 'userId': 'admin',

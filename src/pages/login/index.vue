@@ -34,7 +34,6 @@
           </el-form-item>
           <el-form-item label="验证码" prop="vercode" :label-width="formLabelWidth">
             <el-input v-model="findForm.vercode" auto-complete="off"></el-input>
-
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -64,7 +63,8 @@
   import request from 'superagent'
   import $ from 'jquery'
   import {checkMobile, IsEmpty} from '../../../utils/index.js'
-  import { host } from '../../config/index.js'
+  import { host, instance } from '../../config/index.js'
+  import axios from 'axios'
   export default {
     data () {
       var validateTel = (rule, value, callback) => {
@@ -162,6 +162,10 @@
           if(checkMobile(val)){
             // 像后台发送 手机号，确认手机号是否已经注册，如果注册 则 发送验证码，否则返回 该手机号未注册
             request.post(host + 'franchisee/account/checkPhone')
+            .withCredentials()
+            .set({
+              'content-type': 'application/x-www-form-urlencoded'
+            })
             .send({
               phoneNo:this.findForm.tel
             })
@@ -226,6 +230,10 @@
         } else {
             request
               .post(host + 'franchisee/franchiseeLogin')
+              .withCredentials()
+              .set({
+                'content-type': 'application/x-www-form-urlencoded'
+              })
               .send({ 
                 'name': this.formLabelAlign.username,
                 'password': this.formLabelAlign.password })
@@ -246,6 +254,40 @@
                   }
                 }
               })
+
+            // instance.post(host + 'franchisee/franchiseeLogin',{
+            //   params: { 
+            //     'name': this.formLabelAlign.username,
+            //     'password': this.formLabelAlign.password }
+            //   })
+            //   .then(function (response) {
+            //     console.log('dadadd')
+            //     console.log(response);
+            //   })
+            //   .catch(function (error) {
+            //     console.log('aaaaaa')
+            //     console.log(error);
+            //   });
+
+            // request
+            //   .post(host + 'franchisee/franchiseeLogin')
+            //   .set({
+            //     withCredentials: true
+            //   })
+            //   .withCredentials()
+            //   .set({
+            //     'content-type': 'application/x-www-form-urlencoded'
+            //   })
+            //   .send({ 
+            //     'name': this.formLabelAlign.username,
+            //     'password': this.formLabelAlign.password })
+            //   .end((error, res) => {
+            //     if (error) {
+            //       console.log('error:', error)
+            //     } else {
+            //       console.log(res)
+            //     }
+            //   })
         }
       },
       handleEnter () {
@@ -296,6 +338,10 @@
           if (valid) {
             // 像服务器发送 重置密码的请求
             request.post(host + 'franchisee/account/resetPwd')
+            .withCredentials()
+            .set({
+              'content-type': 'application/x-www-form-urlencoded'
+            })
             .send({
               	password: that.resetForm.pass
             })

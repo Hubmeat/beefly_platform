@@ -238,6 +238,7 @@ export default {
       this.timer = setTimeout(function () {
         request
           .post(host + 'franchisee/franchiseeManager/' + type + '?page=' + e.target.innerHTML)
+          .set('header','application/x-www-form-urlencoded')
           .send({
             'franchiseeId': '123456',
             'userId': 'admin',
@@ -257,6 +258,9 @@ export default {
       }, 200)
     })
 
+    /**
+     * 根据不同的加盟城市，来展示不同的数据
+     * */
     var that = this
     $('.citys span').on('click', function () {
       clearTimeout(this.timer2)
@@ -267,6 +271,7 @@ export default {
         console.log('this is city')
         request
           .post(host + 'franchisee/franchiseeManager/getAllotBikes')
+          .set('header','application/x-www-form-urlencoded')
           .send({
             'franchiseeId': '123456',
             'userId': 'admin',
@@ -334,6 +339,7 @@ export default {
         var radio = this.checkList
         request
           .post(host + 'franchisee/bikeManager/queryBikes')
+          .set('header','application/x-www-form-urlencoded')
           .send({
             'start': startTime?startTime:null,
             'end': endTime?endTime:null,
@@ -389,6 +395,7 @@ export default {
     getDateByTabName (type) {
       request
         .post(host + 'franchisee/franchiseeManager/' + type)
+        .set('header','application/x-www-form-urlencoded')
         .send({
           'franchiseeId': '123456',
           'userId': 'admin',
@@ -445,7 +452,11 @@ export default {
     },
     getCityList () {
       request
-        .post(host + 'franchiseeManager/getFranchiseeCity')
+        .post(host + 'franchisee/franchiseeManager/getFranchiseeCity')
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
         .send({
           'franchiseeId': '123456',
           'userId': 'admin'
