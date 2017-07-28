@@ -12,7 +12,7 @@
           <template slot="title">
             <i class="iconfont my_icon_class">&#xe67d;</i>报表管理</template>
           <el-menu-item-group>
-            <el-menu-item index="/index/incomingRank?type=day">收益排行</el-menu-item>
+            <el-menu-item index="/index/incomingRank?type=0">收益排行</el-menu-item>
             <el-menu-item index="/index/earningsDetail?type=getAllRevenue">收益明细</el-menu-item>
             <el-menu-item index="/index/allDaysData?type=0">24小时数据走势</el-menu-item>
             <el-menu-item index="/index/hotMap?type=curHour">热力图</el-menu-item>

@@ -23,12 +23,10 @@
       <div class="datashow" v-show="noDate">
         <p>暂无数据</p>
       </div> -->
-
       <el-table
         :data="lists"
         v-loading="loading2"
         element-loading-text="拼命加载中"
-        :empty-text="emptyText"
         style="width: 100%">
         <el-table-column
           prop="time"
@@ -165,7 +163,8 @@ export default {
     return {
       lists: [],
       pageTotal: '',
-      noDate: false
+      noDate: false,
+      loading2: false
     }
   },
   methods: {
@@ -173,26 +172,23 @@ export default {
       this.$router.push('/index/incomingRank/queryCharts')
     },
     dataUpdate () {
-      var flag = true
-      if (this.$route.query.type === undefined) {
-        return
-      } else if (flag === true) {
+      // var flag = true
+      // if (this.$route.query.type === undefined) {
+      //   return
+      // } else if (flag === true) {
         request
-          .post(host + 'franchisee/report/consume/' + this.$route.query.type)
+          .post(host + 'franchisee/revenue/getRevenueSort')
           .withCredentials()
           .set({
             'content-type': 'application/x-www-form-urlencoded'
           })
           .send({
-            'franchiseeId': '123456',
-            'userId': 'admin'
+            type: this.$route.query.type
           })
           .end((error, res) => {
-            // console.log('this is entry')
             if (error) {
               console.log('error:', error)
             } else {
-              // console.log(res)
               // console.log(JSON.parse(res.text).list)
               var arr = JSON.parse(res.text).list
               var pageNumber = JSON.parse(res.text).totalPage
@@ -224,27 +220,24 @@ export default {
               flag = false
             }
           })
-      } else {
-        return
-      }
+      // } else {
+      //   return
+      // }
     },
     getDateMount () {
       request
-        .post(host + 'franchisee/report/consume/day')
+        .post(host + 'franchisee/revenue/getRevenueSort')
         .withCredentials()
         .set({
           'content-type': 'application/x-www-form-urlencoded'
         })
         .send({
-          'franchiseeId': '123456',
-          'userId': 'admin'
+          type: this.$route.query.type
         })
         .end((error, res) => {
-          // console.log('this is entry')
           if (error) {
             console.log('error:', error)
           } else {
-            // console.log(JSON.parse(res.text))
             // console.log(JSON.parse(res.text).list)
             var arr = JSON.parse(res.text).list
             var pageNumber = JSON.parse(res.text).totalPage
@@ -278,29 +271,17 @@ export default {
     time () {
       if (this.$store.state.timeline.length === 0) {
         return
-      } else { 
-        var type
-        if (this.$route.query.type === 'day') {
-          type = 0
-        } else if (this.$route.query.type === 'week') {
-          type = 1
-        } else {
-          type = 2
-        }
-        console.log(type)
-        var that = this
+      } else {
           request
-            .post(host + 'franchisee/report/consume/userDefine')
+            .post(host + 'franchisee/revenue/getRevenueSort')
             .withCredentials()
             .set({
               'content-type': 'application/x-www-form-urlencoded'
             })
             .send({
-              'franchiseeId': '123456',
-              'userId': 'admin',
-              'start': that.$store.state.timeline.newObj.time1,
-              'end': that.$store.state.timeline.newObj.time2,
-              'type': type
+              type: 4,
+              start: this.$store.state.timeline.newObj.time1,
+              end: this.$store.state.timeline.newObj.time2
             })
             .end((error, res) => {
               if (error) {
@@ -322,8 +303,8 @@ export default {
                       obj.money = arr[i].money
                       newArr.push(obj)
                     }
-                    that.$store.dispatch('consumeData_action', {newArr})
-                    that.lists = that.$store.state.consumeData
+                    this.$store.dispatch('consumeData_action', {newArr})
+                    this.lists = that.$store.state.consumeData
                   }
                 }
 
@@ -343,18 +324,7 @@ export default {
     this.dataUpdate()
   },
   beforeMount () {
-    if (this.$store.state.consumeData === '') {
-      this.noDate = true
-    }
     this.time()
-  },
-  beforeUpdate () {
-    if (this.lists === '') {
-      this.noDate = true
-    } else {
-      this.noDate = false
-      return
-    }
   },
   watch: {
     '$route': 'dataUpdate',

@@ -8,12 +8,11 @@
           <el-button @click="handleChangeType">本周</el-button>
           <el-button @click="handleChangeType">本月</el-button>
           <el-button @click="handleChangeType">所有日期</el-button>
+          <el-button @click='handleChangeType' style="margin-right: 15px;">指定时间段</el-button>
         </div>
-        <!-- <span class="timePeried labelAlign">数据时间段</span>
-        <el-date-picker :format="form.formatType" v-model='form.data1' :type="form.type" placeholder="选择日期"></el-date-picker>
-        <span class="division">至</span>
-        <el-date-picker :format="form.formatType" v-model='form.data2' :type="form.type" placeholder="选择日期"></el-date-picker>
-        <el-button class="my_btn" @click="getDateByTimeLine" >查询</el-button> -->
+        <el-date-picker style="vertical-align: top; margin-top: 0px;" v-show="show" v-model="value4" type="datetimerange" :picker-options="pickerOptions2" placeholder="选择时间范围" align="right">
+        </el-date-picker>
+        <el-button v-show="show" class="my_btn" @click="getDateByTimeLine">查询</el-button>
       </el-row>
     </div>
     <el-row class="countDetail">
@@ -36,7 +35,39 @@ export default {
         formatType: 'yyyy-MM-dd'
       },
       active: false,
-      loading2: false
+      value4: '',
+      show: false,
+      pickerOptions2: {
+        shortcuts: [
+          {
+            text: '最近一周',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+              picker.$emit('pick', [start, end])
+            }
+          },
+          {
+            text: '最近一个月',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+              picker.$emit('pick', [start, end])
+            }
+          },
+          {
+            text: '最近三个月',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+              picker.$emit('pick', [start, end])
+            }
+          }
+        ]
+      }
     }
   },
   methods: {
@@ -44,25 +75,33 @@ export default {
       switch (e.target.innerText) {
         case '今日': {
           this.form.type = 'date'
-          this.$router.push({ query: { type: 'day' } })
+          this.show = false
+          this.$router.push({ query: { type: 0 } })
           this.form.formatType = 'yyyy-MM-dd'
           break
         }
         case '本周': {
           this.form.type = 'week'
-          this.$router.push({ query: { type: 'week' } })
+          this.show = false
+          this.$router.push({ query: { type: 1 } })
           this.form.formatType = 'yyyy 第 WW 周'
           break
         }
         case '本月': {
           this.form.type = 'month'
-          this.$router.push({ query: { type: 'month' } })
+          this.show = false
+          this.$router.push({ query: { type: 2 } })
           this.form.formatType = ''
           break
         }
         case '所有日期': {
-          this.form.type = 'all'
-          this.$router.push({ query: { type: 'allMonth' } })
+          this.show = false
+          this.$router.push({ query: { type: 3 } })
+          this.form.formatType = ''
+          break
+        }
+        case '指定时间段': {
+          this.show = true
           this.form.formatType = ''
           break
         }
@@ -74,17 +113,17 @@ export default {
       e.currentTarget.setAttribute('class', 'el-button active el-button--default')
     },
     getDateByTimeLine() {
-      if (this.form.data1 === '' || this.form.data2 === '') {
+      if (this.value4 === '') {
         this.$message({
           message: '请输入日期',
           type: 'warning'
         })
       } else {
-        var timeStart = moment(this.form.data1).format('YYYY-MM-DD')
-        var timeEnd = moment(this.form.data2).format('YYYY-MM-DD')
+        var start = moment(this.value4[0]).format('YYYY-MM-DD HH:MM:SS')
+        var end = moment(this.value4[1]).format('YYYY-MM-DD HH:MM:SS')
         var newObj = {}
-        newObj.time1 = timeStart
-        newObj.time2 = timeEnd
+        newObj.time1 = start
+        newObj.time2 = end
         this.$store.dispatch('timeline_action', { newObj })
       }
     }
@@ -184,24 +223,6 @@ div.timeSelectBtn button.active {
   height: 35px;
 }
 
-.my_btn {
-    width: 80px;
-    float: right;
-    height: 36px;
-    line-height: 11px;
-    color: #fff;
-    /*margin-top: 10px;*/
-    outline: none;
-    border: none;
-    /* border-radius: 4px; */
-    background: rgba(52,52,67, 0.8);
-}
-
-.my_btn:hover {
-    background: rgba(52,52,67, 0.9);
-    color: #fff;
-}
-
 .el-input__inner {
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -239,6 +260,23 @@ div.timeSelectBtn button.active {
 }
 
 .el-button:focus, .el-button:hover {
+  color: #fff;
+}
+
+.my_btn {
+  width: 80px;
+  height: 36px;
+  line-height: 11px;
+  margin-right: 30px;
+  color: #fff;
+  outline: none;
+  border: none;
+  /* border-radius: 4px; */
+  background: rgba(52,52,67, 0.8);
+}
+
+.my_btn:hover {
+  background: rgba(52, 52, 67, 0.9);
   color: #fff;
 }
 </style>

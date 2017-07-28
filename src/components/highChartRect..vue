@@ -26,18 +26,17 @@
       }
     },
     mounted: function () {
-      console.log(this.$store.state)
+      console.log(this.$store.state.consumeData)
       console.log(this.$store.state.consumeData.length)
       if (this.$store.state.consumeData.length === 0) {
         request
-          .post(host + 'franchisee/report/consume/day')
+          .post(host + 'franchisee/revenue/getRevenueSort')
           .withCredentials()
           .set({
             'content-type': 'application/x-www-form-urlencoded'
           })
           .send({
-            'franchiseeId': '123456',
-            'userId': 'admin'
+            type: this.$route.query.type
           })
           .end((error, res) => {
             // console.log('this is entry')

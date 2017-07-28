@@ -42,19 +42,24 @@
       element-loading-text="拼命加载中"
       style="width: 100%">
       <el-table-column
-        prop="money"
-        label="金额"
-        min-width="60">
-      </el-table-column>
-      <el-table-column
         prop="bikeCode"
         label="车牌号"
+        min-width="70">
+      </el-table-column>
+      <el-table-column
+        prop="allianceArea"
+        label="加盟区域"
         min-width="70">
       </el-table-column>
       <el-table-column
         prop="placeOrderTime"
         label="消费时间"
         min-width="70">
+      </el-table-column>
+      <el-table-column
+        prop="money"
+        label="金额"
+        min-width="60">
       </el-table-column>
       <el-table-column
         prop="journey"
