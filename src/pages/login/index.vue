@@ -55,6 +55,11 @@
           <el-button type="primary" @click="resetPsd">确 定</el-button>
         </div>
       </el-dialog>
+
+      <!-- footer  -->
+      <div id="footer">
+        北京蜜蜂出行科技有限公司版权所有©2017
+      </div> 
     </div>
   </div>
 </template>
@@ -412,8 +417,9 @@ div#login div.content header h3 {
   left: 5%;
   top: 3%;
   /* margin: 0 auto; */
-  color: #999;
-   text-align: left; 
+  color: #000;
+  text-shadow: -2px 1px 4px #333;
+  text-align: left; 
   font-size: 30px;
 }
 
@@ -458,34 +464,60 @@ button.login {
   outline: none;
   border: none;
   background: rgba(241, 194, 52, 1);
-  color: #fff;
+  color: #fff !important;
   cursor: pointer;
 }
 
 button.login:hover {
   background: rgba(241, 194, 52, 0.8);
+  color: #fff !important;
+}
+
+button.login:active {
+  background: rgba(241, 194, 52, 0.8);
+  color: #fff !important;
 }
 
 button.forget_psd {
   float: right;
   outline: none;
   border: none;
-  text-decoration: underline;
   background: #fff;
-  margin-right: 80px;
+  margin-right: 64px;
   margin-top: 20px;
 }
+
+button.forget_psd:hover {
+  text-decoration: underline;
+  color: rgba(241, 194, 52, 1);
+}
+
+button.forget_psd:active {
+  text-decoration: underline;
+  color: rgba(241, 194, 52, 1);
+}
+
 
 h3.title {
   color: #444;
   font-size: 30px;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   margin-left: 80px;
 }
 
 .findPsdBtn {
   width: 120px;
   height: 50px;
+}
+
+#footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 50px;
+  text-align: center;
+  color: #555;
 }
 </style>
 

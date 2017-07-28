@@ -4,15 +4,16 @@
       <el-row class="countTitle">
         <span class="countDimension labelAlign" style="margin-right: 0px;">统计维度</span>
         <div class="timeSelectBtn">
-          <el-button class="active" @click="handleChangeType" type="primary">日</el-button>
-          <el-button @click="handleChangeType">周</el-button>
-          <el-button @click="handleChangeType">月</el-button>
+          <el-button class="active" @click="handleChangeType" type="primary">今日</el-button>
+          <el-button @click="handleChangeType">本周</el-button>
+          <el-button @click="handleChangeType">本月</el-button>
+          <el-button @click="handleChangeType">所有日期</el-button>
         </div>
-        <span class="timePeried labelAlign">数据时间段</span>
+        <!-- <span class="timePeried labelAlign">数据时间段</span>
         <el-date-picker :format="form.formatType" v-model='form.data1' :type="form.type" placeholder="选择日期"></el-date-picker>
         <span class="division">至</span>
         <el-date-picker :format="form.formatType" v-model='form.data2' :type="form.type" placeholder="选择日期"></el-date-picker>
-        <el-button class="my_btn" @click="getDateByTimeLine" >查询</el-button>
+        <el-button class="my_btn" @click="getDateByTimeLine" >查询</el-button> -->
       </el-row>
     </div>
     <el-row class="countDetail">
@@ -34,27 +35,34 @@ export default {
         type: 'date',
         formatType: 'yyyy-MM-dd'
       },
-      active: false
+      active: false,
+      loading2: false
     }
   },
   methods: {
     handleChangeType(e) {
       switch (e.target.innerText) {
-        case '日': {
+        case '今日': {
           this.form.type = 'date'
           this.$router.push({ query: { type: 'day' } })
           this.form.formatType = 'yyyy-MM-dd'
           break
         }
-        case '周': {
+        case '本周': {
           this.form.type = 'week'
           this.$router.push({ query: { type: 'week' } })
           this.form.formatType = 'yyyy 第 WW 周'
           break
         }
-        case '月': {
+        case '本月': {
           this.form.type = 'month'
           this.$router.push({ query: { type: 'month' } })
+          this.form.formatType = ''
+          break
+        }
+        case '所有日期': {
+          this.form.type = 'all'
+          this.$router.push({ query: { type: 'allMonth' } })
           this.form.formatType = ''
           break
         }

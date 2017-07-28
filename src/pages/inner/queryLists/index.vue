@@ -32,8 +32,7 @@
         style="width: 100%">
         <el-table-column
           prop="time"
-          label="订单日期"
-          sortable
+          label="加盟区域"
           min-width="120">
         </el-table-column>
         <el-table-column
@@ -43,6 +42,7 @@
         </el-table-column>
         <el-table-column
           prop="money"
+          sortable
           label="订单总额">
         </el-table-column>
         <el-table-column
@@ -51,15 +51,8 @@
         </el-table-column>
         <el-table-column
           min-width="80"
-          label="实际收益（元） ?"
+          label="实际收益（元)?"
           prop='bikeCode'>
-          <template scope="scope">
-            <el-tooltip placement="top">
-              <div slot="content">多行信息<br/>第二行信息</div>
-              <el-button>Top center</el-button>
-            </el-tooltip>
-            <span>11</span>
-          </template>
         </el-table-column>
       </el-table>
     </div>

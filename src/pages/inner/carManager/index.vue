@@ -39,7 +39,6 @@
                       <span class="division">至</span>
                         <el-date-picker v-model='form.data2' type="date" placeholder="选择日期"></el-date-picker>
                         <el-button class="my_btn" @click="searchByTimeline">查询</el-button>
-                        <!--<button @click='searchByTimeline'>查询</button>-->
                       </el-form-item>
                     </el-col>
                   </el-row>
@@ -62,7 +61,7 @@
                 <tbody>
                   <tr v-bind:key="item.finnalNum" v-for="item of tableData">
                     <td>
-                      <router-link v-bind:to="{path:'/index/carUseDetail', query: {code:item.bikeCode}}">{{item.bikeCode}}</router-link>
+                      <router-link v-bind:to="{path:'/carUseDetail', query: {code:item.bikeCode}}">{{item.bikeCode}}</router-link>
                     </td>
                     <td>{{item.boxCode}}</td>
                     <td>{{item.generationsName}}</td>
@@ -111,7 +110,6 @@
                       <span class="division">至</span>
                         <el-date-picker v-model='form.data2' type="date" placeholder="选择日期"></el-date-picker>
                         <el-button class="my_btn" @click="searchByTimeline">查询</el-button>
-                        <!--<button @click='searchByTimeline'>查询</button>-->
                       </el-form-item>
                     </el-col>
                   </el-row>
@@ -200,15 +198,20 @@ export default {
     } else {
       this.noDate = false
     }
-    var type
+    var type, type1
     console.log('beforeUpdata:' + this.signForQuery)
     if (this.signForQuery === true) {
       type = 'queryBikes'
     } else {
       if (this.activeName === '已分配') {
         type = 'getAllotBikes'
+        /**
+         * 表示是已分配，还是未分配的分页查询。
+         */
+        type1 = '0'
       } else {
         type = 'getNotAllotBikes'
+        type1 = '1'
       } 
       this.signForQuery = false
     }
@@ -235,7 +238,22 @@ export default {
       } else {
         return
       }
+
+      console.log('这个是分页查询')
       this.timer = setTimeout(function () {
+        var startTime, endTime
+        if (that.form.data1 === '' || that.form.data2 === '') {
+          startTime = null
+          endTime = null
+        } else {
+          startTime = moment(that.form.data1).format('YYYY-MM-DD')
+          endTime = moment(that.form.data2).format('YYYY-MM-DD')
+        }
+
+        // 根据用户选择不同状态进行数据的筛选
+        // var radio = JSON.stringify(this.checkList)
+        var radio = that.checkList.toString()
+        
         request
           .post(host + 'franchisee/franchiseeManager/' + type + '?page=' + e.target.innerHTML)
           .withCredentials()
@@ -243,9 +261,12 @@ export default {
             'content-type': 'application/x-www-form-urlencoded'
           })
           .send({
-            'franchiseeId': '123456',
-            'userId': 'admin',
-            'cityCode': $('.citys span.active').attr('myId')
+            'start': startTime,
+            'end': endTime,
+            'state': radio,
+            'name': that.terminalNumber,
+            'cityCode': $('.citys span.active').attr('myId'),
+            'type': type1
           })
           .end((error, res) => {
             if (error) {
@@ -327,8 +348,7 @@ export default {
       } else {
         type = '1'
       }
-
-      if (this.terminalNumber === '' && this.form.data1 === '' && this.form.data2 === '' &&  this.checkList === '') {
+      if (this.terminalNumber === '' && this.form.data1 === '' && this.form.data2 === '' &&  this.checkList.length === 0) {
         this.$message({
           message: '请输入查询条件',
           type: 'warning'
@@ -344,25 +364,35 @@ export default {
         }
 
         // 根据用户选择不同状态进行数据的筛选
-        var radio = JSON.stringify(this.checkList)
+        // var radio = JSON.stringify(this.checkList)
+        var radio = this.checkList.toString()
         request
-          .post(host + 'franchisee/bikeManager/queryBikes')
+          .post(host+'franchisee/franchiseeManager/queryBikes')
           .withCredentials()
           .set({
             'content-type': 'application/x-www-form-urlencoded'
           })
+          // .send({
+          //   'start': startTime?startTime:null,
+          //   'end': endTime?endTime:null,
+          //   'state': radio?radio:'null',
+          //   'name': this.terminalNumber?this.terminalNumber:null,
+          //   'cityCode': $('.citys span.active').attr('myId')? $('.citys span.active').attr('myId'):null,
+          //   'type': type
+          // })
           .send({
-            'start': startTime?startTime:null,
-            'end': endTime?endTime:null,
-            'state': radio?radio:null,
-            'name': this.terminalNumber?this.terminalNumber:null,
-            'cityCode': $('.citys span.active').attr('myId')? $('.citys span.active').attr('myId'):null,
+            'start': startTime,
+            'end': endTime,
+            'state': radio,
+            'name': this.terminalNumber,
+            'cityCode': $('.citys span.active').attr('myId'),
             'type': type
           })
           .end((error, res) => {
             if (error) {
               console.log('error:', error)
             } else {
+              console.log('分页这是分页')
               console.log(JSON.parse(res.text))
               var data = (JSON.parse(res.text)).list
               var newData = this.tableDataDel(data)
@@ -419,6 +449,7 @@ export default {
           if (error) {
             console.log('error:', error)
           } else {
+            console.log((JSON.parse(res.text)).list)
             var data = (JSON.parse(res.text)).list
             this.pagetotal = (JSON.parse(res.text)).totalPage
             var newData = this.tableDataDel(data)
@@ -447,7 +478,8 @@ export default {
         obj.boxCode = arr[i].boxCode
         obj.generationsName = arr[i].generationsName
         obj.model = arr[i].model
-        if (arr[i].onlineTime == '') {
+        console.log(arr[i].onlineTime)
+        if (arr[i].onlineTime === undefined) {
           obj.onlineTime = ''
         } else {
           obj.onlineTime = moment(arr[i].onlineTime).format('YYYY-MM-DD HH:MM:SS')
