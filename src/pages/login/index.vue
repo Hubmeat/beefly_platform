@@ -2,7 +2,7 @@
   <div id="login">
     <div v-title>蜜蜂出行城市合伙人管理平台-登录</div>
     <div id="bgImage">
-     <img src="../../assets/img/1.jpg">
+       <img src="../../assets/img/1.jpg">  
     </div>
     <div class="content">
       <header>
@@ -10,15 +10,16 @@
       </header>
       <div class="loginForm">
         <el-form label-width="80px" :model="formLabelAlign" :rules="rules" ref="formLabelAlign">
-          <el-form-item prop="username" label="用户名">
+          <h3 class="title">登录</h3>
+          <el-form-item prop="username">
             <el-input v-model="formLabelAlign.username" placeholder="请输入用户名" autofocus="autofocus" tabindex="1"></el-input>
           </el-form-item>
-          <el-form-item prop="password" label="密码">
+          <el-form-item prop="password">
             <el-input v-model="formLabelAlign.password" @keyup.enter.native="handleEnter" type="password" placeholder="请输入密码" tabindex="2"></el-input>
           </el-form-item>
           <div class="button-group" style="padding-left:81px; margin-top: -5px;">
-            <el-button class="login" type="primary" name="username" @click="handleSubmit">登录</el-button>
-            <el-button class="forget_psd" @click="handleFindPsd" type="danger" name="password">忘记密码</el-button>
+            <el-button class="login" name="username" @click="handleSubmit">登录</el-button>
+            <el-button class="forget_psd" @click="handleFindPsd" name="password">忘记密码</el-button>
           </div>
         </el-form>
       </div>
@@ -220,7 +221,7 @@ export default {
       }
     },
     handleSubmit() {
-      if (this.formLabelAlign.username === '' && this.formLabelAlign.password) {
+      if (this.formLabelAlign.username === '' && this.formLabelAlign.password === '') {
         this.$message({
           message: '请输入用户名和密码',
           type: 'warning'
@@ -387,10 +388,9 @@ div#login {
 }
 
 #bgImage {
-  position: fixed;
+  position: absolute;
   left: 0;
   top: 8%;
-  z-index: 1;
 }
 
 div#login div.content {
@@ -407,30 +407,35 @@ div#login div.content header {
 }
 
 div#login div.content header h3 {
-  width: 400px;
-  margin: 0 auto;
-  color: #fffaea;
-  text-align: center;
+  width: 100%;
+  position: fixed;
+  left: 5%;
+  top: 3%;
+  /* margin: 0 auto; */
+  color: #999;
+   text-align: left; 
   font-size: 30px;
 }
 
 div#login div.content div.loginForm {
   width: 400px;
   z-index: 10;
-  margin: 0 auto;
+  position: absolute;
+  right: 5%;
   color: #fff;
+  margin-top: 100px;
 }
 
 div#login div.content div.loginForm form.el-form {
   height: 100%;
-  background: #292626;
-  padding: 40px;
+  background: #fff;
+  padding: 20px 0px 70px 0px;
   border-radius: 5px;
   box-shadow: 2px -1px 6px 2px rgba(0, 0, 0, .6)
 }
 
 div#login div.content div.loginForm form.el-form input {
-  border: 1px solid #fbfdff;
+  border: 1px solid #444;
   width: 240px;
 }
 
@@ -446,8 +451,36 @@ div#login div.content div.loginForm form.el-form input {
   color: #222
 }
 
+button.login {
+  width: 240px;
+  height: 36px;
+  border-radius: 4px;
+  outline: none;
+  border: none;
+  background: rgba(241, 194, 52, 1);
+  color: #fff;
+  cursor: pointer;
+}
+
+button.login:hover {
+  background: rgba(241, 194, 52, 0.8);
+}
+
 button.forget_psd {
   float: right;
+  outline: none;
+  border: none;
+  text-decoration: underline;
+  background: #fff;
+  margin-right: 80px;
+  margin-top: 20px;
+}
+
+h3.title {
+  color: #444;
+  font-size: 30px;
+  margin-bottom: 30px;
+  margin-left: 80px;
 }
 
 .findPsdBtn {

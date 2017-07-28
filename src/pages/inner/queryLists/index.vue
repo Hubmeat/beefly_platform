@@ -4,7 +4,7 @@
       <button class="btn_list" @click="handeClick">查看统计图</button>
     </h3>
     <div>
-      <table>
+      <!-- <table>
         <thead>
           <tr>
             <th>消费时间</th>
@@ -22,7 +22,46 @@
       </table>
       <div class="datashow" v-show="noDate">
         <p>暂无数据</p>
-      </div>
+      </div> -->
+
+      <el-table
+        :data="lists"
+        v-loading="loading2"
+        element-loading-text="拼命加载中"
+        :empty-text="emptyText"
+        style="width: 100%">
+        <el-table-column
+          prop="time"
+          label="订单日期"
+          sortable
+          min-width="120">
+        </el-table-column>
+        <el-table-column
+          prop="totalBill"
+          label="订单数"
+          min-width="120">
+        </el-table-column>
+        <el-table-column
+          prop="money"
+          label="订单总额">
+        </el-table-column>
+        <el-table-column
+          prop="couponApplyMoney"
+          label="优惠卷支付总额">
+        </el-table-column>
+        <el-table-column
+          min-width="80"
+          label="实际收益（元） ?"
+          prop='bikeCode'>
+          <template scope="scope">
+            <el-tooltip placement="top">
+              <div slot="content">多行信息<br/>第二行信息</div>
+              <el-button>Top center</el-button>
+            </el-tooltip>
+            <span>11</span>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
 
 		<div id="earD_page">
@@ -178,8 +217,11 @@ export default {
               var newArr = []
               for (var i = 0; i < arr.length; i++) {
                 var obj = {}
-                obj.time = moment(arr[i].time).format('YYYY-MM-DD')
+                obj.allianceArea = arr[i].city
+                // obj.time = moment(arr[i].time).format('YYYY-MM-DD')
+                obj.orderNum = arr[i].orderNum
                 obj.totalBill = arr[i].totalBill
+                obj.trualMoney = arr[i].trualMoney
                 obj.money = arr[i].money
                 newArr.push(obj)
               }
@@ -227,8 +269,11 @@ export default {
             var newArr = []
             for (var i = 0; i < arr.length; i++) {
               var obj = {}
-              obj.time = moment(arr[i].time).format('YYYY-MM-DD')
+              obj.allianceArea = arr[i].city
+              // obj.time = moment(arr[i].time).format('YYYY-MM-DD')
+              obj.orderNum = arr[i].orderNum
               obj.totalBill = arr[i].totalBill
+              obj.trualMoney = arr[i].trualMoney
               obj.money = arr[i].money
               newArr.push(obj)
             }
@@ -276,8 +321,11 @@ export default {
                     var newArr = []
                     for (var i = 0; i < arr.length; i++) {
                       var obj = {}
-                      obj.time = moment(arr[i].time).format('YYYY-MM-DD')
+                      obj.allianceArea = arr[i].city
+                      // obj.time = moment(arr[i].time).format('YYYY-MM-DD')
+                      obj.orderNum = arr[i].orderNum
                       obj.totalBill = arr[i].totalBill
+                      obj.trualMoney = arr[i].trualMoney
                       obj.money = arr[i].money
                       newArr.push(obj)
                     }

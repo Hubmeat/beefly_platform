@@ -270,6 +270,8 @@ export default {
       // 更换城市搜索。
       that.signForQuery = false
       var id = $(this).attr('myId')
+      console.log('这个是城市ID')
+      console.log(id)
       this.timer2 = setTimeout(function () {
         console.log('this is city')
         request
@@ -342,7 +344,7 @@ export default {
         }
 
         // 根据用户选择不同状态进行数据的筛选
-        var radio = this.checkList
+        var radio = JSON.stringify(this.checkList)
         request
           .post(host + 'franchisee/bikeManager/queryBikes')
           .withCredentials()
@@ -394,10 +396,10 @@ export default {
     getTabName (tab, event) {
       if (this.activeName === '未分配') {
         this.getDateByTabName('getNotAllotBikes')
-        this.checkList = []
+        // this.checkList = []
       } else {
         this.getDateByTabName('getAllotBikes')
-        this.checkList = []
+        // this.checkList = []
       }
     },
     getDateByTabName (type) {
@@ -484,19 +486,7 @@ export default {
   //   this.searchByTimeline()
   // },
   watch: {
-    'checkList': {
-        handler:(val,oldVal) => {
-          console.log(this.default.data)
-          console.log(this.default.data.checkList)
-          // if (this.checkList === '') {
-          //   console.log(this.checkList)
-          //   console.log(this.checkList.length)
-          //   console.log('this is checklist by watch')
-          // } else {
-          //   this.searchByTimeline()
-          // }
-        }
-    }
+    'checkList': 'searchByTimeline'
   }
 }
 </script>

@@ -178,7 +178,7 @@ export default {
           .send({
             'franchiseeId': '123456',
             'userId': 'admin',
-            'cityId': $('.citys span.active').attr('myId')?$('.citys span.active').attr('myId'):0
+            'cityId': $('.citys span.active').attr('myId')===0?0:$('.citys span.active').attr('myId')
           })
           .end((error, res) => {
             if (error) {
