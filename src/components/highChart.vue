@@ -12,6 +12,11 @@
   import moment from 'moment'
   import request from 'superagent'
   var Highcharts = require('highcharts')
+  // import { Loading } from 'element-ui'
+  // var loading = Loading.service({
+  //   fullscreen: false,
+  //   text: '查询数据中...'
+  // })
   // 在 Highcharts 加载之后加载功能模块
   require('highcharts/modules/exporting')(Highcharts)
   import { host } from '../config/index.js'
@@ -25,16 +30,15 @@
     },
     mounted: function () {
       request
-        .post(host + 'franchisee/report/get24HourTrend?type=' + this.$route.query.type)
+        .post(host + 'franchisee/report/getDayHourTrend?type=' + this.$route.query.type)
         .withCredentials()
         .set({
           'content-type': 'application/x-www-form-urlencoded'
         })
         .send({
-          "account": {
-            'franchiseeId': '123456',
-            'userId': 'admin'
-          }
+          'franchiseeId': '123456',
+          'userId': 'admin',
+          'cityId': 0
         })
         .end((err, res) => {
           if (err) {
@@ -44,6 +48,7 @@
               $('#container').html('')
               this.noData = true
             } else {
+              this.noData = false
               var data = JSON.parse(res.text)
               this.getChartByRoute(data)
               this.initHighCharDate()
@@ -64,6 +69,11 @@
               downloadPDF: '下载PDF文件',
               downloadPNG: '下载PNG文件',
               downloadSVG: '下载SVG文件'
+            },
+            credits: {
+              enabled: true,
+              text:"北京蜜蜂出行科技有限公司",  
+              href: "http://www.mmuu.com" 
             },
             chart: {
               type: 'line'                           // 指定图表的类型，默认是折线图（line）
@@ -138,18 +148,26 @@
         this.moneyList = order
       },
       dataUpdate () {
+        var that = this
+        // var loading2 = this.$loading({
+        //   fullscreen: false,
+        //   text: '查询数据中...'
+        // })
+        // setTimeout(function () {
+        //   loading2.close()
+        //   that.$message.error('连接超时，请重试')
+        // }, 6000)
+
         request
-          .post(host + 'franchisee/report/get24HourTrend?type=' + this.$route.query.type)
+          .post(host + 'franchisee/report/getDayHourTrend?type=' + this.$route.query.type)
           .withCredentials()
           .set({
             'content-type': 'application/x-www-form-urlencoded'
           })
           .send({
-            "account": {
-              'franchiseeId': '123456',
-              'userId': 'admin',
-              'cityId': this.$route.query.cityId?this.$route.query.cityId:null
-            },
+            'franchiseeId': '123456',
+            'userId': 'admin',
+            'cityId': this.$route.query.cityId?this.$route.query.cityId:0,
             "date": this.$route.query.date
           })
           .end((error, res) => {
@@ -169,9 +187,6 @@
               }
             }
           })
-      },
-      getCityInfo () {
-        console.log(this.$route.params)
       }
     },
     beforeUpdate () {
@@ -180,11 +195,9 @@
       } else {
         this.noData = false
       }
-      this.dataUpdate()
     },
     watch: {
-      '$route': 'dataUpdate',
-      '$router.params': 'getCityInfo'
+      '$route': 'dataUpdate'
     }
   }
 </script>

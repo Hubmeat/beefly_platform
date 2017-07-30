@@ -89,6 +89,11 @@
               downloadPNG: '下载PNG文件',
               downloadSVG: '下载SVG文件'
             },
+            credits: {
+              enabled: true,
+              text:"北京蜜蜂出行科技有限公司",  
+              href: "http://www.mmuu.com" 
+            },
             chart: {
               type: 'column',
               backgroundColor: 'rgba(255,255,255,0)'                        // 指定图表的类型，默认是折线图（line）
