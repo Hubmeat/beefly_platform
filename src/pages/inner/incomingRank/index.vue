@@ -119,8 +119,8 @@ export default {
           type: 'warning'
         })
       } else {
-        var start = moment(this.value4[0]).format('YYYY-MM-DD HH:MM:SS')
-        var end = moment(this.value4[1]).format('YYYY-MM-DD HH:MM:SS')
+        var start = moment(this.value4[0]).format('YYYY-MM-DD HH:mm:ss')
+        var end = moment(this.value4[1]).format('YYYY-MM-DD HH:mm:ss')
         var newObj = {}
         newObj.time1 = start
         newObj.time2 = end

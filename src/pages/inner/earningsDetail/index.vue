@@ -13,8 +13,8 @@
         </div>
         <div class="time_earning">
           <el-button @click='getDailyDate' class="active">今日</el-button>
-          <el-button @click='getMonthDate'>本月</el-button>
           <el-button @click='getWeekDate'>本周</el-button>
+          <el-button @click='getMonthDate'>本月</el-button>
           <el-button @click='getAllDate'>所有日期</el-button>
           <el-button @click='handleChangeType'>指定时间段</el-button>
         </div>
@@ -36,42 +36,58 @@
 		</div>
 
 		<div id="earD_body">
-			<el-table
-      :data="tableData"
-      v-loading="loading2"
-      element-loading-text="拼命加载中"
-      style="width: 100%">
-      <el-table-column
-        prop="bikeCode"
-        label="车牌号"
-        min-width="70">
-      </el-table-column>
-      <el-table-column
-        prop="allianceArea"
-        label="加盟区域"
-        min-width="70">
-      </el-table-column>
-      <el-table-column
-        prop="placeOrderTime"
-        label="消费时间"
-        min-width="70">
-      </el-table-column>
-      <el-table-column
-        prop="money"
-        label="金额"
-        min-width="60">
-      </el-table-column>
-      <el-table-column
-        prop="journey"
-        label="里程"
-        min-width="70">
-      </el-table-column>
-      </el-table-column>
-      <el-table-column
-        prop="orderDate"
-        label="订单日期">
-      </el-table-column>
-    </el-table>
+        <el-table
+        :data="tableData"    
+        v-loading="loading2"
+        element-loading-text="拼命加载中"
+        style="width: 100%">
+        <el-table-column
+          prop="bikeCode"
+          label="车牌编号"
+          min-width="95"
+          >
+        </el-table-column>
+        <el-table-column
+          prop="allianceArea"
+          label="加盟地区"
+          min-width="60"
+          >
+        </el-table-column>
+        <el-table-column
+          prop="orderDate"
+          min-width="110"
+          label="下单时间">
+        </el-table-column>
+        <el-table-column
+          prop="placeOrderTime"
+          label="骑行时间（分钟）"
+          min-width="90"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="journey"
+          label="骑行里程（公里）"
+          min-width="85"
+          >
+        </el-table-column>
+        <el-table-column
+          prop="money"
+          label="订单费用"
+          min-width="60"
+          >
+        </el-table-column>
+        <el-table-column
+          prop="couponAmount"
+          label="优惠券支付"
+          min-width="60"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="userPayAmount"
+          label="实际收益（元）"
+        >
+        </el-table-column>
+      </el-table>
 		</div>
 
 		<div id="earD_page">
@@ -379,14 +395,15 @@ export default {
       })
       .send({
         'franchiseeId': '123456',
-        'userId': 'admin'
+        'userId': 'admin',
+        'cityId': 0
       })
       .end((err, res) => {
         if (err) {
           console.log('err:' + err)
         } else {
           // console.log(res)
-          // console.log(JSON.parse(res.text).list)
+          console.log(JSON.parse(res.text).list)
           var newArr = JSON.parse(res.text).list
           // 表单Loading
           this.loading2 = false
@@ -395,15 +412,20 @@ export default {
           var arr2 = this.tableDataDel(newArr)
           this.$store.dispatch('earningsDate_action', { arr2 })
           this.tableData = this.$store.state.earningsDate.arr2
-          $('.M-box').pagination({
-            pageCount: pageNumber,
-            jump: true,
-            coping: true,
-            homePage: '首页',
-            endPage: '尾页',
-            prevContent: '«',
-            nextContent: '»'
-          })
+          if (pageNumber > 1) {
+            $('.M-box').pagination({
+              pageCount: pageNumber,
+              jump: true,
+              coping: true,
+              homePage: '首页',
+              endPage: '尾页',
+              prevContent: '«',
+              nextContent: '»'
+            })
+          } else {
+            $('.M-box').html('')
+            return
+          }
         }
       })
 
@@ -466,6 +488,7 @@ export default {
                   nextContent: '»'
                 })
               } else {
+                $('.M-box').html('')
                 return
               }
             }
@@ -496,11 +519,11 @@ export default {
         require.ensure([], () => {
           this.$loading({customClass: 'loading_class'})
           var that = this
-          setTimeout(() => {
+          setTimeout(() => { 
             that.$loading({customClass: 'loading_class'}).close()
             const { export_json_to_excel } = require('../../../assets/lib/js/Export2Excel.js')
-            const tHeader = ['金额', '车牌号', '消费时间', '里程(公里)', '订单日期']
-            const filterVal = ['money', 'bikeCode', 'placeOrderTime', 'journey', 'orderDate']
+            const tHeader = ['车辆编号', '加盟地区', '下单时间', '骑行时间（分钟）', '骑行里程（公里)', '订单费用', '优惠卷支付', '实际收益（元）']
+            const filterVal = ['bikeCode','allianceArea', 'orderDate', 'placeOrderTime', 'journey', 'money', 'couponAmount', 'userPayAmount']
             var type = that.$route.query.type
             var newType
             switch (type) {
@@ -586,32 +609,31 @@ export default {
       var arrDeled = []
       for (var i = 0; i < arr.length; i++) {
         var obj = {}
-        obj.money = arr[i].money
         obj.bikeCode = arr[i].bikeCode
+        obj.allianceArea = arr[i].area
+        obj.orderDate = moment(arr[i].chargeTime).format('YYYY-MM-DD HH:mm:ss')
         obj.placeOrderTime = Math.floor((arr[i].time) / 60000) + ' 分钟'
         obj.journey = arr[i].mileage
-        obj.orderDate = moment(arr[i].chargeTime).format('YYYY-MM-DD')
+        obj.money = arr[i].money
+        obj.couponAmount = arr[i].couponAmount
+        obj.userPayAmount = arr[i].userPayAmount
         arrDeled.push(obj)
       }
-
-      console.log('arrDeled:', arrDeled)
       return arrDeled
     },
     getAllDate () {
       this.$router.push('/index/earningsDetail?type=getAllRevenue')
-    },
-    getMonthDate () {
-      this.$router.push('/index/earningsDetail?type=getRevenueCurMonth')
       this.loading2 = true
       request
-        .post(host + 'franchisee/revenue/getRevenueCurMonth')
+        .post(host + 'franchisee/revenue/getAllRevenue')
         .withCredentials()
         .set({
           'content-type': 'application/x-www-form-urlencoded'
         })
         .send({
           'franchiseeId': '123456',
-          'userId': 'admin'
+          'userId': 'admin',
+          'cityId': $('.citys span.active').attr('myId')
         })
         .end((err, res) => {
           if (err) {
@@ -637,6 +659,51 @@ export default {
                 nextContent: '»'
               })
             } else {
+              $('.M-box').html('')
+              return
+            }
+          }
+        })
+    },
+    getMonthDate () {
+      this.$router.push('/index/earningsDetail?type=getRevenueCurMonth')
+      this.loading2 = true
+      request
+        .post(host + 'franchisee/revenue/getRevenueCurMonth')
+        .withCredentials()
+        .set({
+          'content-type': 'application/x-www-form-urlencoded'
+        })
+        .send({
+          'franchiseeId': '123456',
+          'userId': 'admin',
+          'cityId': $('.citys span.active').attr('myId')
+        })
+        .end((err, res) => {
+          if (err) {
+            console.log('err:' + err)
+          } else {
+            console.log(res)
+            var newArr = JSON.parse(res.text).list
+            var pageNumber = JSON.parse(res.text).totalPage
+            var arr2 = this.tableDataDel(newArr)
+            // loading关闭
+            this.loading2 = false
+            this.totalPage = pageNumber
+            this.$store.dispatch('earningsDate_action', { arr2 })
+            this.tableData = this.$store.state.earningsDate.arr2
+            if (pageNumber > 1) {
+              $('.M-box').pagination({
+                pageCount: pageNumber,
+                jump: true,
+                coping: true,
+                homePage: '首页',
+                endPage: '尾页',
+                prevContent: '«',
+                nextContent: '»'
+              })
+            } else {
+              $('.M-box').html('')
               return
             }
           }
@@ -653,7 +720,8 @@ export default {
         })
         .send({
           'franchiseeId': '123456',
-          'userId': 'admin'
+          'userId': 'admin',
+          'cityId': $('.citys span.active').attr('myId')
         })
         .end((err, res) => {
           if (err) {
@@ -667,15 +735,20 @@ export default {
             this.totalPage = pageNumber
             this.$store.dispatch('earningsDate_action', { arr2 })
             this.tableData = this.$store.state.earningsDate.arr2
-            $('.M-box').pagination({
-              pageCount: pageNumber,
-              jump: true,
-              coping: true,
-              homePage: '首页',
-              endPage: '尾页',
-              prevContent: '«',
-              nextContent: '»'
-            })
+            if (this.pagetotal > 1) {
+              $('.M-box').pagination({
+                pageCount: this.pagetotal,
+                jump: true,
+                coping: true,
+                homePage: '首页',
+                endPage: '尾页',
+                prevContent: '«',
+                nextContent: '»'
+              })
+            } else {
+              $('.M-box').html('')
+              return
+            }
           }
         })
     },
@@ -690,7 +763,8 @@ export default {
         })
         .send({
           'franchiseeId': '123456',
-          'userId': 'admin'
+          'userId': 'admin',
+          'cityId': $('.citys span.active').attr('myId')
         })
         .end((err, res) => {
           if (err) {
@@ -704,15 +778,20 @@ export default {
             this.loading2 = false
             this.$store.dispatch('earningsDate_action', { arr2 })
             this.tableData = this.$store.state.earningsDate.arr2
-            $('.M-box').pagination({
-              pageCount: pageNumber,
-              jump: true,
-              coping: true,
-              homePage: '首页',
-              endPage: '尾页',
-              prevContent: '«',
-              nextContent: '»'
-            })
+            if (this.pagetotal > 1) {
+              $('.M-box').pagination({
+                pageCount: this.pagetotal,
+                jump: true,
+                coping: true,
+                homePage: '首页',
+                endPage: '尾页',
+                prevContent: '«',
+                nextContent: '»'
+              })
+            } else {
+              $('.M-box').html('')
+              return
+            }
           }
         })
     },
@@ -804,8 +883,8 @@ export default {
           type: 'warning'
         })
       } else {
-        var startTime = moment(this.timeLine[0]).format('YYYY-MM-DD HH:MM:SS')
-        var endTime = moment(this.timeLine[1]).format('YYYY-MM-DD HH:MM:SS')
+        var startTime = moment(this.timeLine[0]).format('YYYY-MM-DD HH:mm:ss')
+        var endTime = moment(this.timeLine[1]).format('YYYY-MM-DD HH:mm:ss')
         console.log(startTime, endTime)
         this.loading2 = true
         request
@@ -815,12 +894,13 @@ export default {
             'content-type': 'application/x-www-form-urlencoded'
           })
           .send({
-            "account": {
+            'account': {
               'franchiseeId': '123456',
-              'userId': 'admin'
+              'userId': 'admin',
+              'cityId': $('citys span.active').attr('myId')
             },
             'startTime': startTime,
-            'endTime': endTime
+            'endTime': endTime,
           })
           .end((error, res) => {
             if (error) {
@@ -835,12 +915,9 @@ export default {
               this.tableData = this.$store.state.earningsDate.arr2
               var pageNumber = JSON.parse(res.text).totalPage
               this.totalPage = pageNumber
-              if (pageNumber < 10) { 
-                $('.M-box').html('')
-                return
-              } else {
+              if (this.pagetotal > 1) {
                 $('.M-box').pagination({
-                  pageCount: pageNumber,
+                  pageCount: this.pagetotal,
                   jump: true,
                   coping: true,
                   homePage: '首页',
@@ -848,6 +925,9 @@ export default {
                   prevContent: '«',
                   nextContent: '»'
                 })
+              } else {
+                $('.M-box').html('')
+                return
               }
             }
           })
@@ -887,8 +967,8 @@ export default {
   beforeMount () {
     this.$router.push('/index/earningsDetail?type=getRevenueCurDay')
   },
-  watch: {
-    '$route': 'dataUpdate'
-  }
+  // watch: {
+  //   '$route': 'dataUpdate'
+  // }
 }
 </script>

@@ -29,28 +29,29 @@
         element-loading-text="拼命加载中"
         style="width: 100%">
         <el-table-column
-          prop="time"
+          prop="allianceArea"
           label="加盟区域"
-          min-width="120">
+          min-width="80">
+        </el-table-column>
+        <el-table-column
+          prop="orderNum"
+          label="订单数"
+          min-width="80">
         </el-table-column>
         <el-table-column
           prop="totalBill"
-          label="订单数"
-          min-width="120">
-        </el-table-column>
-        <el-table-column
-          prop="money"
           sortable
-          label="订单总额">
+          label="订单总额"
+          min-width="100">
         </el-table-column>
         <el-table-column
-          prop="couponApplyMoney"
+          prop="couponAmount"
           label="优惠卷支付总额">
         </el-table-column>
         <el-table-column
           min-width="80"
           label="实际收益（元)?"
-          prop='bikeCode'>
+          prop='userPayAmount'>
         </el-table-column>
       </el-table>
     </div>
@@ -169,7 +170,7 @@ export default {
   },
   methods: {
     handeClick () {
-      this.$router.push('/index/incomingRank/queryCharts')
+      this.$router.push('/index/incomingRank/queryCharts?type=' + this.$route.query.type)
     },
     dataUpdate () {
       // var flag = true
@@ -206,18 +207,16 @@ export default {
               var newArr = []
               for (var i = 0; i < arr.length; i++) {
                 var obj = {}
-                obj.allianceArea = arr[i].city
-                // obj.time = moment(arr[i].time).format('YYYY-MM-DD')
-                obj.orderNum = arr[i].orderNum
-                obj.totalBill = arr[i].totalBill
-                obj.trualMoney = arr[i].trualMoney
-                obj.money = arr[i].money
+                obj.allianceArea = arr[i].area
+                obj.orderNum = arr[i].totalBill
+                obj.totalBill = arr[i].money
+                obj.couponAmount = arr[i].couponAmount
+                obj.userPayAmount = arr[i].userPayAmount
                 newArr.push(obj)
               }
               // console.log(newArr)
               this.$store.dispatch('consumeData_action', {newArr})
               this.lists = this.$store.state.consumeData
-              flag = false
             }
           })
       // } else {
@@ -238,7 +237,7 @@ export default {
           if (error) {
             console.log('error:', error)
           } else {
-            // console.log(JSON.parse(res.text).list)
+            console.log(JSON.parse(res.text).list)
             var arr = JSON.parse(res.text).list
             var pageNumber = JSON.parse(res.text).totalPage
             // 设置data分页
@@ -255,12 +254,11 @@ export default {
             var newArr = []
             for (var i = 0; i < arr.length; i++) {
               var obj = {}
-              obj.allianceArea = arr[i].city
-              // obj.time = moment(arr[i].time).format('YYYY-MM-DD')
-              obj.orderNum = arr[i].orderNum
-              obj.totalBill = arr[i].totalBill
-              obj.trualMoney = arr[i].trualMoney
-              obj.money = arr[i].money
+              obj.allianceArea = arr[i].area
+              obj.orderNum = arr[i].totalBill
+              obj.totalBill = arr[i].money
+              obj.couponAmount = arr[i].couponAmount
+              obj.userPayAmount = arr[i].userPayAmount
               newArr.push(obj)
             }
             this.$store.dispatch('consumeData_action', {newArr})
@@ -295,16 +293,15 @@ export default {
                     var newArr = []
                     for (var i = 0; i < arr.length; i++) {
                       var obj = {}
-                      obj.allianceArea = arr[i].city
-                      // obj.time = moment(arr[i].time).format('YYYY-MM-DD')
-                      obj.orderNum = arr[i].orderNum
-                      obj.totalBill = arr[i].totalBill
-                      obj.trualMoney = arr[i].trualMoney
-                      obj.money = arr[i].money
+                      obj.allianceArea = arr[i].area
+                      obj.orderNum = arr[i].totalBill
+                      obj.totalBill = arr[i].money
+                      obj.CouponAmount = arr[i].CouponAmount
+                      obj.UserPayAmount = arr[i].UserPayAmount
                       newArr.push(obj)
                     }
                     this.$store.dispatch('consumeData_action', {newArr})
-                    this.lists = that.$store.state.consumeData
+                    this.lists = this.$store.state.consumeData
                   }
                 }
 
@@ -320,9 +317,9 @@ export default {
       return
     }
   },
-  created () {
-    this.dataUpdate()
-  },
+  // created () {
+  //   this.dataUpdate()
+  // },
   beforeMount () {
     this.time()
   },
