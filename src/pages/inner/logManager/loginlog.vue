@@ -21,7 +21,7 @@
          </el-form>
        </el-row>
        <el-row class="table">
-          <el-table :data="form_plat.tableData" style="width:100%">
+          <el-table :data="form_plat.tableData" style="width:100%" element-loading-text="拼命加载中" v-loading="loading">
             <el-table-column
               prop="userId"
               label="用户名"
@@ -142,6 +142,7 @@
     outline: none;
     border: none;
     background: rgba(52,52,67, 0.8);}
+    div.el-pagination{margin-top:20px;margin-bottom:10px;margin-left:0;padding-left:0;}
 </style>
 <script>
   import $ from 'jquery'
@@ -154,6 +155,7 @@
   export default {
     data: function () {
       return {
+        loading: false,
         currentPage3:1,
         totalItems:1,
         pageShow: false,
@@ -167,6 +169,7 @@
         form_join: {
           tableData: []
         },
+        totalPage:1,
         plat_totalPage: '',
         join_totalPage: '',
         plat_currentPage: 1,
@@ -189,6 +192,7 @@
       },
       handleClickTab (tab, event) {
         var that = this
+         this.currentPage3 = 1
         this.tabTitle = event.target.innerText
          if(this.tabTitle === '平台') {
           request.post(host + 'franchisee/log/allLog')
@@ -209,55 +213,18 @@
                 return obj
               })
               that.form_plat.tableData = newArr
-              that.plat_totalPage = JSON.parse(res.text).totalPage || 20
+              that.plat_totalPage = JSON.parse(res.text).totalPage
               var len = JSON.parse(res.text).list.length
-              if (len>0) {
-                that.form_plat.hasPlatData = false
-                $('.M-box').eq(0).pagination({
-                  pageCount: that.plat_totalPage,
-                  jump: true,
-                  coping: true,
-                  homePage: '首页',
-                  endPage: '尾页',
-                  prevContent: '«',
-                  nextContent: '»'
-                })
-                $('.M-box').eq(0).click(function (e) {
-                  if (e.target.getAttribute('class') === 'active') {
-                    return false
-                  }
-                  if (e.target.tagName === 'A') {
-                    if (e.target.innerText === '首页') {
-                      that.plat_currentPage = 1
-                    }
-                    if (e.target.innerText === '尾页') {
-                      that.plat_currentPage = that.totalPage
-                    }
-                    if (e.target.innerText === '»') {
-                      that.plat_currentPage++
-                    }
-                    if (e.target.innerText === '«') {
-                      that.plat_currentPage--
-                    }
-                    if (checkPositiveNumber(e.target.innerText)) {
-                      that.plat_currentPage = e.target.innerText
-                    }
-                    if (e.target.innerText === '跳转') {
-                      e.preventDefault()
-                      var jumpPageNum = $('.M-box .active')
-                      that.plat_currentPage = jumpPageNum[0].innerText
-                    }
-                  }
-                })
-                $(document).keydown(function (e) {
-                  if (e.keyCode === 13) {
-                    that.plat_currentPage = e.target.value
-                  }
-                })
+              if (that.plat_totalPage>1) {
+                that.pageShow = true
+              }else {
+                that.pageShow = false
               }
+              that.totalItems  = JSON.parse(res.text).totalItems
             }
           })
         }else {
+          that.pageShow = false
           request.post(host + 'franchisee/log/getLoginLog')
           .withCredentials()
           .set({
@@ -278,50 +245,13 @@
               that.form_join.tableData = newArr
               that.join_totalPage = JSON.parse(res.text).totalPage || 20
               var len = JSON.parse(res.text).list.length
-              if (len>0) {
+              if (that.join_totalPage>1) {
                 that.form_join.hasJoinData = false
-                $('.M-box').eq(1).pagination({
-                  pageCount: that.join_totalPage,
-                  jump: true,
-                  coping: true,
-                  homePage: '首页',
-                  endPage: '尾页',
-                  prevContent: '«',
-                  nextContent: '»'
-                })
-                $('.M-box').eq(1).click(function (e) {
-                  if (e.target.getAttribute('class') === 'active') {
-                    return false
-                  }
-                  if (e.target.tagName === 'A') {
-                    if (e.target.innerText === '首页') {
-                      that.join_currentPage = 1
-                    }
-                    if (e.target.innerText === '尾页') {
-                      that.join_currentPage = that.totalPage
-                    }
-                    if (e.target.innerText === '»') {
-                      that.join_currentPage++
-                    }
-                    if (e.target.innerText === '«') {
-                      that.join_currentPage--
-                    }
-                    if (checkPositiveNumber(e.target.innerText)) {
-                      that.join_currentPage = e.target.innerText
-                    }
-                    if (e.target.innerText === '跳转') {
-                      e.preventDefault()
-                      var jumpPageNum = $('.M-box .active')
-                      that.join_currentPage = jumpPageNum[0].innerText
-                    }
-                  }
-                })
-                $(document).keydown(function (e) {
-                  if (e.keyCode === 13) {
-                    that.join_currentPage = e.target.value
-                  }
-                })
+                that.pageShow = true
+              }else{
+                that.pageShow = false
               }
+              that.totalItems = JSON.parse(res.text).totalItems
             }
           })
         }
@@ -363,8 +293,9 @@
       currentPage3: {
         handler: function (val, oldVal) {
           var that = this
+          that.loading = true
           if(this.tabTitle==='平台'){
-             request.post(host + 'franchisee/log/allLog?page=' + that.plat_currentPage)
+             request.post(host + 'franchisee/log/allLog?page=' + val)
               .withCredentials()
               .set({
                 'content-type': 'application/x-www-form-urlencoded'
@@ -375,13 +306,22 @@
               })
               .end(function (err, res) {
                 if (err) {
+                  that.loading = false
                   console.log(err)
                 } else {
+                  that.loading = false
+                  var totalPage = JSON.parse(res.text).totalPage
+                  if(totalPage>1){
+                    that.pageShow = true
+                  }else{
+                    that.pageShow = false
+                  }
+                  that.totalItems = JSON.parse(res.text).totalItems
                   that.form_plat.tableData = JSON.parse(res.text).list
                 }
               })
           }else{
-            request.post(host + 'franchisee/log/getLoginLog?page=' + that.join_currentPage)
+            request.post(host + 'franchisee/log/getLoginLog?page=' + val)
               .withCredentials()
               .set({
                 'content-type': 'application/x-www-form-urlencoded'

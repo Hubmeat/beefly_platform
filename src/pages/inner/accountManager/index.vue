@@ -4,7 +4,7 @@
       <el-tab-pane name="平台">
         <span slot="label">
           <i class="el-icon-date"></i> 平台</span>
-        <div id="am_search">
+        <div class="am_search">
           <label>
             <span>关键字</span>
             <input type="text" placeholder="账号/用户名" v-on:blur="initQuery" v-model="accountOrUsername" class="account_my_input">
@@ -75,23 +75,20 @@
         <el-row class="selectPlace">
           <address class="joinArea">加盟区域：</address>
           <div class="citys">
-            <span @click="handleClick">全部地区</span>
-            <span @click="handleClick">芜湖</span>
-            <span @click="handleClick">郑州</span>
-            <span @click="handleClick">南京</span>
-            <span @click="handleClick" class="active">上海</span>
+            <span @click="handleClick" name="0" class="active">全部地区</span>
+            <span @click="handleClick" :name="list.cityId" :key="list.cityId" v-for="list of cityList">{{list.cityName}}</span>
           </div>
         </el-row>
-        <div id="am_search">
+        <div class="am_search">
           <label>
             <span>关键字 :</span>
-            <input type="text" v-model="name" placeholder="姓名/用户名" @blur="initQuery" class="account_my_input">
+            <input type="text" v-model="accountOrUsername" placeholder="姓名/用户名" @blur="initQuery" class="account_my_input">
           </label>
           <label>
             <span>联系方式 :</span>
-            <input type="text" v-model="phone" placeholder="邮箱/手机号" @blur="initQuery" class="account_my_input">
+            <input type="text" v-model="telOrMail" placeholder="邮箱/手机号" @blur="initQuery" class="account_my_input">
           </label>
-          <button type="submit" class="my_btn" @click="queryInfo">查询</button>
+          <button type="submit" class="my_btn" @click="queryAccountInfo">查询</button>
         </div>
         <!-- account -->
         <div class="account">
@@ -99,7 +96,7 @@
             <button type="button" @click="addAccount">添加新账号</button>
           </h1>
           <!-- 表单 -->
-          <el-table :data="joinTableData" style="width: 100%; font-size:13px;" v-loading="loading" element-loading-text="正在删除中">
+          <el-table :data="joinTableData" style="width: 100%; font-size:13px;" v-loading="loading" element-loading-text="拼命加载中" :empty-text="emptyText">
             <el-table-column prop="userId" label="用户名" min-width="15%"></el-table-column>
             <el-table-column prop="phoneNo" label="手机号" min-width="15%"></el-table-column>
             <el-table-column prop="email" label="邮箱" min-width="20%"></el-table-column>
@@ -152,7 +149,14 @@
         </div>
       </el-tab-pane>
       <div>
-        <el-pagination v-show="pageShow" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="currentPage" :page-size="10" layout="prev, pager, next, jumper" :total="totalItems">
+        <el-pagination 
+          v-show="pageShow"
+           @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page.sync="currentPage" 
+            :page-size="10" 
+            layout="prev, pager, next, jumper" 
+            :total="totalItems">
         </el-pagination>
       </div>
       <div id="account_page">
@@ -184,6 +188,8 @@ import { host } from '../../../config/index.js'
 export default {
   data() {
     return {
+      cityList:[],
+      cityId: '0',
       isQuery: false,
       accountOrUsername: '',
       telOrMail: '',
@@ -239,11 +245,23 @@ export default {
         phone: this.telOrMail,
         cityId:'0'
       }
+      if(this.accountOrUsername.trim().length===0&&this.telOrMail.trim().length===0){
+          this.$message({
+            type:'error',
+            message: '查询条件并不能为空！'
+          })
+          return false
+      }
       var that = this
       if(this.activeName==='平台') {
+        this.loading  = true
          if (this.accountOrUsername.trim().length > 0 || this.telOrMail.trim().length > 0) {
           request.post(host + 'franchisee/account/getAllAdminUser')
             .send(obj)
+             .withCredentials()
+            .set({
+                'content-type': 'application/x-www-form-urlencoded'
+            })
             .end(function (error, res) {
               if (error) {
                 console.log(error)
@@ -264,36 +282,92 @@ export default {
               }
             })
           } else {
-            that.loading = false
-            this.platTableData = this.initData
+            request.post(host + 'franchisee/account/getAllAdminUser')
+            .send(obj)
+             .withCredentials()
+              .set({
+                  'content-type': 'application/x-www-form-urlencoded'
+              })
+            .end(function (error, res) {
+              if (error) {
+                console.log(error)
+                that.loading = false
+              } else {
+                that.loading = false
+                var newArr = JSON.parse(res.text).list
+                that.totalPage = JSON.parse(res.text).totalPage
+                if (that.totalPage > 1) {
+                  that.emptyText = ''
+                  that.pageShow = true
+                } else {
+                  that.emptyText = '暂无数据'
+                  that.pageShow = false
+                }
+                that.totalItems = JSON.parse(res.text).totalItems
+                that.platTableData = that.handleData(newArr)
+              }
+            })
           }
       }else{
-        alert(2)
+          this.loading = true
           if (this.accountOrUsername.trim().length > 0 || this.telOrMail.trim().length > 0) {
-            request.post(host + 'franchisee/account/getAllAccount')
-              .send(obj)
-              .end(function (error, res) {
+            getAllAccount({ franchiseeId: '123456', userId: 'admin',cityId:this.cityId,name:this.accountOrUsername,phone: this.telOrMail }, 1, function (error, res) {
+              if (error) {
+                console.log(error)
+                setTimeout(function () {
+                  that.loading = false
+                  that.loadingText = '服务器链接超时'
+                }, 5000)
+                setTimeout(function () {
+                  that.emptyText = '暂无数据'
+                }, 6000)
+              } else {
+                that.loading = false
+                that.totalPage = JSON.parse(res.text).totalPage || 20
+                var arr = JSON.parse(res.text).list
+                that.totalItems = JSON.parse(res.text).totalItems
+                if (that.totalPage > 1) {
+                  that.emptyText = ' '
+                  that.pageShow = true
+                } else {
+                  that.emptyText = '暂无数据'
+                  that.pageShow = false
+                }
+                that.$store.state.joinTableData = that.handleData(arr)
+                that.joinTableData = that.$store.state.joinTableData
+                that.initData = that.joinTableData
+                //that.setPage(arr,that.totalPage)
+              }
+            })
+          } else {
+             getAllAccount({ franchiseeId: '123456', userId: 'admin',cityId:this.cityId }, 1, function (error, res) {
                 if (error) {
                   console.log(error)
-                  that.loading = false
+                  setTimeout(function () {
+                    that.loading = false
+                    that.loadingText = '服务器链接超时'
+                  }, 5000)
+                  setTimeout(function () {
+                    that.emptyText = '暂无数据'
+                  }, 6000)
                 } else {
                   that.loading = false
-                  var newArr = JSON.parse(res.text).list
-                  that.totalPage = JSON.parse(res.text).totalPage
+                  that.totalPage = JSON.parse(res.text).totalPage || 20
+                  var arr = JSON.parse(res.text).list
+                  that.totalItems = JSON.parse(res.text).totalItems
                   if (that.totalPage > 1) {
-                    that.emptyText = ''
+                    that.emptyText = ' '
                     that.pageShow = true
                   } else {
                     that.emptyText = '暂无数据'
                     that.pageShow = false
                   }
-                  that.totalItems = JSON.parse(res.text).totalItems
-                  that.joinTableData = that.handleData(newArr)
+                  that.$store.state.joinTableData = that.handleData(arr)
+                  that.joinTableData = that.$store.state.joinTableData
+                  that.initData = that.joinTableData
+                  //that.setPage(arr,that.totalPage)
                 }
               })
-          } else {
-            that.loading = false
-            this.joinTableData = this.initData
           }
       }
     },
@@ -369,7 +443,7 @@ export default {
         }
       }else {
         if (this.accountOrUsername.trim().length === 0 && this.telOrMail.trim().length === 0 && this.isQuery === false) {
-          getAllAccount({ franchiseeId: '123456', userId: 'admin' }, 1, function (error, res) {
+          getAllAccount({ franchiseeId: '123456', userId: 'admin',cityId:this.cityId,type:1 }, 1, function (error, res) {
             if (error) {
               console.log(error)
               setTimeout(function () {
@@ -381,7 +455,7 @@ export default {
               }, 6000)
             } else {
               that.loading = false
-              that.totalPage = JSON.parse(res.text).totalPage || 20
+              that.totalPage = JSON.parse(res.text).totalPage
               var arr = JSON.parse(res.text).list
               if (that.totalPage > 1) {
                 that.emptyText = ' '
@@ -489,7 +563,33 @@ export default {
       for (var i = 0; i < elems.length; i++) {
         elems[i].setAttribute('class', '')
       }
+      var that = this
       e.target.setAttribute('class', 'active')
+      this.cityId = e.target.getAttribute('name')
+      this.loading = true
+       getAllAccount({ franchiseeId: '123456', userId: 'admin',name: this.accountOrUsername,phone:this.telOrMail,cityId:this.cityId }, 1, function (error, res) {
+          if (error) {
+            console.log(error)
+            this.loading = false
+            this.pageShow = false
+          } else {
+            that.loading = false
+            that.totalPage = JSON.parse(res.text).totalPage
+            var arr = JSON.parse(res.text).list
+            that.totalItems = JSON.parse(res.text).totalItems
+            if (that.totalPage > 1) {
+              that.emptyText = ' '
+              that.pageShow = true
+            } else {
+              that.emptyText = '暂无数据'
+              that.pageShow = false
+            }
+            that.$store.state.joinTableData = that.handleData(arr)
+            that.joinTableData = that.$store.state.joinTableData
+            that.initData = that.joinTableData
+            //that.setPage(arr,that.totalPage)
+          }
+        })
     },
     openEdit(scope) {
       console.log(scope)
@@ -580,18 +680,25 @@ export default {
           that.loading = true
           delAdminUser(
             {
-              curUser: {
-                id: 0,
-                role: 0,
-                userId: '123'
-              },
-              user: {
-                id: scope.row.id,
-                userId: scope.row.userId
-              }
+              // curUserId: {
+              //   id: 0,
+              //   role: 0,
+              //   userId: '123'
+              // },
+              // user: {
+              //   id: scope.row.id,
+              //   userId: scope.row.userId
+              // }
+              id: scope.row.id,
+              userId: scope.row.userId
             },
             function (error, res) {
               if (error) {
+                that.loading = false
+                that.$message({
+                  type: 'error',
+                  message: 'sorry，删除失败!'
+                })
                 console.log(error)
               } else {
                 var code = JSON.parse(res.text).code
@@ -631,18 +738,21 @@ export default {
           that.loading = true
           delAccountByAdmin(
             {
-              adminUser: {
-                id: 0,
-                role: 0,
-                userId: '123'
-              },
-              account: {
-                id: scope.row.id,
-                userId: scope.row.userId
-              }
+              // adminUser: {
+              //   id: 0,
+              //   role: 0,
+              //   userId: '123'
+              // },
+              // account: {
+              //   id: scope.row.id,
+              //   userId: scope.row.userId
+              // }
+              id: scope.row.id,
+              userId: scope.row.userId
             }, function (error, res) {
               if (error) {
                 console.log(error)
+                that.loading = false
                 that.$message({
                   type: 'error',
                   message: '对不起，删除失败!'
@@ -769,10 +879,32 @@ export default {
       })
       return res
     },
+    loadCity () {
+      request.post(host + 'franchisee/franchiseeManager/getFranchiseeCity')
+      .end((error,res)=>{
+        if(error){
+          console.log(error)
+          this.cityList = []
+        }else {
+          var result = JSON.parse(res.text)
+          var map = result.map((item)=>{
+            var obj = {}
+            obj.cityId = item.cityId
+            obj.cityName = item.cityName
+            return obj
+          })
+          console.log(map)
+          this.cityList = map
+        }
+      })
+    },
     handleClickTab(tab, event) {
       var that = this
       this.name = ''
       this.phone = ''
+      this.accountOrUsername = ''
+      this.telOrMail = ''
+      this.pageShow = false
       if (this.activeName === '平台') {
         this.currentPage = 1
         this.loading = true
@@ -805,6 +937,7 @@ export default {
           }
         })
       } else {
+        this.loading = true
         this.currentPage = 1
         getAllAccount({ franchiseeId: '123456', userId: 'admin',cityId:'0' }, 1, function (error, res) {
           if (error) {
@@ -886,17 +1019,21 @@ export default {
   },
   mounted() {
     this.loadData()
+    this.loadCity()
   },
   watch: {
     currentPage: {
       handler: function (val, oldVal) {
         var that = this
+        that.loading = true
         if (this.activeName === '平台') {
           if (this.name.trim().length === 0 && this.phone.trim().length === 0) {
             getAllAdminUser({ franchiseeId: '123456', userId: 'admin' }, val, function (err, res) {
               if (err) {
                 console.log(err)
+                that.loading = false
               } else {
+                 that.loading = false
                 var arr = JSON.parse(res.text).list
                 var totalPage = JSON.parse(res.text).totalPage
                 if (totalPage > 1) {
@@ -919,7 +1056,9 @@ export default {
               }).end(function (error, res) {
                 if (error) {
                   console.log(error)
+                   that.loading = false
                 } else {
+                  that.loading = false
                   var arr = JSON.parse(res.text).list
                   that.tableTableData = that.handleData(arr)
                   that.totalItems = JSON.parse(res.text).totalItems
@@ -934,15 +1073,19 @@ export default {
           }
         } else {
           if (this.name.trim().length === 0 && this.phone.trim().length === 0) {
-            getAllAccount({ franchiseeId: '123456', userId: 'admin' }, val, function (error, res) {
+            getAllAccount({ franchiseeId: '123456', userId: 'admin',cityId: this.cityId }, val, function (error, res) {
               if (error) {
                 console.log(error)
+                that.loading = false
               } else {
+                that.loading = false
                 var arr = JSON.parse(res.text).list
-                if (arr.length === 0) {
-                  that.emptyText = '暂无数据'
+                var totalPage = JSON.parse(res.text).totalPage
+                if (totalPage>1) {
+                   that.pageShow = true
                 } else {
-                  that.emptyText = ' '
+                  that.pageShow  = false
+                   that.emptyText = '暂无数据'
                 }
                 that.$store.state.joinTableData = that.handleData(arr)
                 that.joinTableData = that.$store.state.joinTableData
@@ -953,12 +1096,19 @@ export default {
               send({
                 name: this.name.trim(),
                 phone: this.phone.trim(),
-                type: 1
+                type: 1,
+                cityId: this.cityId
+              })
+              .withCredentials()
+               .set({
+                  'content-type': 'application/x-www-form-urlencoded'
               })
               .end(function (error, res) {
                 if (error) {
                   console.log(error)
+                  that.loading = false
                 } else {
+                  that.loading = false
                   var arr = JSON.parse(res.text).list
                   that.joinTableData = that.handleData(arr)
                   that.totalItems = JSON.parse(res.text).totalItems
@@ -1081,7 +1231,7 @@ div.account>h1 button:hover {
   cursor: pointer;
 }
 
-#am_search {
+.am_search {
   width: 100%;
   height: 70px;
   background: #fff;
@@ -1099,7 +1249,7 @@ div.account>h1 button:hover {
   text-indent: 8px;
 }
 
-#am_search label {
+.am_search label {
   /* width: 190px; */
   height: 70px;
   line-height: 70px;
@@ -1108,7 +1258,7 @@ div.account>h1 button:hover {
   float: left;
 }
 
-#am_search label span {
+.am_search label span {
   line-height: 70px;
   font-weight: 400;
   font-size: 14px;
@@ -1117,11 +1267,11 @@ div.account>h1 button:hover {
   float: left;
 }
 
-#am_search label:nth-child(2) {
+.am_search label:nth-child(2) {
   margin-left: 0;
 }
 
-#am_search button {
+.am_search button {
   display: inline-block;
   line-height: 1;
   white-space: nowrap;
@@ -1135,7 +1285,7 @@ div.account>h1 button:hover {
   border-radius: 4px;
 }
 
-#am_search button:hover {
+.am_search button:hover {
   color: #20a0ff;
   border-color: #20a0ff;
 }

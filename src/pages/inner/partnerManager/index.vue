@@ -436,14 +436,14 @@ export default {
       date2: '',
       pickerOptions0: {
         disabledDate (time) {
-          return time.getTime() < Date.now() - 8.64e7
+          return time.getTime()
         }
       }
     }
   },
   mounted() {
     request
-      .post('http://192.168.3.52:7099/franchisee/franchiseeManager/getPartners')
+      .post(host + '/franchisee/franchiseeManager/queryFranchisee')
       .withCredentials()
       .set({
         'content-type': 'application/x-www-form-urlencoded'

@@ -3,7 +3,7 @@
         <div id="addaccount_form">
             <h1 id="addaccount_title">添加加盟商账号
                 <span>
-                    <a href="/index/accountManager">
+                    <a href="javscript:void(0)" style="color:#000" @click="$router.push({path:'/index/accountManager'})">
                         <i class="el-icon-close">
                         </i>
                     </a>
@@ -19,9 +19,7 @@
                 </el-form-item>
                 <el-form-item label="所属加盟商">
                     <el-radio-group v-model="ruleForm.radio2">
-                        <el-radio label="上海">上海</el-radio>
-                        <el-radio label="北京">北京</el-radio>
-                        <el-radio label="芜湖">芜湖</el-radio>
+                        <el-radio  :key="list.cityId" :name="list.cityId" :label="list.cityId" v-for="list of cityList">{{list.cityName}}</el-radio>
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item label="所属角色" prop="role">
@@ -196,7 +194,9 @@ export default {
             isDisabled: true,
             options4: [],
             loading: false,
+            cityList:[],
             ruleForm: {
+                radio2:'',
                 id: '',
                 emailBinding: '',
                 franchiseeId: '',
@@ -226,6 +226,25 @@ export default {
         }
     },
     methods: {
+        loadCity () {
+            request.post(host + 'franchisee/franchiseeManager/getFranchiseeCity')
+                .end((error,res)=>{
+                    if(error){
+                    console.log(error)
+                    this.cityList = []
+                    }else {
+                    var result = JSON.parse(res.text)
+                    var map = result.map((item)=>{
+                        var obj = {}
+                        obj.cityId = item.cityId
+                        obj.cityName = item.cityName
+                        return obj
+                    })
+                    console.log(map)
+                    this.cityList = map
+                    }
+                })
+        },
         remoteMethod() {
             this.loading = true;
             setTimeout(() => {
@@ -267,19 +286,13 @@ export default {
                         type: 'warning'
                     }
                     ).then(() => {
-                        request.post(host + 'franchisee/account/addAccount')
-                            .send({
-                                curAcc: {
-                                    id: 0,
-                                    emailBinding: 0,
-                                    franchiseeId: '123456',
-                                    loginAuth: 0,
-                                    phoneNoBinding: 0,
-                                    role: 0,
-                                    state: 0,
-                                    userId: '123'
-                                },
-                                newAcc: {
+                        request.post(host + 'franchisee/account/addAccountByAdmin')
+                            .withCredentials()
+                            .set({
+                                'content-type': 'application/x-www-form-urlencoded'
+                            })
+                            .send(
+                                {
                                     emailBinding: 0,
                                     franchiseeId: '123456',
                                     loginAuth: 0,
@@ -290,9 +303,10 @@ export default {
                                     userId: this.ruleForm.userId,
                                     email: this.ruleForm.email,
                                     phoneNo: this.ruleForm.phoneNo,
-                                    password: this.ruleForm.password
+                                    password: this.ruleForm.password,
+                                    cityId: this.ruleForm.radio2
                                 }
-                            })
+                            )
                             .end((err, res) => {
                                 if (err) {
                                     console.log(err)
@@ -310,10 +324,13 @@ export default {
                                             type: 'success',
                                             message: '添加成功'
                                         })
-                                        this.$store.commit({
-                                            type: 'addAcount',
-                                            obj: this.ruleForm
-                                        })
+                                        var newAccount = Object.assign({},JSON.parse(JSON.parse(res.text).data),{state:true})
+                                        that.$store.state.joinTableData.unshift(newAccount)
+                                        console.log(that.$store.state.joinTableData)
+                                        // this.$store.commit({
+                                        //     type: 'addJoinAcount',
+                                        //     obj: this.ruleForm
+                                        // })
                                     }
                                 }
                             })
@@ -332,6 +349,7 @@ export default {
     },
     mounted: function () {
         this.remoteMethod()
+        this.loadCity()
     }
 }
 </script>

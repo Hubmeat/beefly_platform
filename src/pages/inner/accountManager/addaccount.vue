@@ -265,22 +265,13 @@ export default {
             type: 'warning'
           }
         ).then(() => {
-          request.post(host + 'franchisee/account/addAccount')
+          request.post(host + 'franchisee/account/addAdminUser')
+            .withCredentials()
+            .set({
+                'content-type': 'application/x-www-form-urlencoded'
+            })
            .send({
-              curAcc: {
-                id: 0,
                 emailBinding: 0,
-                franchiseeId: '123456',
-                loginAuth: 0,
-                phoneNoBinding: 0,
-                role: 0,
-                state: 0,
-                userId: '123'
-              },
-              newAcc: {
-                emailBinding: 0,
-                franchiseeId: '123456',
-                loginAuth: 0,
                 phoneNoBinding: 0,
                 roleName: this.ruleForm.role,
                 state: 0,
@@ -289,7 +280,6 @@ export default {
                 email: this.ruleForm.email,
                 phoneNo: this.ruleForm.phoneNo,
                 password: this.ruleForm.password
-              }
             })
           .end( (err, res)=>{
             if (err) {
@@ -308,10 +298,12 @@ export default {
                     type: 'success',
                     message: '添加成功'
                   })
-                 this.$store.commit({
-                   type: 'addAcount',
-                   obj: this.ruleForm
-                 })
+                  var newAccount = Object.assign({},JSON.parse(JSON.parse(res.text).data),{state:true})
+                  that.$store.state.platTableData.unshift(newAccount)
+                //  this.$store.commit({
+                //    type: 'addAcount',
+                //    obj: this.ruleForm
+                //  })
               }
             }
           })

@@ -47,7 +47,7 @@
       </h1>
   
       <!-- 表单 -->
-      <el-table :data="tableData" style="width: 100%; font-size:13px;" v-loading="loading">
+      <el-table :data="tableData" style="width: 100%; font-size:13px;" element-loading-text="拼命加载中" v-loading="loading">
         <el-table-column prop="roleName" label="角色名称"  min-width="160"></el-table-column>
         <el-table-column prop="des" label="备注" min-width="160"></el-table-column>
         <el-table-column label="包含用户" min-width="170">
@@ -350,7 +350,7 @@ export default {
     initRole(){
       this.isQuery = false
       this.currentPage3 = 1
-      if(this.roleName.trim().length===0){
+      if(this.roleName.trim().length===0&&this.isQuery===false){
         var that = this
         request
         .post(host + 'franchisee/account/getRole')
@@ -391,14 +391,21 @@ export default {
       var that = this
       if(this.roleName.trim().length!==0){
         this.isQuery = true
+        that.loading = true
         request.post(host + 'franchisee/account/queryRole')
+          .withCredentials()
+          .set({
+              'content-type': 'application/x-www-form-urlencoded'
+          })
           .send({
             roleName: this.roleName.trim()
           })
           .end(function(error,res){
             if(error){
               console.log(error)
+              that.loading = false
             }else {
+              that.loading = false
                var result = JSON.parse(res.text).list
                 var totalPage = JSON.parse(res.text).totalPage
                 if(totalPage>1){
@@ -425,6 +432,12 @@ export default {
                 that.tableData  = newArr
             }
           })
+      }else{
+        this.$message({
+          type:'error',
+          message:'查询条件不能为空'
+        })
+        return false
       }
     },
     openAddRole () {
@@ -444,26 +457,39 @@ export default {
     },
     handleEditRole () {
       var that = this
-      var authList = this.getCheckedKeys().map((item)=>{
-        return {code: item}
-      })
+      var authList = this.getCheckedKeys().join('-')
       request
         .post(host + 'franchisee/account/updateRole')
-        .send({
-          oldRole: {
-            id: that.editForm.id
-          },
-          newRole: {
+        // .send({
+        //   oldRole: {
+        //     id: that.editForm.id
+        //   },
+        //   newRole: {
+        //     id: that.editForm.id,
+        //     roleType:  that.editForm.roleType,
+        //     roleName: that.editForm.roleName,
+        //     des: that.editForm.des,
+        //     auths: authList
+        //   }
+        // })
+          .withCredentials()
+          .set({
+              'content-type': 'application/x-www-form-urlencoded'
+          })
+         .send({
             id: that.editForm.id,
             roleType:  that.editForm.roleType,
             roleName: that.editForm.roleName,
             des: that.editForm.des,
-            auths: authList
-          }
+            auth: authList
         })
         .end(function(err,res){
           if(err){
             console.log(err)
+            that.$message({
+                type: 'error',
+                message: '修改失败!'
+            })
           } else {
             that.loading2 = false
             var code = JSON.parse(res.text).code
@@ -472,7 +498,8 @@ export default {
                   type: 'success',
                   message: '修改成功!'
                 })
-                that.tableData.splice(that.editForm.index,1,{roleName: that.editForm.roleName,des: that.editForm.des, id: that.editForm.id})
+                that.tableData.splice(that.editForm.index,1,JSON.parse(JSON.parse(res.text).data))
+                //that.tableData.splice(that.editForm.index,1,{roleName: that.editForm.roleName,des: that.editForm.des, id: that.editForm.id})
                 that.dialogEditVisible = false
             } else {
               that.$message({
@@ -493,6 +520,10 @@ export default {
           this.loading = true
           request
             .post(host + 'franchisee/account/delRole')
+            .withCredentials()
+            .set({
+                'content-type': 'application/x-www-form-urlencoded'
+            })
             .send({
               id: scope.row.id,
               roleType: scope.row.roleType,
@@ -502,6 +533,11 @@ export default {
             .end((err, res) => {
               if(err) {
                 console.log(err)
+                this.loading = flase
+                this.$message({
+                    type: 'error',
+                    message: '删除失败!'
+                })
               } else {
                 that.loading = false
                 var code = JSON.parse(res.text).code
@@ -530,20 +566,22 @@ export default {
         })
     },
     handleAddRole () {
-        var authList = this.getCheckedKeys().map((item)=>{
-          return {code: item}
-        })
+       var authList = this.getCheckedKeys().join('-')
         var that = this
 
         this.$refs.ruleForm.validate((valid) => {
           if(valid){
               this.dialogFormVisible = false
               request
-                .post(host + 'franchisee/account/addRole')
+                .post(host + 'franchisee/account/addRole4Admin')
+                .withCredentials()
+                .set({
+                    'content-type': 'application/x-www-form-urlencoded'
+                })
                 .send({
                   des: that.form.des,
                   roleName: that.form.roleName,
-                  auths: authList,
+                  auth: authList,
                   roleType: that.form.roleName === '管理员'?'0':'1',
                   belong: 1
                 })
@@ -557,7 +595,10 @@ export default {
                         type: 'success',
                         message: '恭喜您！添加角色成功'
                       })
-                     that.tableData.unshift({des: that.form.des,names:[],roleName:that.form.roleName})
+                     var newRole =  JSON.parse(JSON.parse(res.text).data)
+                     console.log(newRole)
+                     that.tableData.unshift(newRole)
+                     //that.tableData.unshift({des: that.form.des,names:[],roleName:that.form.roleName})
                     } else {
                       that.$message({
                         type: 'error',
@@ -578,12 +619,16 @@ export default {
   },
   mounted () {
     var that = this
+    that.loading = true
+    that.pageShow = false
     request
      .post(host + 'franchisee/account/getRole')
      .end((err, res) => {
        if (err) {
          console.log(err)
+          that.loading = false
        } else {
+          that.loading = false
          var result = JSON.parse(res.text).list
          var totalPage = JSON.parse(res.text).totalPage
          if(totalPage>1){
@@ -616,14 +661,21 @@ export default {
     currentPage3:{
       handler: function(val,oldVal){
         var that = this
+        that.loading = true
         if(this.isQuery===false){
           // 初始化查询
            request
             .post(host + 'franchisee/account/getRole?page=' + val)
+            .withCredentials()
+            .set({
+                'content-type': 'application/x-www-form-urlencoded'
+            })
             .end((err, res) => {
               if (err) {
                 console.log(err)
+                that.loading = false
               } else {
+                that.loading = false
                 var result = JSON.parse(res.text).list
                 var totalPage = JSON.parse(res.text).totalPage
                 if(totalPage>1){
@@ -653,6 +705,10 @@ export default {
         }else {
           // 筛选查询
           request.post(host + 'franchisee/account/queryRole?page=' + val)
+          .withCredentials()
+          .set({
+              'content-type': 'application/x-www-form-urlencoded'
+          })
           .send({
             roleName: this.roleName.trim()
           })
@@ -668,6 +724,7 @@ export default {
                   that.pageShow = false
                 }
                 that.totalItems = JSON.parse(res.text).totalItems
+                console.log(result)
                 var newArr = result.map(function(item, index) {
                     var res = item.auth.split('-')
                     var fathCode = []
