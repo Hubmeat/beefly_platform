@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div id="addaccount_form" v-loading="loading" element-loading-text="拼命加载中">
+		<div id="memberCenter_form" v-loading="loading" element-loading-text="拼命加载中">
 						<h1 id="addaccount_title">修改密码
               <span>
                 <a @click="$router.push('/index/memberCenter')">
@@ -30,7 +30,7 @@
 <style scoped>
 
   @media screen and (min-width:1367px) {
-    #addaccount_form {
+    #memberCenter_form {
       /*  适配好的样式 */
       height: 36%;
       /*overflow-y: scroll; 
@@ -52,7 +52,7 @@
   }
 
   @media screen and (max-width:1367px) {
-    #addaccount_form {
+    #memberCenter_form {
       height: 36%;
       width: 40%;
       box-shadow: 0 5px 15px rgba(0,0,0,.5);
@@ -124,7 +124,6 @@
       
 <script>
 import request from 'superagent'
-import { host } from '../../../config/index.js'
 export default {
   data () {
     var validatePass = (rule, value, callback) => {
@@ -177,11 +176,7 @@ export default {
           that.loading = true
           setTimeout(() => {
             request.post(host + 'franchisee/userCenter/modifyPwd')
-              .withCredentials()
-              .set({
-                'content-type': 'application/x-www-form-urlencoded'
-              })
-              .send({id:50, oldPwd: this.ruleForm.pass, newPwd: this.ruleForm.checkPass})
+              .send({id: 1123339, oldPwd: this.ruleForm.pass, newPwd: this.ruleForm.checkPass})
               .end((err, res) => {
                 if (err) {
                   console.log(err)
@@ -193,7 +188,7 @@ export default {
                   var cbText = JSON.parse(res.text).data
                   if (status !== 0) {
                     that.loading = false
-                    this.$message.error('sorry,修改密码失败')
+                    this.$message.error('sorry,修改密码失败' )
                   } else {
                     that.loading = false
                     that.$message({

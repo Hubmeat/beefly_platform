@@ -44,11 +44,22 @@
             </template>
           </el-table-column>
         </el-table>
+      <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page.sync="currentPage3"
+      :page-size="10"
+      layout="prev, pager, next, jumper"
+      :total="totalItems"
+      v-show="pageShow"
+      >
+    </el-pagination>
+    </el-pagination>
       </el-col>
     </el-row>
-    <div class="loginLog_page">
+    <!-- <div class="loginLog_page">
       <div class="M-box"></div>
-    </div>
+    </div> -->
   </div>
 </template>
 <style scoped>
@@ -65,21 +76,22 @@ div.hasData{line-height: 60px;text-align: center;height: 60px;color:#9e9090;widt
     border: none;
     /* border-radius: 4px; */
     background: rgba(52,52,67, 0.8);}
-  div.messageCenter{padding:20px;background:#fff;}
+  div.messageCenter{padding: 20px 20px 0 30px;background:#fff;}
   span.unRead{width:18px;height:18px;border-radius:20px;background:#ecb042;display:inline-block;vertical-align: middle;margin-top: -2px;}
   span.read{background:transparent;opacity: 0}
   i.icon-xinfeng.read{cursor:default;color:gray}
   i.icon-xinfeng.unread{cursor:pointer;color:#f35000}
   .el-table th>.tableTitle{margin-left: 20px;}
   /* td.isread i {color:gray;cursor:default;} */
+  div.el-pagination{padding-left:0;margin-top:20px;margin-bottom:10px;}
 </style>
 <script>
   import request from 'superagent'
   import $ from 'jquery'
   require('../../../assets/lib/js/jquery.pagination.js')
   import '../../../assets/css/pagination.css'
-  import {checkPositiveNumber} from '../../../../utils/index.js'
-  import { host } from '../../../config/index.js'
+   import {checkPositiveNumber} from '../../../../utils/index.js'
+   import {host} from '../../../config/index'
   import moment from 'moment'
   export default {
     data: function () {
@@ -88,16 +100,15 @@ div.hasData{line-height: 60px;text-align: center;height: 60px;color:#9e9090;widt
         msg_totalPage: '',
         msg_currentPage: 1,
         tableData: [],
-        msgList: []
+        msgList: [],
+        pageShow:false,
+        totalItems:1,
+        currentPage3:1,
       }
     },
     mounted: function () {
       var that = this
       request.post(host + 'franchisee/msg/getAllMsg')
-      .withCredentials()
-      .set({
-        'content-type': 'application/x-www-form-urlencoded'
-      })
       .send({
         franchiseeId: '123456',
         userId: 'jjjj'
@@ -113,63 +124,21 @@ div.hasData{line-height: 60px;text-align: center;height: 60px;color:#9e9090;widt
           that.checkWordsLength()
           that.msg_totalPage = JSON.parse(res.text).totalPage || 20
           var len = JSON.parse(res.text).list.length
-          if (len>0) {
-            that.hasMsgData = false
-            $('.M-box').pagination({
-              pageCount: that.msg_totalPage,
-              jump: true,
-              coping: true,
-              homePage: '首页',
-              endPage: '尾页',
-              prevContent: '«',
-              nextContent: '»'
-            })
-            $('.M-box').click(function (e) {
-              if (e.target.getAttribute('class') === 'active') {
-                return false
-              }
-              if (e.target.tagName === 'A') {
-                if (e.target.innerText === '首页') {
-                  that.msg_currentPage = 1
-                }
-                if (e.target.innerText === '尾页') {
-                  that.msg_currentPage = that.msg_totalPage
-                }
-                if (e.target.innerText === '»') {
-                  that.msg_currentPage++
-                }
-                if (e.target.innerText === '«') {
-                  that.msg_currentPage--
-                }
-                if (checkPositiveNumber(e.target.innerText)) {
-                  that.msg_currentPage = e.target.innerText
-                }
-                if (e.target.innerText === '跳转') {
-                  e.preventDefault()
-                  var jumpPageNum = $('.M-box .active')
-                  that.msg_currentPage = jumpPageNum[0].innerText
-                }
-              }
-            })
-            $(document).keydown(function (e) {
-              if (e.keyCode === 13) {
-                that.msg_currentPage = e.target.value
-                console.log(that.currentPage)
-              }
-            })
+          if (that.msg_totalPage>1) {
+              that.pageShow = true
+          }else {
+            that.pageShow = false
           }
+
+          that.totalItems = JSON.parse(res.text).totalItems
         }
       })
     },
     watch: {
-      msg_currentPage: {
+      currentPage3: {
         handler: function (val, oldVal) {
           var that = this
-          request.post(host + 'franchisee/msg/getAllMsg?page=' + that.msg_currentPage)
-            .withCredentials()
-            .set({
-              'content-type': 'application/x-www-form-urlencoded'
-            })
+          request.post(host + 'franchisee/msg/getAllMsg?page=' + val)
             .send({
               franchiseeId: '123456',
               userId: 'jjjj'
@@ -178,7 +147,17 @@ div.hasData{line-height: 60px;text-align: center;height: 60px;color:#9e9090;widt
               if (err) {
                 console.log(err)
               } else {
-                that.tableData = JSON.parse(res.text).list
+                var arr = JSON.parse(res.text).list
+                that.tableData = arr.map((item) => {
+                  return Object.assign({},item,{createTime: moment(item.createTime).format('YYYY-MM-DD HH:mm:ss')},{isChecked: item.isRead===0?false: true},{unRead:true,read:item.isRead===0?false: true})
+                })
+                that.totalPage = JSON.parse(res.text).totalPage
+                if(that.totalPage>1){
+                  that.pageShow = true
+                }else {
+                  that.pageShow  = false
+                }
+                that.totalItems  = JSON.parse(res.text).totalItems
                 that.checkWordsLength()
               }
             })
@@ -187,6 +166,12 @@ div.hasData{line-height: 60px;text-align: center;height: 60px;color:#9e9090;widt
       }
     },
     methods: {
+       handleSizeChange(val) {
+        console.log(`每页 ${val} 条`);
+      },
+      handleCurrentChange(val) {
+        console.log(`当前页: ${val}`);
+      },
       showMordWords (msg) {
         var len = msg.prevHtml.length
         // 截取的字符串 content 暂存在temp中
@@ -224,10 +209,6 @@ div.hasData{line-height: 60px;text-align: center;height: 60px;color:#9e9090;widt
             this.msgList.push({id:row.id})
             row.isRead=1
             request.post(host + 'franchisee/msg/read')
-              .withCredentials()
-              .set({
-                'content-type': 'application/x-www-form-urlencoded'
-              })
               .send({
                 list: this.msgList
               })
@@ -250,10 +231,6 @@ div.hasData{line-height: 60px;text-align: center;height: 60px;color:#9e9090;widt
         })
         this.tableData = newArr
         request.post(host + 'franchisee/msg/read')
-          .withCredentials()
-          .set({
-            'content-type': 'application/x-www-form-urlencoded'
-          })
           .send({
             list: newArr
           })

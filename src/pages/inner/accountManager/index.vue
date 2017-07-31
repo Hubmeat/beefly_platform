@@ -1,55 +1,53 @@
 <template>
   <div style="margin-right:20px;">
-    <el-tabs v-model="activeName" type="border-card" @tab-click="handleClickTab" >
+    <el-tabs v-model="activeName" type="border-card" @tab-click="handleClickTab">
       <el-tab-pane name="平台">
-        <span slot="label"><i class="el-icon-date"></i> 平台</span>
+        <span slot="label">
+          <i class="el-icon-date"></i> 平台</span>
         <div id="am_search">
           <label>
-            <span>关键字 :</span>
-            <input placeholder="姓名/用户名" @blur="initQuery" v-model="name" type="text" class="account_my_input">
+            <span>关键字</span>
+            <input type="text" placeholder="账号/用户名" v-on:blur="initQuery" v-model="accountOrUsername" class="account_my_input">
           </label>
           <label>
-            <span>联系方式 :</span>
-            <input placeholder="手机号/邮箱" @blur="initQuery" v-model="phone" type="text" class="account_my_input">
+            <span>联系方式</span>
+            <input type="text" placeholder="手机号/邮箱" v-on:blur="initQuery" v-model="telOrMail" class="account_my_input">
           </label>
-      
-          <el-button class="my_btn" @click="queryInfo">查询</el-button>
-            </div>
-            <!-- account -->
-            <div class="account">
+          <el-button id="accountSearchBtn" @click="queryAccountInfo" class="timeSelect_button">查询</el-button>
+        </div>
+  
+        <!-- account -->
+        <div class="account">
           <h1>
             <button type="button" @click="addAccount">添加新账号</button>
+            <!--新增数据开始-->
+            <!--新增数据结束-->
           </h1>
+  
           <!-- 表单 -->
-          <el-table  :data="platTableData" :empty-text='emptyText' style="width: 100%; font-size:13px;" v-loading="loading" :element-loading-text="loadingText">
+          <el-table :data="platTableData" :empty-text='emptyText' style="width: 100%; font-size:13px;" v-loading="loading" :element-loading-text="loadingText">
             <el-table-column prop="userId" label="用户名" min-width="140"></el-table-column>
             <el-table-column prop="phoneNo" label="手机号" min-width="140"></el-table-column>
             <el-table-column prop="email" label="邮箱" min-width="170"></el-table-column>
             <el-table-column prop="name" label="姓名" min-width="100"></el-table-column>
+            <el-table-column prop="roleName" label="角色" min-width="120">
+            </el-table-column>
             <el-table-column label="状态" min-width="120" style="font-size:12px;">
               <template scope="scope">
-                <el-switch
-                    v-on:change="changeState(scope)"
-                    v-model="scope.row.state" 
-                    on-text="开启" 
-                    off-text="关闭" 
-                    on-color="#13ce66"
-                    off-color="#ff4949"
-                >
+                <el-switch v-on:change="changeState(scope)" v-model="scope.row.state" on-text="开启" off-text="关闭" on-color="#13ce66" off-color="#ff4949">
                 </el-switch>
               </template>
             </el-table-column>
-            <el-table-column  label="操作">
+            <el-table-column prop="del" label="操作">
               <template scope="scope">
                 <a href="javascript:;"></a>
-                <i class="el-icon-edit" @click="openEdit(scope)" title="修改" style="cursor:pointer;margin-right:10px;"></i>
+                <i class="el-icon-edit" @click="openEdit(scope)" title="修改" style="margin-right:10px;"></i>
                 </a>
-                <i class="el-icon-close" title="删除" style="cursor:pointer;" @click="openDelete(scope)"></i>
+                <i class="el-icon-close" title="删除" @click="openDelete(scope)"></i>
                 <!--dialog 弹窗开始-->
-                <el-dialog title="平台账号信息" :visible.sync="dialogVisible" :modal="true"
-                  :modal-append-to-body="false">
-                  <el-form :model="editAccount">
-                    <el-form-item label="用户名" :label-width="formLabelWidth">
+                <el-dialog title="账号信息" :visible.sync="dialogVisible" :modal="true" :modal-append-to-body="false">
+                  <el-form class="editAccount" :model="editAccount" :rules="editAccountRule" ref="editRuleForm">
+                    <el-form-item label="用户名" prop="userId" :label-width="formLabelWidth">
                       <el-input v-model="editAccount.userId" auto-complete="off"></el-input>
                     </el-form-item>
                     <el-form-item label="手机号" :label-width="formLabelWidth">
@@ -96,7 +94,7 @@
           <button type="submit" class="my_btn" @click="queryInfo">查询</button>
         </div>
         <!-- account -->
-         <div class="account">
+        <div class="account">
           <h1>
             <button type="button" @click="addAccount">添加新账号</button>
           </h1>
@@ -106,29 +104,21 @@
             <el-table-column prop="phoneNo" label="手机号" min-width="15%"></el-table-column>
             <el-table-column prop="email" label="邮箱" min-width="20%"></el-table-column>
             <el-table-column prop="name" label="姓名" min-width="10%"></el-table-column>
-            <el-table-column label="所属加盟商" min-width="20%"></el-table-column>
+            <el-table-column label="所属加盟商" prop="cityName" min-width="20%"></el-table-column>
             <el-table-column label="状态" min-width="10%" style="font-size:12px;">
               <template scope="scope">
-                <el-switch
-                    v-on:change="changeState(scope)"
-                    v-model="scope.row.state" 
-                    on-text="开启" 
-                    off-text="关闭" 
-                    on-color="#13ce66"
-                    off-color="#ff4949"
-                >
+                <el-switch v-on:change="changeState(scope)" v-model="scope.row.state" on-text="开启" off-text="关闭" on-color="#13ce66" off-color="#ff4949">
                 </el-switch>
               </template>
             </el-table-column>
             <el-table-column label="操作" min-width="10%">
               <template scope="scope">
                 <a href="javascript:;"></a>
-                <i class="el-icon-edit"  @click="openEdit(scope)" title="修改" style="cursor:pointer;margin-right:10px;"></i>
+                <i class="el-icon-edit" @click="openEdit(scope)" title="修改" style="cursor:pointer;margin-right:10px;"></i>
                 </a>
                 <i class="el-icon-close" style="cursor:pointer;" title="删除" @click="openDelete(scope)"></i>
                 <!--dialog 弹窗开始-->
-                <el-dialog title="加盟商账号信息" :visible.sync="dialogVisible" :modal="true"
-                  :modal-append-to-body="false">
+                <el-dialog title="加盟商账号信息" :visible.sync="dialogVisible" :modal="true" :modal-append-to-body="false">
                   <el-form :model="editAccount">
                     <el-form-item label="用户名" :label-width="formLabelWidth">
                       <el-input v-model="editAccount.userId" auto-complete="off"></el-input>
@@ -143,12 +133,12 @@
                       <el-input v-model="editAccount.name" auto-complete="off"></el-input>
                     </el-form-item>
                     <!--<el-form-item label="所属加盟商" :label-width="formLabelWidth">
-                      <el-radio-group v-model="editAccount.radio">
-                        <el-radio :label="3">上海</el-radio>
-                        <el-radio :label="6">北京</el-radio>
-                        <el-radio :label="9">芜湖</el-radio>
-                      </el-radio-group>
-                    </el-form-item>-->
+                          <el-radio-group v-model="editAccount.radio">
+                            <el-radio :label="3">上海</el-radio>
+                            <el-radio :label="6">北京</el-radio>
+                            <el-radio :label="9">芜湖</el-radio>
+                          </el-radio-group>
+                        </el-form-item>-->
                   </el-form>
                   <div slot="footer" class="dialog-footer editfooter">
                     <el-button class="accountMangerBtn" type="primary" @click="handleEditAccount">确 定</el-button>
@@ -162,14 +152,7 @@
         </div>
       </el-tab-pane>
       <div>
-        <el-pagination
-          v-show="pageShow"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page.sync="currentPage"
-          :page-size="10"
-          layout="prev, pager, next, jumper"
-          :total="totalItems">
+        <el-pagination v-show="pageShow" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="currentPage" :page-size="10" layout="prev, pager, next, jumper" :total="totalItems">
         </el-pagination>
       </div>
       <div id="account_page">
@@ -178,7 +161,7 @@
       </div>
     </el-tabs>
     <!--<div v-show='router_show' >-->
-      <router-view id="account_router"></router-view>
+    <router-view id="account_router"></router-view>
     <!--</div>-->
   </div>
 </template>
@@ -186,40 +169,49 @@
 <script>
 import $ from 'jquery'
 import request from 'superagent'
-import {siblings,checkPositiveNumber,setPage } from '../../../../utils/index.js'
+import { siblings, checkPositiveNumber, setPage } from '../../../../utils/index.js'
 require('../../../assets/lib/js/jquery.pagination.js')
 import '../../../assets/css/pagination.css'
-import {getAllAdminUser} from '../../../api/getAdminUser.api.js'
-import {getAllAccount} from '../../../api/getAllAccount.api'
-import {updateAdmin} from '../../../api/updateAdmin.api'
-import {updateAccountByAdmin} from '../../../api/updateAccountByAdmin.api'
-import {modifyAdminState} from '../../../api/modifyAdminState.api'
-import {modifyAccountStateByAdmin} from '../../../api/modifyAccountStateByAdmin.api'
-import {delAdminUser} from '../../../api/delAdminUser.api'
-import {delAccountByAdmin} from '../../../api/delAccountByAdmin.api'
-import {host} from '../../../config/index.js'
+import { getAllAdminUser } from '../../../api/getAdminUser.api.js'
+import { getAllAccount } from '../../../api/getAllAccount.api'
+import { updateAdmin } from '../../../api/updateAdmin.api'
+import { updateAccountByAdmin } from '../../../api/updateAccountByAdmin.api'
+import { modifyAdminState } from '../../../api/modifyAdminState.api'
+import { modifyAccountStateByAdmin } from '../../../api/modifyAccountStateByAdmin.api'
+import { delAdminUser } from '../../../api/delAdminUser.api'
+import { delAccountByAdmin } from '../../../api/delAccountByAdmin.api'
+import { host } from '../../../config/index.js'
 export default {
-  data () {
+  data() {
     return {
-      name:'',
+      isQuery: false,
+      accountOrUsername: '',
+      telOrMail: '',
+      pageShow: false,
+      emptyText: ' ',
+      loadingText: '',
+      totalItems: 1,
+      name: '',
       phone: '',
-      activeName:'平台',
       activeName: '平台',
-      totalItems:1,
+      totalItems: 1,
       pageShow: false,
       input: '',
       currentPage: 1,
-      totalPage:1,
-      platTableData:[],
+      totalPage: 1,
+      platTableData: [],
       joinTableData: [],
       initData: [],
       router_show: false,
       dialogVisible: false,
       totalPage: '',
       loading: false,
-      loadingText:'',
-      emptyText:' ',
+      loadingText: '',
+      emptyText: ' ',
       formLabelWidth: '90px',
+      editAccountRule: {
+        userId: [{ required: true, trigger: 'blur', message: '请输入用户名' }]
+      },
       editAccount: {
         userId: '',
         phoneNo: '',
@@ -228,41 +220,111 @@ export default {
         role: '',
         state: '',
         value: '',
-        index:'',
+        index: '',
         radio: ''
       }
-    } 
+    }
   },
   methods: {
-    loadData(){
+    handleSizeChange(val) {
+      // console.log(`每页 ${val} 条`);
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val
+    },
+    queryAccountInfo() {
+      this.isQuery = true
+      var obj = {
+        name: this.accountOrUsername,
+        phone: this.telOrMail,
+        cityId:'0'
+      }
+      var that = this
       if(this.activeName==='平台') {
+         if (this.accountOrUsername.trim().length > 0 || this.telOrMail.trim().length > 0) {
+          request.post(host + 'franchisee/account/getAllAdminUser')
+            .send(obj)
+            .end(function (error, res) {
+              if (error) {
+                console.log(error)
+                that.loading = false
+              } else {
+                that.loading = false
+                var newArr = JSON.parse(res.text).list
+                that.totalPage = JSON.parse(res.text).totalPage
+                if (that.totalPage > 1) {
+                  that.emptyText = ''
+                  that.pageShow = true
+                } else {
+                  that.emptyText = '暂无数据'
+                  that.pageShow = false
+                }
+                that.totalItems = JSON.parse(res.text).totalItems
+                that.platTableData = that.handleData(newArr)
+              }
+            })
+          } else {
+            that.loading = false
+            this.platTableData = this.initData
+          }
+      }else{
+        alert(2)
+          if (this.accountOrUsername.trim().length > 0 || this.telOrMail.trim().length > 0) {
+            request.post(host + 'franchisee/account/getAllAccount')
+              .send(obj)
+              .end(function (error, res) {
+                if (error) {
+                  console.log(error)
+                  that.loading = false
+                } else {
+                  that.loading = false
+                  var newArr = JSON.parse(res.text).list
+                  that.totalPage = JSON.parse(res.text).totalPage
+                  if (that.totalPage > 1) {
+                    that.emptyText = ''
+                    that.pageShow = true
+                  } else {
+                    that.emptyText = '暂无数据'
+                    that.pageShow = false
+                  }
+                  that.totalItems = JSON.parse(res.text).totalItems
+                  that.joinTableData = that.handleData(newArr)
+                }
+              })
+          } else {
+            that.loading = false
+            this.joinTableData = this.initData
+          }
+      }
+    },
+    loadData() {
+      if (this.activeName === '平台') {
         var that = this
         this.loading = true
         this.loadingText = '拼命加载中'
-        getAllAdminUser({franchiseeId: '123456',userId: 'admin'}, 1, function(err,res){
-          if(err) {
+        getAllAdminUser({ franchiseeId: '123456', userId: 'admin' }, 1, function (err, res) {
+          if (err) {
             console.log(err)
-            setTimeout(function(){
+            setTimeout(function () {
               that.loading = false
               that.loadingText = '服务器链接超时'
-            },5000)
-            setTimeout(function(){
+            }, 5000)
+            setTimeout(function () {
               that.emptyText = '暂无数据'
-            },6000)
-          }else {
+            }, 6000)
+          } else {
             that.loading = false
             that.emptyText = ' '
             that.totalPage = JSON.parse(res.text).totalPage
             var arr = JSON.parse(res.text).list
-            if(that.totalPage>1) {
-              alert(2)
+            if (that.totalPage > 1) {
               that.emptyText = ' '
               that.pageShow = true
             } else {
               that.emptyText = '暂无数据'
               that.pageShow = false
             }
-            that.totalItems = JSON.parse(res.text).totalItems          
+            that.totalItems = JSON.parse(res.text).totalItems
             that.$store.state.platTableData = that.handleData(arr)
             that.platTableData = that.$store.state.platTableData
             that.initData = that.platTableData
@@ -270,174 +332,184 @@ export default {
         })
       }
     },
-    initQuery(){
+   initQuery() {
       var that = this
-     if (this.activeName==='平台'){
-       if(this.name.trim().length===0&&this.phone.trim().length===0){
-          getAllAdminUser({franchiseeId: '123456',userId: 'admin'}, 1, function(err,res){
-            if(err) {
-              console.log(err)
-              setTimeout(function(){
+      this.isQuery = false
+      this.currentPage = 1
+      if(this.activeName==='平台'){
+        if (this.accountOrUsername.trim().length === 0 && this.telOrMail.trim().length === 0 && this.isQuery === false) {
+          getAllAdminUser({ franchiseeId: '123456', userId: 'admin' }, 1, function (error, res) {
+            if (error) {
+              console.log(error)
+              setTimeout(function () {
                 that.loading = false
                 that.loadingText = '服务器链接超时'
-              },5000)
-              setTimeout(function(){
+              }, 5000)
+              setTimeout(function () {
                 that.emptyText = '暂无数据'
-              },6000)
-            }else {
+              }, 6000)
+            } else {
               that.loading = false
               that.totalPage = JSON.parse(res.text).totalPage || 20
-              that.totalItems = JSON.parse(res.text).totalItems
               var arr = JSON.parse(res.text).list
-              if(that.totalPage>1) {
+              if (that.totalPage > 1) {
                 that.emptyText = ' '
                 that.pageShow = true
               } else {
                 that.emptyText = '暂无数据'
                 that.pageShow = false
               }
-              that.$store.state.platTableData = that.handleData(arr)
-              that.platTableData = that.$store.state.platTableData
-              that.initData = that.platTableData
+              that.totalItems = JSON.parse(res.text).totalItems
+              that.$store.state.accountMangerData = that.handleData(arr)
+              that.initData = that.$store.state.accountMangerData
+              that.platTableData = that.$store.state.accountMangerData
+              //that.setPage(arr,that.totalPage)
             }
           })
-       }else {
-         return false
-       }
-     }else {
-        if(this.name.trim().length===0&&this.phone.trim().length===0){
-          getAllAccount({franchiseeId: '123456',userId: 'admin'}, 1, function(error, res){
-                if(error){
-                  console.log(error)
-                } else {
-                  that.loading = false
-                  that.totalPage = JSON.parse(res.text).totalPage || 20
-                  that.totalItems = JSON.parse(res.text).totalItems
-                  var arr = JSON.parse(res.text).list
-                  if(that.totalPage>1) {
-                    that.emptyText = ' '
-                    that.pageShow = true
-                  } else {
-                    that.emptyText = '暂无数据'
-                    that.pageShow = false
-                  }
-                  that.$store.state.joinTableData = that.handleData(arr)
-                  that.joinTableData = that.$store.state.joinTableData
-                }
-              })
-        }else {
-          return false
         }
-     }
+      }else {
+        if (this.accountOrUsername.trim().length === 0 && this.telOrMail.trim().length === 0 && this.isQuery === false) {
+          getAllAccount({ franchiseeId: '123456', userId: 'admin' }, 1, function (error, res) {
+            if (error) {
+              console.log(error)
+              setTimeout(function () {
+                that.loading = false
+                that.loadingText = '服务器链接超时'
+              }, 5000)
+              setTimeout(function () {
+                that.emptyText = '暂无数据'
+              }, 6000)
+            } else {
+              that.loading = false
+              that.totalPage = JSON.parse(res.text).totalPage || 20
+              var arr = JSON.parse(res.text).list
+              if (that.totalPage > 1) {
+                that.emptyText = ' '
+                that.pageShow = true
+              } else {
+                that.emptyText = '暂无数据'
+                that.pageShow = false
+              }
+              that.totalItems = JSON.parse(res.text).totalItems
+              that.$store.state.accountMangerData = that.handleData(arr)
+              that.initData = that.$store.state.accountMangerData
+              that.joinTableData = that.$store.state.accountMangerData
+              //that.setPage(arr,that.totalPage)
+            }
+          })
+        }
+      }
     },
-    queryInfo(){
+    queryInfo() {
       var name = this.name.trim()
       var phone = this.phone.trim()
       var that = this
       var type = null
-      if(this.activeName==='平台'){
+      if (this.activeName === '平台') {
         this.currentPage = 1
         type = 0
-        if(name.length>0||phone.length>0) {
-          request.post(host + 'franchisee/account/queryAccount')
-          .withCredentials()
-          .set({
-            'content-type': 'application/x-www-form-urlencoded'
-          })
-          .send({
-            name: this.name.trim(),
-            phone: this.phone.trim(),
-            type:type
-          }).end(function(error,res){
-            if(error){
-              console.log(error)
-            }else {
-              var arr = JSON.parse(res.text).list
-              that.platTableData = that.handleData(arr)
-              that.totalItems = JSON.parse(res.text).totalItems
-              var totalPage = JSON.parse(res.text).totalPage
-              if(totalPage>1){
-                that.pageShow = true
-              }else {
-                that.pageShow = false
+        if (name.length > 0 || phone.length > 0) {
+          request.post(host + 'franchisee/account/getAllAdminUser')
+            .withCredentials()
+            // .set({
+            //   'content-type': 'application/x-www-form-urlencoded'
+            // })
+            .send({
+              name: this.name.trim(),
+              phone: this.phone.trim(),
+              type: type
+            }).end(function (error, res) {
+              if (error) {
+                console.log(error)
+              } else {
+                var arr = JSON.parse(res.text).list
+                that.platTableData = that.handleData(arr)
+                that.totalItems = JSON.parse(res.text).totalItems
+                var totalPage = JSON.parse(res.text).totalPage
+                if (totalPage > 1) {
+                  that.pageShow = true
+                } else {
+                  that.pageShow = false
+                }
               }
-            }
-          })
+            })
         }
       } else {
-        type =1
+        type = 1
         this.currentPage = 1
-        if(name.length>0||phone.length>0) {
-          request.post(host + 'franchisee/account/queryAccount')
-          .withCredentials()
-          .set({
-            'content-type': 'application/x-www-form-urlencoded'
-          })
-          .send({
-            name: this.name.trim(),
-            phone: this.phone.trim(),
-            type:type
-          }).end(function(error,res){
-            if(error){
-              console.log(error)
-            }else {
-              var arr = JSON.parse(res.text).list
-              that.joinTableData = that.handleData(arr)
-              that.totalItems = JSON.parse(res.text).totalItems
-              var totalPage = JSON.parse(res.text).totalPage
-              if(totalPage>1){
-                that.pageShow = true
-              }else {
-                that.pageShow = false
+        if (name.length > 0 || phone.length > 0) {
+          request.post(host + 'franchisee/account/getAllAccount')
+            .withCredentials()
+            // .set({
+            //   'content-type': 'application/x-www-form-urlencoded'
+            // })
+            .send({
+              name: this.name.trim(),
+              phone: this.phone.trim(),
+              type: type
+            }).end(function (error, res) {
+              if (error) {
+                console.log(error)
+              } else {
+                var arr = JSON.parse(res.text).list
+                that.joinTableData = that.handleData(arr)
+                that.totalItems = JSON.parse(res.text).totalItems
+                var totalPage = JSON.parse(res.text).totalPage
+                if (totalPage > 1) {
+                  that.pageShow = true
+                } else {
+                  that.pageShow = false
+                }
               }
-            }
-          })
+            })
         }
       }
     },
     handleSizeChange(val) {
-     // console.log(`每页 ${val} 条`);
+      // console.log(`每页 ${val} 条`);
     },
     handleCurrentChange(val) {
       this.currentPage = val
     },
-    change (type) {
+    change(type) {
       this.$router.push('/index/accountManager/addaccount' + type)
       this.router_show = true
     },
-    addAccount () {
-      if(this.activeName==='平台') {
-         this.$router.push('/index/accountManager/addaccount')
-         this.router_show = true
-      }else {
+    addAccount() {
+      if (this.activeName === '平台') {
+        this.$router.push('/index/accountManager/addaccount')
+        this.router_show = true
+      } else {
         this.$router.push('/index/accountManager/addaccount2')
         this.router_show = true
       }
     },
-    handleClick (e) {
+    handleClick(e) {
       var elems = siblings(e.target)
       for (var i = 0; i < elems.length; i++) {
         elems[i].setAttribute('class', '')
       }
       e.target.setAttribute('class', 'active')
     },
-    openEdit (scope) {
-      if (scope.row.role === 0) {
-        this.editAccount.role = '管理员'
-      } else {
-        this.editAccount.role = '加盟商'
-      }
+    openEdit(scope) {
+      console.log(scope)
+      // if (scope.row.role === 0) {
+      //   this.editAccount.role = '管理员'
+      // } else {
+      //   this.editAccount.role = '加盟商'
+      // }
       this.dialogVisible = true
+      this.editAccount.roleName = scope.row.roleName
       this.editAccount.userId = scope.row.userId
       this.editAccount.email = scope.row.email
       this.editAccount.phoneNo = scope.row.phoneNo
       this.editAccount.name = scope.row.name
       this.editAccount.state = scope.row.state
-      this.editAccount.index= scope.$index
+      this.editAccount.index = scope.$index
       this.editAccount.id = scope.row.id
       this.editAccount.initUserId = scope.row.userId
     },
-    handleEditAccount () {
+    handleEditAccount() {
       this.dialogVisible = false
       var that = this
       var newAccountInfo = {}
@@ -451,22 +523,22 @@ export default {
       newAccountInfo.email = this.editAccount.email
       newAccountInfo.phoneNo = this.editAccount.phoneNo
       newAccountInfo.name = this.editAccount.name
-      newAccountInfo.state = (this.editAccount.state==true?0:1)
+      newAccountInfo.state = (this.editAccount.state == true ? 0 : 1)
       var index = this.editAccount.index
-      if(this.activeName === '平台') {
+      if (this.activeName === '平台') {
         var AccountInfo = newAccountInfo
         delete AccountInfo.role
-        updateAdmin(AccountInfo,function(error,res){
-          if(error) {
+        updateAdmin(AccountInfo, function (error, res) {
+          if (error) {
             console.log(error)
           } else {
-            var code =  JSON.parse(res.text).code
-            if(code === 0) {
+            var code = JSON.parse(res.text).code
+            if (code === 0) {
               that.$message({
                 type: 'success',
                 message: '恭喜您，修改成功！'
               })
-              that.platTableData.splice(index,1,that.editAccount)
+              that.platTableData.splice(index, 1, that.editAccount)
             } else {
               that.$message({
                 type: 'error',
@@ -475,215 +547,215 @@ export default {
             }
           }
         })
-      } else{
-          updateAccountByAdmin(newAccountInfo,function(error,res){
-            if(error) {
-              console.log(error)
+      } else {
+        updateAccountByAdmin(newAccountInfo, function (error, res) {
+          if (error) {
+            console.log(error)
+          } else {
+            var code = JSON.parse(res.text).code
+            if (code === 0) {
+              that.$message({
+                type: 'success',
+                message: '恭喜您，修改成功！'
+              })
+              that.joinTableData.splice(index, 1, that.editAccount)
             } else {
-              var code =  JSON.parse(res.text).code
-              if(code === 0) {
+              that.$message({
+                type: 'error',
+                message: 'sorry, 对不起修改失败！'
+              })
+            }
+          }
+        })
+      }
+    },
+    openDelete(scope) {
+      var that = this
+      if (this.activeName === '平台') {
+        this.$confirm('此操作将永久删除该账号, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          that.loading = true
+          delAdminUser(
+            {
+              curUser: {
+                id: 0,
+                role: 0,
+                userId: '123'
+              },
+              user: {
+                id: scope.row.id,
+                userId: scope.row.userId
+              }
+            },
+            function (error, res) {
+              if (error) {
+                console.log(error)
+              } else {
+                var code = JSON.parse(res.text).code
+                if (code === 1) {
+                  that.loading = false
+                  that.$message({
+                    type: 'error',
+                    message: '对不起，您没有权限!'
+                  })
+                } else if (code === 0) {
+                  that.loading = false
+                  that.$message({
+                    type: 'success',
+                    message: '恭喜您，删除成功!'
+                  })
+                  that.platTableData.splice(scope.$index, 1)
+                  if (that.platTableData.length === 0) {
+                    that.pageShow = false
+                    that.emptyText = '暂无数据'
+                  }
+                }
+              }
+            }
+          )
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+      } else {
+        this.$confirm('此操作将永久删除该账号, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          that.loading = true
+          delAccountByAdmin(
+            {
+              adminUser: {
+                id: 0,
+                role: 0,
+                userId: '123'
+              },
+              account: {
+                id: scope.row.id,
+                userId: scope.row.userId
+              }
+            }, function (error, res) {
+              if (error) {
+                console.log(error)
+                that.$message({
+                  type: 'error',
+                  message: '对不起，删除失败!'
+                })
+              } else {
+                var code = JSON.parse(res.text).code
+                if (code === 1) {
+                  that.loading = false
+                  that.$message({
+                    type: 'error',
+                    message: '对不起，您没有权限!'
+                  })
+                } else if (code === 0) {
+                  that.loading = false
+                  that.$message({
+                    type: 'success',
+                    message: '恭喜您，删除成功!'
+                  })
+                  that.joinTableData.splice(scope.$index, 1)
+                  if (that.joinTableData.length === 0) {
+                    that.pageShow = false
+                    that.emptyText = '暂无数据'
+                  }
+                }
+              }
+            }
+          )
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+      }
+    },
+    changeState(scope) {
+      if (this.activeName === '平台') {
+        var that = this
+        var initObj = Object.assign({}, scope.row, { state: scope.row.state })
+        var obj = Object.assign({}, scope.row, { state: !scope.row.state })
+        var obj2 = Object.assign({}, scope.row, { state: !scope.row.state ? 0 : 1 })
+        modifyAdminState(
+          {
+            id: scope.row.id,
+            userId: scope.row.userId,
+            state: !scope.row.state ? 0 : 1
+          }, function (error, res) {
+            if (error) {
+              console.log(error)
+              that.$message({
+                type: 'error',
+                message: '对不起，修改失败'
+              })
+              that.platTableData.splice(scope.$index, 1, initObj)
+            } else {
+              var code = JSON.parse(res.text).code
+              if (code === 0) {
                 that.$message({
                   type: 'success',
-                  message: '恭喜您，修改成功！'
+                  message: '恭喜你，修改成功'
                 })
-                that.joinTableData.splice(index,1,that.editAccount)
+                that.platTableData.splice(scope.$index, 1, obj)
               } else {
                 that.$message({
                   type: 'error',
-                  message: 'sorry, 对不起修改失败！'
+                  message: '对不起，修改失败'
                 })
+                that.platTableData.splice(scope.$index, 1, scope.row)
               }
             }
-          })
-      }
-    },
-    openDelete (scope) {
-      var that = this
-      if(this.activeName==='平台') {
-          this.$confirm('此操作将永久删除该账号, 是否继续?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {
-              that.loading = true
-              delAdminUser(
-                {
-                  curUser: {
-                    id: 0,
-                    role: 0,
-                    userId: '123'
-                  },
-                  user: {
-                    id: scope.row.id,
-                    userId: scope.row.userId
-                  }
-                },
-                function (error, res) {
-                  if(error) {
-                    console.log(error)
-                  } else {
-                    var code = JSON.parse(res.text).code
-                    if (code === 1) {
-                      that.loading = false
-                      that.$message({
-                        type: 'error',
-                        message: '对不起，您没有权限!'
-                      })
-                    }else if(code === 0) {
-                      that.loading = false
-                      that.$message({
-                        type: 'success',
-                        message: '恭喜您，删除成功!'
-                      })
-                      that.platTableData.splice(scope.$index,1)
-                      if( that.platTableData.length===0) {
-                        that.pageShow = false
-                        that.emptyText = '暂无数据'
-                      }
-                    }
-                  }
-                }
-              )
-            }).catch(() => {
-              this.$message({
-                type: 'info',
-                message: '已取消删除'
-              })      
-            })
-      } else{
-         this.$confirm('此操作将永久删除该账号, 是否继续?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {
-              that.loading = true
-              delAccountByAdmin(
-                {
-                  adminUser: {
-                    id: 0,
-                    role: 0,
-                    userId: '123'
-                  },
-                  account: {
-                    id: scope.row.id,
-                    userId: scope.row.userId
-                  }
-                },function(error,res){
-                  if(error) {
-                    console.log(error)
-                    that.$message({
-                      type: 'error',
-                      message: '对不起，删除失败!'
-                    })
-                  }else {
-                    var code = JSON.parse(res.text).code
-                    if (code === 1) {
-                      that.loading = false
-                      that.$message({
-                        type: 'error',
-                        message: '对不起，您没有权限!'
-                      })
-                    }else if(code === 0) {
-                      that.loading = false
-                      that.$message({
-                        type: 'success',
-                        message: '恭喜您，删除成功!'
-                      })
-                      that.joinTableData.splice(scope.$index,1)
-                      if( that.joinTableData.length===0) {
-                        that.pageShow = false
-                        that.emptyText = '暂无数据'
-                      }
-                    } 
-                  }
-                }
-              )
-            }).catch(() => {
-              this.$message({
-                type: 'info',
-                message: '已取消删除'
-              })      
-            })
-      }
-    },
-    changeState (scope) {
-      if(this.activeName==='平台') {
-          var that = this
-          var initObj = Object.assign({},scope.row, {state: scope.row.state})
-          var obj = Object.assign({},scope.row, {state: !scope.row.state})
-          var obj2 = Object.assign({},scope.row, {state: !scope.row.state?0:1})
-          modifyAdminState(
-            {
-              id: scope.row.id,
-              userId: scope.row.userId,
-              state: !scope.row.state?0:1
-            },function(error,res){
-                if(error) {
-                  console.log(error)
-                  that.$message({
-                    type:'error',
-                    message: '对不起，修改失败'
-                  })
-                  that.platTableData.splice(scope.$index,1,initObj)
-                } else {
-                  var code = JSON.parse(res.text).code
-                  if(code ===0 ){
-                    that.$message({
-                      type:'success',
-                      message: '恭喜你，修改成功'
-                    })
-                    that.platTableData.splice(scope.$index,1,obj)
-                  }else {
-                    that.$message({
-                      type:'error',
-                      message: '对不起，修改失败'
-                    })
-                    that.platTableData.splice(scope.$index,1,scope.row)
-                  }
-                }
-            }
-          )
-      }else {
-          var that = this
-          var initObj = Object.assign({},scope.row, {state: scope.row.state})
-          var obj = Object.assign({},scope.row, {state: !scope.row.state})
-          var obj2 = Object.assign({},scope.row, {state: !scope.row.state?0:1})
-          modifyAccountStateByAdmin(
-            {
-              adminUser: {
-                id:0,
-                userId: 'root'
-              },
-              account: obj2
-            },function(error, res){
-                if(error) {
-                  console.log(error)
-                  that.$message({
-                    type:'error',
-                    message: '对不起，修改失败'
-                  })
-                  that.joinTableData.splice(scope.$index,1,initObj)
-                }else {
-                  var code = JSON.parse(res.text).code
-                  if(code ===0 ){
-                    that.$message({
-                      type:'success',
-                      message: '恭喜你，修改成功'
-                    })
-                    that.joinTableData.splice(scope.$index,1,obj)
-                  }else {
-                    that.$message({
-                      type:'error',
-                      message: '对不起，修改失败'
-                    })
-                    that.joinTableData.splice(scope.$index,1,scope.row)
-                  }
-                }
-              }
-            )
           }
+        )
+      } else {
+        var that = this
+        var initObj = Object.assign({}, scope.row, { state: scope.row.state })
+        var obj = Object.assign({}, scope.row, { state: !scope.row.state })
+        var obj2 = Object.assign({}, scope.row, { state: !scope.row.state ? 0 : 1 })
+        modifyAccountStateByAdmin(
+          {
+            adminUser: {
+              id: 0,
+              userId: 'root'
+            },
+            account: obj2
+          }, function (error, res) {
+            if (error) {
+              console.log(error)
+              that.$message({
+                type: 'error',
+                message: '对不起，修改失败'
+              })
+              that.joinTableData.splice(scope.$index, 1, initObj)
+            } else {
+              var code = JSON.parse(res.text).code
+              if (code === 0) {
+                that.$message({
+                  type: 'success',
+                  message: '恭喜你，修改成功'
+                })
+                that.joinTableData.splice(scope.$index, 1, obj)
+              } else {
+                that.$message({
+                  type: 'error',
+                  message: '对不起，修改失败'
+                })
+                that.joinTableData.splice(scope.$index, 1, scope.row)
+              }
+            }
+          }
+        )
+      }
     },
-    handleData (arr) {
+    handleData(arr) {
       var res = arr.map((item) => {
         var obj = {}
         var state = null
@@ -692,79 +764,79 @@ export default {
         } else {
           state = false
         }
-        obj = Object.assign({}, item, {state: state})
+        obj = Object.assign({}, item, { state: state })
         return obj
       })
       return res
     },
-    handleClickTab (tab, event) {
+    handleClickTab(tab, event) {
       var that = this
       this.name = ''
       this.phone = ''
-      if(this.activeName === '平台') {
-          this.currentPage = 1
-          this.loading = true
-          this.loadingText = '拼命加载中'
-          getAllAdminUser({franchiseeId: '123456',userId: 'admin'}, 1, function(err,res){
-            if(err) {
-              console.log(err)
-              setTimeout(function(){
-                that.loading = false
-                that.loadingText = '服务器链接超时'
-              },5000)
-              setTimeout(function(){
-                that.emptyText = '暂无数据'
-              },6000)
-            }else {
-              that.loading = false
-              that.totalPage = JSON.parse(res.text).totalPage
-              var arr = JSON.parse(res.text).list
-              if(that.totalPage>1) {
-                  that.emptyText = ' '
-                  that.pageShow = true
-              } else {
-                that.emptyText = '暂无数据'
-                that.pageShow = false
-              }
-              that.totalItems = JSON.parse(res.text).totalItems
-              that.$store.state.platTableData = that.handleData(arr)
-              that.platTableData = that.$store.state.platTableData
-              that.initData = that.platTableData
-            }
-          })
-      }else {
+      if (this.activeName === '平台') {
         this.currentPage = 1
-        getAllAccount({franchiseeId: '123456',userId: 'admin'}, 1, function(error, res){
-          if(error){
-            console.log(error)
-            setTimeout(function(){
+        this.loading = true
+        this.loadingText = '拼命加载中'
+        getAllAdminUser({ franchiseeId: '123456', userId: 'admin' }, 1, function (err, res) {
+          if (err) {
+            console.log(err)
+            setTimeout(function () {
               that.loading = false
               that.loadingText = '服务器链接超时'
-            },5000)
-            setTimeout(function(){
+            }, 5000)
+            setTimeout(function () {
               that.emptyText = '暂无数据'
-            },6000)
+            }, 6000)
           } else {
+            that.loading = false
+            that.totalPage = JSON.parse(res.text).totalPage
+            var arr = JSON.parse(res.text).list
+            if (that.totalPage > 1) {
+              that.emptyText = ' '
+              that.pageShow = true
+            } else {
+              that.emptyText = '暂无数据'
+              that.pageShow = false
+            }
+            that.totalItems = JSON.parse(res.text).totalItems
+            that.$store.state.platTableData = that.handleData(arr)
+            that.platTableData = that.$store.state.platTableData
+            that.initData = that.platTableData
+          }
+        })
+      } else {
+        this.currentPage = 1
+        getAllAccount({ franchiseeId: '123456', userId: 'admin',cityId:'0' }, 1, function (error, res) {
+          if (error) {
+            console.log(error)
+            setTimeout(function () {
               that.loading = false
-              that.totalPage = JSON.parse(res.text).totalPage || 20
-              var arr = JSON.parse(res.text).list
-              that.totalItems = JSON.parse(res.text).totalItems
-              if(that.totalPage>1) {
-                that.emptyText = ' '
-                that.pageShow = true
-              } else {
-                that.emptyText = '暂无数据'
-                that.pageShow = false
-              }
-              that.$store.state.joinTableData = that.handleData(arr)
-              that.joinTableData =  that.$store.state.joinTableData
-              that.initData = that.joinTableData
-              //that.setPage(arr,that.totalPage)
+              that.loadingText = '服务器链接超时'
+            }, 5000)
+            setTimeout(function () {
+              that.emptyText = '暂无数据'
+            }, 6000)
+          } else {
+            that.loading = false
+            that.totalPage = JSON.parse(res.text).totalPage || 20
+            var arr = JSON.parse(res.text).list
+            that.totalItems = JSON.parse(res.text).totalItems
+            if (that.totalPage > 1) {
+              that.emptyText = ' '
+              that.pageShow = true
+            } else {
+              that.emptyText = '暂无数据'
+              that.pageShow = false
+            }
+            that.$store.state.joinTableData = that.handleData(arr)
+            that.joinTableData = that.$store.state.joinTableData
+            that.initData = that.joinTableData
+            //that.setPage(arr,that.totalPage)
           }
         })
       }
     },
-    setPage (arr, totalPage) {
+    setPage(arr, totalPage) {
       var that = this
       if (arr.length > 0) {
         $('.M-box').html('')
@@ -812,98 +884,98 @@ export default {
       }
     }
   },
-  mounted () {
-   this.loadData()
+  mounted() {
+    this.loadData()
   },
   watch: {
     currentPage: {
-        handler: function (val, oldVal) {
-          var that = this
-          if(this.activeName === '平台') {
-              if(this.name.trim().length===0&&this.phone.trim().length===0){
-                getAllAdminUser({franchiseeId: '123456',userId: 'admin'}, val, function(err,res){
-                  if(err) {
-                    console.log(err)
-                  }else {
-                    var arr = JSON.parse(res.text).list
-                    var totalPage = JSON.parse(res.text).totalPage
-                    if(totalPage>1) {
-                       that.emptyText = ' '
-                       that.pageShow = true
-                    } else {
-                      that.pageShow = false
-                      that.emptyText = '暂无数据'
-                    }
-                    that.$store.state.platTableData = that.handleData(arr)
-                    that.platTableData = that.$store.state.platTableData
-                  }
-                })
-              }else {
-                request.post(host + 'franchisee/account/queryAccount?page=' + val).
-                  send({
-                    name: this.name.trim(),
-                    phone: this.phone.trim(),
-                    type:0
-                  }).end(function(error,res){
-                    if(error){
-                      console.log(error)
-                    }else {
-                      var arr = JSON.parse(res.text).list
-                      that.platTableData = that.handleData(arr)
-                      that.totalItems = JSON.parse(res.text).totalItems
-                      var totalPage = JSON.parse(res.text).totalPage
-                      if(totalPage>1){
-                        that.pageShow = true
-                      }else {
-                        that.pageShow = false
-                      }
-                    }
-                  })
+      handler: function (val, oldVal) {
+        var that = this
+        if (this.activeName === '平台') {
+          if (this.name.trim().length === 0 && this.phone.trim().length === 0) {
+            getAllAdminUser({ franchiseeId: '123456', userId: 'admin' }, val, function (err, res) {
+              if (err) {
+                console.log(err)
+              } else {
+                var arr = JSON.parse(res.text).list
+                var totalPage = JSON.parse(res.text).totalPage
+                if (totalPage > 1) {
+                  that.emptyText = ' '
+                  that.pageShow = true
+                } else {
+                  that.pageShow = false
+                  that.emptyText = '暂无数据'
+                }
+                that.$store.state.platTableData = that.handleData(arr)
+                that.platTableData = that.$store.state.platTableData
               }
-          }else {
-            if(this.name.trim().length===0&&this.phone.trim().length===0){
-              getAllAccount({franchiseeId: '123456',userId: 'admin'}, val, function(error, res){
-                if(error){
+            })
+          } else {
+            request.post(host + 'franchisee/account/getAllAdminUser?page=' + val).
+              send({
+                name: this.name.trim(),
+                phone: this.phone.trim(),
+                type: 0
+              }).end(function (error, res) {
+                if (error) {
                   console.log(error)
                 } else {
-                    var arr = JSON.parse(res.text).list
-                    if(arr.length===0) {
-                      that.emptyText = '暂无数据'
-                    } else {
-                      that.emptyText = ' '
-                    }
-                    that.$store.state.joinTableData = that.handleData(arr)
-                    that.joinTableData = that.$store.state.joinTableData
+                  var arr = JSON.parse(res.text).list
+                  that.tableTableData = that.handleData(arr)
+                  that.totalItems = JSON.parse(res.text).totalItems
+                  var totalPage = JSON.parse(res.text).totalPage
+                  if (totalPage > 1) {
+                    that.pageShow = true
+                  } else {
+                    that.pageShow = false
+                  }
                 }
               })
-            }else {
-              request.post(host + 'franchisee/account/queryAccount?page=' + val).
-                send({
-                  name: this.name.trim(),
-                  phone: this.phone.trim(),
-                  type:1
-                })
-                .end(function(error,res){
-                  if(error){
-                    console.log(error)
-                  }else {
-                    var arr = JSON.parse(res.text).list
-                    that.joinTableData = that.handleData(arr)
-                    that.totalItems = JSON.parse(res.text).totalItems
-                    var totalPage = JSON.parse(res.text).totalPage
-                    if(totalPage>1){
-                      that.pageShow = true
-                    }else {
-                      that.pageShow = false
-                    }
-                  }
-                })
-            }
           }
-        },
-        deep: true
-      }
+        } else {
+          if (this.name.trim().length === 0 && this.phone.trim().length === 0) {
+            getAllAccount({ franchiseeId: '123456', userId: 'admin' }, val, function (error, res) {
+              if (error) {
+                console.log(error)
+              } else {
+                var arr = JSON.parse(res.text).list
+                if (arr.length === 0) {
+                  that.emptyText = '暂无数据'
+                } else {
+                  that.emptyText = ' '
+                }
+                that.$store.state.joinTableData = that.handleData(arr)
+                that.joinTableData = that.$store.state.joinTableData
+              }
+            })
+          } else {
+            request.post(host + 'franchisee/account/getAllAccount?page=' + val).
+              send({
+                name: this.name.trim(),
+                phone: this.phone.trim(),
+                type: 1
+              })
+              .end(function (error, res) {
+                if (error) {
+                  console.log(error)
+                } else {
+                  var arr = JSON.parse(res.text).list
+                  that.joinTableData = that.handleData(arr)
+                  that.totalItems = JSON.parse(res.text).totalItems
+                  var totalPage = JSON.parse(res.text).totalPage
+                  if (totalPage > 1) {
+                    that.pageShow = true
+                  } else {
+                    that.pageShow = false
+                  }
+                }
+              })
+          }
+        }
+      },
+      deep: true
     }
+  }
 }
 </script>
 
@@ -939,6 +1011,7 @@ body {
   font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
 }
 
+
 /*#account_router_cover {
   width: 100%;
   height: 100%;
@@ -948,21 +1021,30 @@ body {
   top: 0;
 }*/
 
-
 #account_router {
   width: 100%;
   height: 100%;
-  background: rgba(68,68,68,0.6);
+  background: rgba(68, 68, 68, 0.6);
   position: fixed;
   z-index: 100;
   left: 0;
-  top: 0;  
+  top: 0;
 }
- div.selectPlace{margin-bottom:20px;}
-  div.selectPlace address{font-style:normal;display:inline;font-size:14px;}
-  div.selectPlace div.citys{display:inline-block;}
-  div.selectPlace span{cursor:pointer;font-size:14px;display:inline-block;padding:5px;border:1px solid transparent;}
-  div.selectPlace span.active{border:1px solid orange;}
+
+
+/*#account_router {
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: block;
+  height: 80%;
+  margin-left: 10%;
+  margin-top: 5%;
+  width: 80%;
+  z-index: 100;
+  background: #f60;
+  overflow: hidden;
+}*/
 
 div.account {
   /* width: 100%; */
@@ -990,12 +1072,12 @@ div.account>h1 button {
   font-size: 12px;
   color: #fff;
   border-radius: 4px;
-  background: rgba(66,66,66, 0.8);
+  background: rgba(66, 66, 66, 0.8);
   transition: all .2s linear 0s;
 }
 
 div.account>h1 button:hover {
-  background: rgb(66,66,66);
+  background: rgb(66, 66, 66);
   cursor: pointer;
 }
 
@@ -1026,30 +1108,18 @@ div.account>h1 button:hover {
   float: left;
 }
 
-::-webkit-input-placeholder { /* WebKit browsers */ 
-color: #bfcbd9; 
-} 
-:-moz-placeholder { /* Mozilla Firefox 4 to 18 */ 
-color: #bfcbd9; 
-} 
-::-moz-placeholder { /* Mozilla Firefox 19+ */ 
-color: #bfcbd9; 
-} 
-:-ms-input-placeholder { /* Internet Explorer 10+ */ 
-color: #bfcbd9; 
-} 
-
-
 #am_search label span {
   line-height: 70px;
   font-weight: 400;
   font-size: 14px;
   display: block;
-  margin-right: 20px;
+  margin-right: 10px;
   float: left;
 }
 
-
+#am_search label:nth-child(2) {
+  margin-left: 0;
+}
 
 #am_search button {
   display: inline-block;
@@ -1085,35 +1155,146 @@ color: #bfcbd9;
   min-height: 230px;
 }
 
-.el-switch__label, .el-switch__label *{font-size:12px;}
-#am_search button.my_btn{width: 80px;
-    float: right;
-    height: 36px;
-    line-height: 11px;
-    margin-right: 30px;
-    color: #fff;
-    margin-top: 17px;
-    outline: none;
-    border: none;
-    background: rgba(52,52,67,0.8);}
-#am_search button.my_btn:hover{background: rgba(52,52,67,1)}
-.el-pagination{
-  border: 1px solid #e7ecf1;
-  border-top: none;
-  border-bottom: none;
-  padding-left: 29px;
+.el-switch__label,
+.el-switch__label * {
+  font-size: 12px;
 }
-.el-pager li.number{
-  padding: 0 4px;
-  border-right: 0;
-  background: #272525;
-  font-size: 13px;
-  min-width: 34px;
-  height: 34px;
-  line-height: 34px;
-  text-align: center;
+
+.el-icon-close,
+.el-icon-edit {
+  cursor: pointer
+}
+
+.el-dialog .dialogModal {
+  background: rgba(0, 0, 0, .5)
+}
+
+.one {
+  background: #f87e2b;
+  border: none;
+  width: 120px;
+  height: 50px;
+}
+
+.two {
+  background: #f87e2b;
+  border: none;
+  width: 120px;
+  height: 50px;
+}
+
+.one:hover {
+  background: rgba(248, 126, 43, 0.9);
+  width: 120px;
+  height: 50px;
+}
+
+
+.two:hover {
+  border: 1px solid rgb(248, 126, 43);
+  color: rgb(248, 126, 43);
+  width: 120px;
+  height: 50px;
+}
+
+button#accountSearchBtn {
+  width: 80px;
+  /* float: right; */
+  height: 36px;
+  line-height: 11px;
+  margin-right: 30px;
   color: #fff;
-  margin-left: 8px;
-  border-radius: 2px;    
-}  
+  outline: none;
+  border: none;
+  /* border-radius: 4px; */
+  background: rgba(52, 52, 67, 0.8);
+}
+
+button#accountSearchBtn:hover {
+  color: #fff;
+  background: rgba(52, 52, 67, 1);
+}
+
+.accountMangerBtn {
+  width: 120px;
+  height: 50px;
+}
+
+.accountMangerBtn:nth-of-type(1):hover {
+  background: rgba(248, 126, 43, 0.9);
+}
+
+.accountMangerBtn:nth-of-type(1) {
+  background: #f87e2b;
+  border: none;
+  color: #fff;
+  margin-left: 170px;
+}
+
+.accountMangerBtn:nth-of-type(2) {
+  background: #fff;
+  color: #444;
+  border: 1px solid rgba(196, 196, 196, 1)
+}
+
+.accountMangerBtn:nth-of-type(2):hover {
+  border: 1px solid rgb(248, 126, 43);
+  color: rgb(248, 126, 43);
+}
+
+div.addfooter,
+div.editfooter {
+  text-align: left;
+  padding-left: 60px;
+  margin-top: -43px;
+  margin-bottom: 10px;
+}
+
+div.el-input {
+  width: initial
+}
+
+.el-pagination {
+  white-space: nowrap;
+  /* padding: 2px 5px; */
+  color: #48576a;
+  padding-left: 30px;
+  background: #fff;
+  /* margin-left: 1px; */
+  border-left: 1px solid #e7ecf1;
+}
+
+div.el-pagination {
+  margin-left: 0;
+  padding-left: 0;
+  border-left: 0;
+  margin-top: 20px;
+  margin-bottom: 10px
+}
+div.selectPlace {
+  margin-bottom: 20px;
+}
+
+div.selectPlace address {
+  font-style: normal;
+  display: inline;
+  font-size: 14px;
+}
+
+div.selectPlace div.citys {
+  display: inline-block;
+}
+
+div.selectPlace span {
+  cursor: pointer;
+  font-size: 14px;
+  display: inline-block;
+  padding: 5px;
+  border: 1px solid transparent;
+}
+
+div.selectPlace span.active {
+  border: 1px solid orange;
+}
 </style>
+

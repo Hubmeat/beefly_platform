@@ -40,7 +40,7 @@
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer addfooter">
-            <el-button class="addRoleBtn" type="primary" @click="handleAddRole">确定</el-button>
+            <el-button class="addRoleBtn" type="primary" @click="handleAddRole">立即创建</el-button>
              <el-button class="addRoleBtn" @click="dialogFormVisible = false">取消</el-button>
           </div>
         </el-dialog> 
@@ -354,10 +354,6 @@ export default {
         var that = this
         request
         .post(host + 'franchisee/account/getRole')
-        .withCredentials()
-        .set({
-          'content-type': 'application/x-www-form-urlencoded'
-        })
         .end((err, res) => {
           if (err) {
             console.log(err)
@@ -396,10 +392,6 @@ export default {
       if(this.roleName.trim().length!==0){
         this.isQuery = true
         request.post(host + 'franchisee/account/queryRole')
-          .withCredentials()
-          .set({
-            'content-type': 'application/x-www-form-urlencoded'
-          })
           .send({
             roleName: this.roleName.trim()
           })
@@ -456,11 +448,7 @@ export default {
         return {code: item}
       })
       request
-        .post('http://192.168.3.52:7099/franchisee/account/updateRole')
-        .withCredentials()
-        .set({
-          'content-type': 'application/x-www-form-urlencoded'
-        })
+        .post(host + 'franchisee/account/updateRole')
         .send({
           oldRole: {
             id: that.editForm.id
@@ -504,11 +492,7 @@ export default {
         }).then(() => {
           this.loading = true
           request
-            .post('http://192.168.3.52:7099/franchisee/account/delRole')
-            .withCredentials()
-            .set({
-              'content-type': 'application/x-www-form-urlencoded'
-            })
+            .post(host + 'franchisee/account/delRole')
             .send({
               id: scope.row.id,
               roleType: scope.row.roleType,
@@ -556,15 +540,12 @@ export default {
               this.dialogFormVisible = false
               request
                 .post(host + 'franchisee/account/addRole')
-                .withCredentials()
-                .set({
-                  'content-type': 'application/x-www-form-urlencoded'
-                })
                 .send({
                   des: that.form.des,
                   roleName: that.form.roleName,
                   auths: authList,
-                  roleType: that.form.roleName === '管理员'?'0':'1'
+                  roleType: that.form.roleName === '管理员'?'0':'1',
+                  belong: 1
                 })
                 .end((err, res) => {
                   if (err) {
@@ -580,7 +561,7 @@ export default {
                     } else {
                       that.$message({
                         type: 'error',
-                        message: 'sorry！添加角色失败'
+                        message: 'sorry！角色已存在，请重新添加'
                       })
                     }
                   }
@@ -599,10 +580,6 @@ export default {
     var that = this
     request
      .post(host + 'franchisee/account/getRole')
-      .withCredentials()
-      .set({
-        'content-type': 'application/x-www-form-urlencoded'
-      })
      .end((err, res) => {
        if (err) {
          console.log(err)
@@ -629,6 +606,7 @@ export default {
             var obj = Object.assign({},item, {fathCode: fathCode},{childrenCode: childrenCode})
             return obj
           })
+          console.log(newArr)
          that.tableData  = newArr
          that.initData = that.tableData
        }
@@ -642,10 +620,6 @@ export default {
           // 初始化查询
            request
             .post(host + 'franchisee/account/getRole?page=' + val)
-            .withCredentials()
-            .set({
-              'content-type': 'application/x-www-form-urlencoded'
-            })
             .end((err, res) => {
               if (err) {
                 console.log(err)
@@ -679,10 +653,6 @@ export default {
         }else {
           // 筛选查询
           request.post(host + 'franchisee/account/queryRole?page=' + val)
-          .withCredentials()
-          .set({
-            'content-type': 'application/x-www-form-urlencoded'
-          })
           .send({
             roleName: this.roleName.trim()
           })
@@ -914,7 +884,8 @@ div.account>h1 .addRoleBtn {
 div.account>h1 .addRoleBtn:nth-of-type(1) {
     background: #f87e2b;
     border: none;
-    color: #fff;}
+    color: #fff;
+    margin-left:100px;}
 div.account>h1 .addRoleBtn:nth-of-type(2){background: #fff;color: #444;border: 1px solid rgba(196,196,196,1)}   
 div.account>h1 .addRoleBtn:nth-of-type(2):hover {border: 1px solid rgb(248, 126, 43);color: rgb(248, 126, 43);} 
  button#roleSearchBtn{width: 80px;

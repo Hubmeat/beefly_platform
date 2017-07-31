@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div id="addaccount_form" v-loading="loading" element-loading-text=" ">
+		<div id="memberCenter_form" v-loading="loading" element-loading-text=" ">
 						<h1 id="addaccount_title">绑定邮箱
               <span>
                 <a @click="$router.push('/index/memberCenter')">
@@ -27,7 +27,7 @@
 <style>
 
   @media screen and (min-width:1367px) {
-    #addaccount_form {
+    #memberCenter_form {
       /*  适配好的样式 */
       height: 36%;
       /*overflow-y: scroll; 
@@ -50,7 +50,7 @@
   }
 
   @media screen and (max-width:1367px) {
-    #addaccount_form {
+    #memberCenter_form {
       height: 40%;
       width: 30%;
       box-shadow: 0 5px 15px rgba(0,0,0,.5);
@@ -166,7 +166,7 @@
       
 <script>
 import {isEmail} from '../../../../utils/index.js'
-import { host } from '../../../config/index.js'
+import {host} from '../../../config/index'
 import request from 'superagent'
 export default {
   data () {
@@ -210,10 +210,6 @@ export default {
               callback: function (action) {
                 that.loading = true
                 request.post(host + 'franchisee/userCenter/bindingEmail')
-                .withCredentials()
-                .set({
-                  'content-type': 'application/x-www-form-urlencoded'
-                })
                 .send({id:1123339, email: that.ruleForm.maiAccount, password: that.ruleForm.account_password})
                 .end((err, res) => {
                   if (err) {

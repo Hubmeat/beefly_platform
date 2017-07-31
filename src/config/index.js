@@ -1,12 +1,12 @@
 /**
  * 内网测试服务端口
  */
-// export const host  = 'http://192.168.3.52:7099/'
+export const host = 'http://192.168.3.52:7099/'
 
 /**
  * 海波测试端口
  */
-export const host  = 'http://192.168.3.78:7099/'
+// export const host = 'http://192.168.3.78:7099/'
 
 
 /**
@@ -25,6 +25,5 @@ import axios from 'axios'
 
 
 export var instance = axios.create({
-    headers: {'content-type': 'application/x-www-form-urlencoded'}
+    headers: { 'content-type': 'application/x-www-form-urlencoded' }
 });
-

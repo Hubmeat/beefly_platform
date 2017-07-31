@@ -46,9 +46,6 @@
             </el-table-column>
           </el-table>
        </el-row>
-       <div class="loginLog_page">
-        <div class="M-box"></div>
-       </div>
       </el-tab-pane>
       <el-tab-pane label="加盟商">
         <el-row class="querybar">
@@ -104,13 +101,20 @@
             >
             </el-table-column>
           </el-table>
-       
        </el-row>
-       <div class="loginLog_page">
-        <div class="M-box"></div>
-       </div>
       </el-tab-pane>
+       <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page.sync="currentPage3"
+        :page-size="10"
+        layout="prev, pager, next, jumper"
+        :total="totalItems"
+        v-show="pageShow"
+        >
+      </el-pagination>
     </el-tabs>
+
   </div>
 </template>
 <style scoped>
@@ -150,6 +154,9 @@
   export default {
     data: function () {
       return {
+        currentPage3:1,
+        totalItems:1,
+        pageShow: false,
         tabTitle: '平台',
         keyword: '',
         startTime: moment(),
@@ -167,6 +174,12 @@
       }
     },
     methods: {
+        handleSizeChange(val) {
+        console.log(`每页 ${val} 条`);
+      },
+      handleCurrentChange(val) {
+        console.log(`当前页: ${val}`);
+      },
       handleClick (e) {
         var elems = siblings(e.target)
         for (var i = 0; i < elems.length; i++) {
@@ -317,116 +330,74 @@
     mounted: function () {
       var that = this
       if(this.tabTitle === '平台') {
-      request.post(host + 'franchisee/log/allLog')
-        .withCredentials()
-        .set({
-          'content-type': 'application/x-www-form-urlencoded'
-        })
-        .send({
-          franchiseeId: '123456',
-          userId: 'jjjj'
-        })
-        .end(function(err, res){
-          if (err) {
-            console.log(err)
-          } else {
-            var newArr =  JSON.parse(res.text).list.map((item) => {
-              var obj = Object.assign({},item,{loginTime: moment(item.loginTime).format('YYYY-MM-DD HH:mm:ss')})
-              return obj
-            })
-            that.form_plat.tableData = newArr
-            that.plat_totalPage = JSON.parse(res.text).totalPage || 20
-            var len = JSON.parse(res.text).list.length
-            if (len>0) {
-              that.form_plat.hasPlatData = false
-              $('.M-box').eq(0).pagination({
-                pageCount: that.plat_totalPage,
-                jump: true,
-                coping: true,
-                homePage: '首页',
-                endPage: '尾页',
-                prevContent: '«',
-                nextContent: '»'
+        request.post(host + 'franchisee/log/allLog')
+          .withCredentials()
+          .set({
+            'content-type': 'application/x-www-form-urlencoded'
+          })
+          .send({
+            franchiseeId: '123456',
+            userId: 'jjjj'
+          })
+          .end(function(err, res){
+            if (err) {
+              console.log(err)
+            } else {
+              var newArr =  JSON.parse(res.text).list.map((item) => {
+                var obj = Object.assign({},item,{loginTime: moment(item.loginTime).format('YYYY-MM-DD HH:mm:ss')})
+                return obj
               })
-              $('.M-box').click(function (e) {
-                if (e.target.getAttribute('class') === 'active') {
-                  return false
-                }
-                if (e.target.tagName === 'A') {
-                  if (e.target.innerText === '首页') {
-                    that.plat_currentPage = 1
-                  }
-                  if (e.target.innerText === '尾页') {
-                    that.plat_currentPage = that.totalPage
-                  }
-                  if (e.target.innerText === '»') {
-                    that.plat_currentPage++
-                  }
-                  if (e.target.innerText === '«') {
-                    that.plat_currentPage--
-                  }
-                  if (checkPositiveNumber(e.target.innerText)) {
-                    that.plat_currentPage = e.target.innerText
-                  }
-                  if (e.target.innerText === '跳转') {
-                    e.preventDefault()
-                    var jumpPageNum = $('.M-box .active')
-                    that.plat_currentPage = jumpPageNum[0].innerText
-                  }
-                }
-              })
-              $(document).keydown(function (e) {
-                if (e.keyCode === 13) {
-                  that.plat_currentPage = e.target.value
-                }
-              })
+              that.form_plat.tableData = newArr
+              that.plat_totalPage = JSON.parse(res.text).totalPage || 20
+              if (that.plat_totalPage>1) {
+                that.pageShow = true
+              }else {
+                that.pageShow = false
+              }
+              that.totalItems = JSON.parse(res.text).totalItems
             }
-          }
-        })
+          })
       }
     },
     watch: {
-      plat_currentPage: {
+      currentPage3: {
         handler: function (val, oldVal) {
           var that = this
-          request.post(host + 'franchisee/log/allLog?page=' + that.plat_currentPage)
-            .withCredentials()
-            .set({
-              'content-type': 'application/x-www-form-urlencoded'
-            })
-            .send({
-              franchiseeId: '123456',
-              userId: 'jjjj'
-            })
-            .end(function (err, res) {
-              if (err) {
-                console.log(err)
-              } else {
-                that.form_plat.tableData = JSON.parse(res.text).list
-              }
-            })
-        },
-        deep: true
-      },
-      join_currentPage: {
-        handler: function (val, oldVal) {
-          var that = this
-          request.post(host + 'franchisee/log/getLoginLog?page=' + that.join_currentPage)
-            .withCredentials()
-            .set({
-              'content-type': 'application/x-www-form-urlencoded'
-            })
-            .send({
-              franchiseeId: '123456',
-              userId: 'jjjj'
-            })
-            .end(function (err, res) {
-              if (err) {
-                console.log(err)
-              } else {
-                that.form_join.tableData = JSON.parse(res.text).list
-              }
-            })
+          if(this.tabTitle==='平台'){
+             request.post(host + 'franchisee/log/allLog?page=' + that.plat_currentPage)
+              .withCredentials()
+              .set({
+                'content-type': 'application/x-www-form-urlencoded'
+              })
+              .send({
+                franchiseeId: '123456',
+                userId: 'jjjj'
+              })
+              .end(function (err, res) {
+                if (err) {
+                  console.log(err)
+                } else {
+                  that.form_plat.tableData = JSON.parse(res.text).list
+                }
+              })
+          }else{
+            request.post(host + 'franchisee/log/getLoginLog?page=' + that.join_currentPage)
+              .withCredentials()
+              .set({
+                'content-type': 'application/x-www-form-urlencoded'
+              })
+              .send({
+                franchiseeId: '123456',
+                userId: 'jjjj'
+              })
+              .end(function (err, res) {
+                if (err) {
+                  console.log(err)
+                } else {
+                  that.form_join.tableData = JSON.parse(res.text).list
+                }
+              })
+          }
         },
         deep: true
       }
