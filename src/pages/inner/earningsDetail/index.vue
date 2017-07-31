@@ -894,11 +894,8 @@ export default {
             'content-type': 'application/x-www-form-urlencoded'
           })
           .send({
-            'account': {
-              'franchiseeId': '123456',
-              'userId': 'admin',
-              'cityId': $('citys span.active').attr('myId')
-            },
+            'userId': 'admin',
+            'cityId': $('.citys span.active').attr('myId'),
             'startTime': startTime,
             'endTime': endTime,
           })

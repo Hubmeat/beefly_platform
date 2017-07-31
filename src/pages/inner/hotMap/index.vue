@@ -395,7 +395,7 @@ export default {
   methods: {
     mountedWay () {
       request
-        .post(host + 'franchisee/report/hot/curHour')
+        .post(host + 'franchisee/report/hotted/' + this.$route.query.type)
         .withCredentials()
         .set({
           'content-type': 'application/x-www-form-urlencoded'
@@ -645,20 +645,19 @@ export default {
           type: 'warning'
         })
       } else {
-        startTime = moment(this.value4[0]).format('YYYY-MM-DD HH:MM:SS')
-        endTime = moment(this.value4[1]).format('YYYY-MM-DD HH:MM:SS')
+        startTime = moment(this.value4[0]).format('YYYY-MM-DD HH:mm:ss')
+        endTime = moment(this.value4[1]).format('YYYY-MM-DD HH:mm:ss')
         console.log(startTime, endTime)
         request
-          .post(host + 'franchisee/report/hot/defineTime')
+          .post(host + 'franchisee/report/hotted/defineTime')
           .withCredentials()
           .set({
             'content-type': 'application/x-www-form-urlencoded'
           })
           .send({
-            "account": {
-              'franchiseeId': '123456',
-              'userId': 'admin'
-            },
+            'franchiseeId': '123456',
+            'userId': 'admin',
+            'cityId': $('citys span.active').attr('myId'),
             'startDate': startTime,
             'endDate': endTime
           })
@@ -691,17 +690,15 @@ export default {
     },
     requestWay(type) {
       request
-        .post(host + 'franchisee/report/hot/' + type)
+        .post(host + 'franchisee/report/hotted/' + type)
         .withCredentials()
         .set({
           'content-type': 'application/x-www-form-urlencoded'
         })
         .send({
-          "account": {
-            'franchiseeId': '123456',
-            'userId': 'admin',
-            'cityId': $('.citys span.active').attr('myId')?$('.citys span.active').attr('myId'):0
-          },
+          'franchiseeId': '123456',
+          'userId': 'admin',
+          'cityId': $('.citys span.active').attr('myId')?$('.citys span.active').attr('myId'):0,
           "date": this.$route.query.date
         })
         .end((error, res) => {
@@ -744,9 +741,9 @@ export default {
         })
     }
   },
-  created() {
-    this.dataUpdate()
-  },
+  // created() {
+  //   this.dataUpdate()
+  // },
   watch: {
     '$route': 'dataUpdate'
   }
