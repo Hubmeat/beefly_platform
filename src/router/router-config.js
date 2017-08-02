@@ -119,11 +119,11 @@ export default [
       },
       {
         path: '/index/partnerManager',
-        name: '合伙人管理',
+        name: '加盟商管理',
         component: partnerManager,
         children: [{
           path: '/index/partnerManager/addpartner',
-          name: '添加合伙人',
+          name: '添加加盟商',
           component: addpartner
         }]
       },
@@ -133,7 +133,7 @@ export default [
         component: vehicleDistribution
       },
       {
-        path: '/index/partnerDetail',
+        path: '/index/partnerDetail/:id',
         name: '加盟商明细',
         component: partnerDetail
       },

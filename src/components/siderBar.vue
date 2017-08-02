@@ -5,7 +5,7 @@
         <el-menu-item index="/index">
           <i class="iconfont my_icon_class">&#xe608;</i>首页</el-menu-item>
         <el-menu-item index="/index/partnerManager">
-          <i class="iconfont my_icon_class">&#xe623;</i>加盟商管理</el-menu-item>        
+          <i class="iconfont my_icon_class">&#xe623;</i>合伙人管理</el-menu-item>        
         <el-menu-item index="/index/carManager">
           <i class="iconfont my_icon_class">&#xe613;</i>车辆管理</el-menu-item>
         <el-submenu index="4">
