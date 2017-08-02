@@ -3,74 +3,104 @@
 	<div id="addpartner_form">
 				<h1 id="addpartner_title">添加加盟商
 					<span>
-						<a href="/index/partnerManager">
+						<a href="javascript:void(0)" style="color:#000;" @click="$router.push({path:'/index/partnerManager'})">
 							<i class="el-icon-close"></i>		
 						</a>
 					</span>
 				</h1>
 			<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="110px" class="demo-ruleForm">
-				  <el-form-item label="企业名称" prop="company_name">
-				    <el-input v-model="ruleForm.company_name" placeholder='长度不超过100字符'></el-input>
-				  </el-form-item>
-				  <el-form-item label="营业执照号" prop="business_license">
-				    <el-input v-model="ruleForm.business_license" placeholder='请输入营业执照注册号'></el-input>
-				  </el-form-item>
-				  <el-form-item label="通讯地址" prop="address">
-				    <el-input v-model="ruleForm.address" placeholder='请输入地址'></el-input>
-				  </el-form-item>
-				  <el-form-item label="加盟日期" prop="alliance_date">
-              <el-date-picker
-                v-model="date1"
-                type="date"
-                placeholder="选择日期"
-                :picker-options="pickerOptions0">
-              </el-date-picker>           
-				  </el-form-item>
-				  <el-form-item label="车辆数" prop="car">
-				    <el-input v-model.number="ruleForm.car" placeholder='请输入车辆数(单位：/辆)'></el-input>
-				  </el-form-item>
-				  <el-form-item label="加盟资金" prop="alliance_money">
-				    <el-input v-model.number="ruleForm.alliance_money" placeholder='请输入加盟资金（元）'></el-input>
-				  </el-form-item>
-				  <el-form-item label="加盟地区" prop="alliance_area">
-				  </el-form-item>
-				  <el-form-item label="邮箱" prop="eamil">
-				    <el-input v-model="ruleForm.eamil" placeholder='请输入邮箱'></el-input>
-				  </el-form-item>
-				  <el-form-item label="加盟分成比例" prop="alliance_percent">
-				    <el-input v-model="ruleForm.alliance_percent" placeholder='请输入分成比例(%)'></el-input>
-				  </el-form-item>		 
-          <h1 class="form_table_h1">联系人信息</h1> 
-				  <el-form-item label="姓名" prop="name">
-				    <el-input v-model="ruleForm.name" placeholder='请输入姓名'></el-input>
-				  </el-form-item>
-				  <el-form-item label="证件类别" prop="IDtype">
-				    <el-select v-model="ruleForm.IDtype" placeholder="请选择证件类别">
-				      <el-option label="居民身份证" value="居民身份证"></el-option>
-				      <el-option label="护照" value="护照"></el-option>
-				    </el-select>
-				  </el-form-item>
-				  <el-form-item label="证件号码" prop="IDcard">
-				    <el-input v-model="ruleForm.IDcard" placeholder='请输入证件号码'></el-input>
-				  </el-form-item>
-				  <el-form-item label="手机号" prop="tel">
-				    <el-input v-model="ruleForm.tel" placeholder='请输入手机号'></el-input>
-				  </el-form-item>
-				  <el-form-item label="邮箱" prop="eamil">
-				    <el-input v-model="ruleForm.eamil" placeholder='请输入邮箱'></el-input>
-				  </el-form-item>
-          <el-checkbox v-model="checked" id="form_checkBox">同时添加联系人的平台账号</el-checkbox>
-				  <el-form-item label="用户名" prop="username" v-show='add'>
-				    <el-input v-model="ruleForm.username" placeholder='请输入用户名'></el-input>
-				  </el-form-item>
-				  <el-form-item label="密码" prop="password" v-show='add'>
-				    <el-input type="password" v-model="ruleForm.password" placeholder='6-20位，可包括字母、数字、下划线'></el-input>
-				  </el-form-item>
-				  <el-form-item>
-				    <el-button class='addpartner_button' type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
-				    <el-button class='addpartner_button' @click="$router.push({path:'/index/partnerManager'})">取消</el-button>
-				  </el-form-item>
-				</el-form>
+        <el-form-item label="企业名称" prop="companyName">
+          <el-input v-model="ruleForm.companyName" placeholder='长度不超过100字符'></el-input>
+        </el-form-item>
+        <el-form-item label="营业执照注册号" prop="businessLicense">
+          <el-input v-model="ruleForm.businessLicense" placeholder='请输入营业执照注册号'></el-input>
+        </el-form-item>
+        <el-form-item label="通讯地址" prop="address">
+          <el-input v-model="ruleForm.address" placeholder='请输入地址'></el-input>
+        </el-form-item>
+        <el-form-item label="加盟日期" prop="joinTime">
+            <el-date-picker
+              v-model="ruleForm.joinTime"
+              type="date"
+              placeholder="选择日期"
+              :picker-options="pickerOptions0">
+            </el-date-picker>           
+        </el-form-item>
+        <el-form-item label="认购车辆数">
+          <el-input v-model.number="ruleForm.subscriptionNum" placeholder='请输入车辆数(单位：/辆)'></el-input>
+        </el-form-item>
+        <el-form-item label="加盟资金">
+          <el-input v-model.number="ruleForm.subscriptionMoney" placeholder='请输入加盟资金（元）'></el-input>
+        </el-form-item>
+        <el-form-item label="加盟地区" prop="alliance_area">
+            <el-select @change="handleChangeProvince"
+              v-model="ruleForm.provinceName"
+              loading-text
+              placeholder="请选择省"
+              :loading="proloading">
+              <el-option
+                v-for="item in provinceList"
+                :key="item.id"
+                :value="(item.name)">
+              </el-option>
+            </el-select>
+            <el-select @change="handleChangeCity"
+              v-model="ruleForm.cityName"
+              placeholder="请选择城市"
+              :loading="proloading">
+              <el-option
+                v-for="item in cityList"
+                :key="item.id"
+                :value="(item.name)">
+              </el-option>
+            </el-select>
+            <el-select
+              @change="handleChangeArea"
+              v-show="areaShow"
+              v-model="ruleForm.areaName"
+              placeholder="请选择区/县"
+              :loading="proloading">
+              <el-option
+                v-for="item in areaList"
+                :key="item.id"
+                :value="item.name">
+              </el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="加盟商分成比例" prop="percent">
+          <el-input v-model="ruleForm.percent" placeholder='请输入分成比例(%)'></el-input>
+        </el-form-item>		 
+        <h1 class="form_table_h1">联系人信息</h1> 
+        <el-form-item label="姓名" prop="username">
+          <el-input v-model="ruleForm.username" placeholder='请输入姓名'></el-input>
+        </el-form-item>
+        <el-form-item label="证件类别" prop="cardType">
+          <el-select v-model="ruleForm.cardType" placeholder="请选择证件类别">
+            <el-option label="居民身份证" value="居民身份证"></el-option>
+            <el-option label="护照" value="护照"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="证件号码" prop="idCard">
+          <el-input v-model="ruleForm.idCard" placeholder='请输入证件号码'></el-input>
+        </el-form-item>
+        <el-form-item label="手机号" prop="phone">
+          <el-input v-model="ruleForm.phone" placeholder='请输入手机号'></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="eamil">
+          <el-input v-model="ruleForm.eamil" placeholder='请输入邮箱'></el-input>
+        </el-form-item>
+        <el-checkbox v-model="checked" @change="handleCheckbox" id="form_checkBox">同时添加联系人的平台账号</el-checkbox>
+        <el-form-item label="用户名" prop="userId" v-show='add'>
+          <el-input v-model="ruleForm.userId" placeholder='请输入用户名'></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password" v-show='add'>
+          <el-input type="password" v-model="ruleForm.password" placeholder='6-20位，可包括字母、数字、下划线'></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button class='addpartner_button' type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
+          <el-button class='addpartner_button' @click="$router.push({path:'/index/partnerManager'})">取消</el-button>
+        </el-form-item>
+      </el-form>
 
         <el-upload
           class="avatar-uploader"
@@ -130,7 +160,7 @@
   }
 
   #form_checkBox {
-    margin-left: 100px;
+    margin-left: 109px;
     margin-bottom: 20px;
   }
 
@@ -226,74 +256,83 @@
 </style>
           
 <script>
+import request from 'superagent'
+import moment from 'moment'
+import {host} from '../../../config/index'
 export default {
   data () {
     return {
+      areaShow:true,
+      proloading:false,
+      provinceList:[],
+      cityList:[],
+      areaList:[],
       ruleForm: {
-        company_name: '',
-        business_license: '',
+        provinceId:'',
+        cityId:'',
+        areaId:'',
+        provinceName:'',
+        cityName:'',
+        areaName:'',
+        joinTime: '',
+        companyName: '',
+        businessLicense: '',
         address: '',
-        alliance_date: '',
-        car: '',
-        alliance_money: '',
-        alliance_area: '',
-        alliance_percent: '',
-        name: '',
-        IDtype: '',
-        IDcard: '',
-        tel: '',
-        eamil: '',
-        username: '',
+        subscriptionNum: '',
+        subscriptionMoney: '',
+        percent: '',
+        userName: '',
+        cardType: '',
+        idCard: '',
+        phone: '',
+        email: '',
+        userId: '',
         password: ''
       },
       rules: {
-        company_name: [
-          { required: true, message: '请输入企业名称', trigger: 'blur' }
+        companyName: [
+          { message: '请输入企业名称', trigger: 'blur' }
         ],
-        business_license: [
+        businessLicense: [
           { message: '非法营业执照号', trigger: 'blur' }
         ],
         address: [
           { message: '请输入正确的地址', trigger: 'blur' }
         ],
-        alliance_date: [
-          { message: '请选择加盟日期', trigger: 'blur' }
+        subscriptionNum: [
+          { message: '请选择输入认购车辆数', trigger: 'blur' }
         ],
-        car: [
-          { required: true, message: '请选择输入认购车辆数', trigger: 'blur' }
-        ],
-        alliance_money: [
+        subscriptionMoney: [
           { message: '输入正确的金额', trigger: 'blur' }
         ],
-        alliance_area: [
-          { required: true, message: '请选择证件类型', trigger: 'blur' }
+        cardType: [
+          {message: '请选择证件类型', trigger: 'blur' }
         ],
-        alliance_percent: [
-          { required: true, message: '请输入加盟比例', trigger: 'blur' }
+        percent: [
+          {message: '请输入加盟比例', trigger: 'blur' }
         ],
-        name: [
-          { required: true, message: '请输入姓名', trigger: 'blur' },
-          { min: 2, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+        userName: [
+          {  message: '请输入姓名', trigger: 'blur' }
         ],
-        IDtype: [
-          { required: true, message: '请选择证件类型', trigger: 'change' }
+        cardType: [
+          {message: '请选择证件类型', trigger: 'change' }
         ],
-        IDcard: [
-          { type: 'string', required: true, message: '请输入身份证号码', trigger: 'blur' },
+        idCard: [
+          {  message: '请输入身份证号码', trigger: 'blur' },
           { min: 15, max: 19, message: '请输入合法的身份证号码', trigger: 'blur' }
         ],
-        tel: [
-          { type: 'string', required: true, message: '请填写手机号', trigger: 'blur' },
+        phone: [
+          {   message: '请填写手机号', trigger: 'blur' },
           { min: 11, message: '请输入正确的手机号', trigger: 'blur' }
         ],
         eamil: [
           { message: '请填写正确邮箱', trigger: 'blur' }
         ],
-        username: [
-          { required: true, message: '请输入用户名', trigger: 'blur' }
+        userId: [
+          {  message: '请输入用户名', trigger: 'blur' }
         ],
         password: [
-          { required: true, message: '请输入密码', trigger: 'blur' },
+          {  message: '请输入密码', trigger: 'blur' },
           { min: 6, max: 19, message: '密码格式不正确', trigger: 'blur' }
         ]
       },
@@ -315,7 +354,151 @@ export default {
       this.add = false
     }
   },
+  mounted:function(){
+    this.filterProvinceMethod()
+    //this.filterCityMethod()
+  },
   methods: {
+    handleCheckbox(e){
+      if(!this.checked){
+        this.ruleForm.username = ''
+        this.ruleForm.password = ''
+      }
+    },
+    handleChangeProvince(val){
+      console.log(val)
+       if(this.provinceList.length>0){
+        this.provinceList.map((item)=>{
+          if(val === item.name){
+            this.ruleForm.provinceId = item.id
+          }
+        })
+        this.ruleForm.cityName = ''
+        this.filterCityMethod()
+      }
+    },
+    handleChangeCity(val){
+      console.log(val)
+       if(this.cityList.length>0){
+        this.cityList.map((item)=>{
+          if(val === item.name){
+            this.ruleForm.cityId = item.id
+          }
+        })
+        this.ruleForm.areaName = ''
+        this.filterAreaMethod()
+      }
+    },
+     handleChangeArea(val){
+        console.log(val)
+       if(this.areaList.length>0){
+        this.areaList.map((item)=>{
+          if(val === item.name){
+            this.ruleForm.areaId = item.id
+          }
+        })
+        //this.ruleForm.areaName = ''
+        //this.filterAreaMethod()
+      }
+    },
+    filterProvinceMethod() {
+      request.post(host + 'franchisee/franchiseeManager/getProvince').
+        end((error,res)=>{
+          if(error){
+            console.log(error)
+          }else{
+            var result = JSON.parse(res.text)
+            var provinceList = result.map((item)=>{
+              var obj = {}
+              obj.id = item.id
+              obj.name = item.name
+              return obj
+            })
+            this.provinceList = provinceList
+          }
+        })
+      // if(this.provinceList.length>0){
+      //   this.provinceList.map((item)=>{
+      //     if(value === item.name){
+      //       this.provinceId = item.id
+      //     }
+      //   })
+      //   this.filterCityMethod()
+      // }
+    },
+    filterCityMethod() {
+      if(this.ruleForm.provinceId){
+        request
+          .post(host + 'franchisee/franchiseeManager/getCity')
+          .withCredentials()
+          .set({
+              'content-type': 'application/x-www-form-urlencoded'
+          })
+          .send({
+            id: this.ruleForm.provinceId
+          })
+          .end((error,res)=>{
+            if(error){
+              console.log(error)
+            }else{
+              var result = JSON.parse(res.text)
+              var cityList = result.map((item)=>{
+                var obj = {}
+                obj.id = item.id
+                obj.name = item.name
+                return obj
+              })
+              this.cityList = cityList
+            }
+          })
+        // if(this.cityList.length>0){
+        //   this.cityList.map((item)=>{
+        //     if(value === item.name){
+        //       this.cityId = item.id
+        //     }
+        //   })
+        // }
+      }
+    },
+    filterAreaMethod() {
+      if(this.ruleForm.provinceId){
+        request
+          .post(host + 'franchisee/franchiseeManager/getArea')
+          .withCredentials()
+          .set({
+              'content-type': 'application/x-www-form-urlencoded'
+          })
+          .send({
+            id: this.ruleForm.cityId
+          })
+          .end((error,res)=>{
+            if(error){
+              console.log(error)
+            }else{
+              var result = JSON.parse(res.text)
+              if(result.length===0){
+                this.areaShow = false
+              }else{
+                this.areaShow = true
+              }
+              var areaList = result.map((item)=>{
+                var obj = {}
+                obj.id = item.id
+                obj.name = item.name
+                return obj
+              })
+              this.areaList = areaList
+            }
+          })
+        // if(this.cityList.length>0){
+        //   this.cityList.map((item)=>{
+        //     if(value === item.name){
+        //       this.cityId = item.id
+        //     }
+        //   })
+        // }
+      }
+    },
     submitForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
@@ -325,11 +508,24 @@ export default {
             type: 'warning'
           })
         .then(() => {
-          this.$router.push('/index/partnerManager')
-          this.$message({
-            type: 'success',
-            message: '添加成功'
-          })
+          request.post(host + '/franchisee/franchiseeManager/addFranchiseeAcc')
+           .withCredentials()
+            .set({
+                'content-type': 'application/x-www-form-urlencoded'
+            })
+            .send(this.ruleForm)
+            .end((error,res)=>{
+              if(error){
+                console.log(error)
+              }else{
+                console.log(res)
+              }
+            })
+            // this.$router.push('/index/partnerManager')
+            // this.$message({
+            //   type: 'success',
+            //   message: '添加成功'
+            // })
         }).catch(() => {
           this.$message({
             type: 'info',
