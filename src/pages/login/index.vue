@@ -2,7 +2,7 @@
   <div id="login">
     <div v-title>蜜蜂出行城市合伙人管理平台-登录</div>
     <div id="bgImage">
-       <img src="../../assets/img/1.jpg">  
+       <img src="../../assets/img/1.jpg">
     </div>
     <div class="content">
       <header>
@@ -233,30 +233,31 @@ export default {
         })
       } else {
         request
-          .post(host + 'franchisee/adminLogin')
+          // .post(host + 'franchisee/adminLogin')
+          .post(host + 'jurong/admin/login/loginSystem')
           .withCredentials()
           .set({
             'content-type': 'application/x-www-form-urlencoded'
           })
           .send({
             'name': this.formLabelAlign.username,
-            'password': this.formLabelAlign.password
+            'description': this.formLabelAlign.password
           })
           .end((error, res) => {
             if (error) {
               console.log('error:', error)
             } else {
               console.log(res)
-              console.log(JSON.parse(res.text).code)
-              if (JSON.parse(res.text).code === 0) {
-                this.$message({
-                  message: '登录成功！',
-                  type: 'success'
-                })
-                this.$router.push('/index')
-              } else {
-                this.$message.error('密码错误');
-              }
+              // console.log(JSON.parse(res.text).code)
+              // if (JSON.parse(res.text).code === 0) {
+              //   this.$message({
+              //     message: '登录成功！',
+              //     type: 'success'
+              //   })
+              //   this.$router.push('/index')
+              // } else {
+              //   this.$message.error('密码错误');
+              // }
             }
           })
 
@@ -380,22 +381,98 @@ export default {
 }
 </script>
 <style scope>
-div#login {
-  width: 100%;
-  height: 100%;
-  background: #fff;
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  overflow: hidden;
-}
+
 
 #bgImage {
   position: absolute;
   left: 0;
-  top: 8%;
+  top: 5%;
+}
+
+@media screen and (min-width:1367px) {
+  div#login {
+    width: 100%;
+    background: #fff;
+    position: absolute;
+    left: 0;
+    top: 10%;
+    bottom: 0;
+    right: 0;
+    overflow: hidden;
+  }
+
+  div#login div.content header h3 {
+    width: 100%;
+    position: fixed;
+    left: 0px;
+    top: 8%;
+    background: #fff;
+    padding-left: 30px;
+    /* margin: 0 auto; */
+    color: #000;
+    /* text-shadow: -2px 1px 4px #333; */
+    text-align: left; 
+    font-size: 28px;
+  }
+
+
+  #footer {
+    position: fixed;
+    left: 0;
+    bottom: 13%;
+    width: 100%;
+    font-size: 12px;
+    height: 46px;
+    line-height: 56px;
+    text-align: center;
+    color: #555;
+  }
+}
+
+@media screen and (max-width:1367px) {
+  div#login {
+    width: 100%;
+    background: #fff;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    overflow: hidden;
+  } 
+
+  div#login div.content header h3 {
+    width: 100%;
+    position: fixed;
+    left: 0px;
+    top: 10px;
+    background: #fff;
+    padding-left: 30px;
+    /* margin: 0 auto; */
+    color: #000;
+    /* text-shadow: -2px 1px 4px #333; */
+    text-align: left; 
+    font-size: 24px;
+  }
+
+
+  #footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    font-size: 12px;
+    height: 46px;
+    line-height: 56px;
+    text-align: center;
+    color: #555;
+  }
+
+}
+
+#bgImage img {
+  display: block;
+  width: 100%;
 }
 
 div#login div.content {
@@ -411,25 +488,13 @@ div#login div.content header {
   margin-top: 10%;
 }
 
-div#login div.content header h3 {
-  width: 100%;
-  position: fixed;
-  left: 5%;
-  top: 3%;
-  /* margin: 0 auto; */
-  color: #000;
-  text-shadow: -2px 1px 4px #333;
-  text-align: left; 
-  font-size: 30px;
-}
-
 div#login div.content div.loginForm {
   width: 400px;
   z-index: 10;
   position: absolute;
-  right: 5%;
+  right: 3%;
+  margin-top: -20px;
   color: #fff;
-  margin-top: 100px;
 }
 
 div#login div.content div.loginForm form.el-form {
@@ -510,14 +575,5 @@ h3.title {
   height: 50px;
 }
 
-#footer {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: 50px;
-  text-align: center;
-  color: #555;
-}
 </style>
 

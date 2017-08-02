@@ -32,7 +32,7 @@
         </el-col>
       </el-row>
     </div>  
-    <div class="hotmap">
+    <!-- <div class="hotmap">
       <div class="mapHeader">
         <div class="mapHeader_content">
           <div class="mapTitle">
@@ -56,7 +56,7 @@
           <Gamp></Gamp>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 <style scoped>

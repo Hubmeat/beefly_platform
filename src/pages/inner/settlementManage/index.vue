@@ -29,7 +29,7 @@
             </el-table-column>
             <el-table-column label="操作" prop="del">
               <template scope="scope">
-                <a href="javascript:;" prop="allianceId" @click="openEdit(scope.row, scope.$index)" style="color:#444; margin-right:10px;" title="编辑">
+                <a href="javascript:;" prop="allianceId franchiseeId" @click="openEdit(scope.row, scope.$index)" style="color:#444; margin-right:10px;" title="编辑">
                   <i class="el-icon-document"></i>
                 </a>
                 <!--dialog 弹窗开始-->
@@ -55,7 +55,7 @@
                       </el-form-item>
                     </el-form>
                     <div slot="footer" class="dialog-footer">
-                      <el-button prop="allianceId" class="partner_button" type="primary" v-loading.fullscreen.lock="fullscreenLoading" @click="editConfim(scope.row, scope.$index)">确定结算</el-button>
+                      <el-button prop="editAccount.withdrawalCode" class="partner_button" type="primary" v-loading.fullscreen.lock="fullscreenLoading" @click="editConfim(scope.row, scope.$index)">确定结算</el-button>
                       <el-button class="partner_button" @click="dialogVisible = false">取消</el-button>
                     </div>
                   </el-dialog> 
@@ -71,7 +71,7 @@
       <el-tab-pane label="已结算" name='已结算'>
         <el-row class="selectPlace" style="padding: 0px 0 13px 0;">
           <address class="joinArea">加盟区域：</address>
-            <div class="citys">
+            <div class="citys2">
               <span @click="handleClick" myId='0' class="active">全部地区</span>
               <span @click="handleClick" :key='item.id' :myId='item.areaID' v-for="item in cityList">{{item.area}}</span>
             </div>
@@ -178,7 +178,7 @@ export default {
           .send({
             'franchiseeId': '123456',
             'userId': 'admin',
-            'cityId': $('.citys span.active').attr('myId')===0?0:$('.citys span.active').attr('myId')
+            'cityId': that.activeName === '待结算'?$('.citys span.active').attr('myId'):$('.citys2 span.active').attr('myId')
           })
           .end((error, res) => {
             if (error) {
@@ -235,7 +235,7 @@ export default {
         .send({
           'franchiseeId': '123456',
           'userId': 'admin',
-          'cityId': $('.citys span.active').attr('myId')
+          'cityId': this.activeName === '待结算'?$('.citys span.active').attr('myId'):$('.citys2 span.active').attr('myId')
         })
         .end((error, res) => {
           if (error) {
@@ -308,7 +308,8 @@ export default {
         })
         .send({
           'franchiseeId': '123456',
-          'userId': 'admin'
+          'userId': 'admin',
+          'cityId': this.activeName === '待结算'?$('.citys span.active').attr('myId'):$('.citys2 span.active').attr('myId')
         })
         .end((error, res) => {
           // console.log('this is entry')
@@ -352,13 +353,13 @@ export default {
         obj.settle_money = arr[i].money
         obj.alliance_area = arr[i].cityName
         obj.apply_person = arr[i].userId
-        // if (arr[i].onlineTime == '') {
-        //   obj.apply_date = ''
-        // } else {
-        //   obj.apply_date = moment(arr[i].onlineTime).format('YYYY-MM-DD HH:MM:SS')
-        // }
-        obj.apply_date = moment(arr[i].applyEndTime).format('YYYY-MM-DD HH:MM:ss')
+        if (this.activeName === '待结算') {
+          obj.apply_date = moment(arr[i].applyTime).format('YYYY-MM-DD HH:mm:ss')         
+        } else {
+          obj.apply_date = moment(arr[i].applyEndTime).format('YYYY-MM-DD HH:mm:ss') 
+        }
         obj.allianceId = arr[i].withdrawalCode
+        obj.franchiseeId = arr[i].franchiseeId
         obj.remark = ''
 
         arrDeled.push(obj)
@@ -368,16 +369,17 @@ export default {
       return arrDeled
     },
     openEdit(row) {
-      console.log(row)
       this.dialogVisible = true
       this.editAccount.month = row.apply_date
-      this.editAccount.allianceNum = row.allianceId
+      this.editAccount.allianceNum = row.franchiseeId
       this.editAccount.allianceArea = row.alliance_area
       this.editAccount.applyPerson = row.apply_person
       this.editAccount.settleMoney = row.settle_money
+      this.editAccount.withdrawalCode = row.allianceId
       this.editAccount.settleRemark = row.remark
     },
     editConfim (row, index) {
+      console.log(row)
       this.$alert('请核对信息后确认结算', 'Warning', {
         confirmButtonText: '确定',
         callback: () => {
@@ -393,7 +395,6 @@ export default {
             'withdrawalCode': row.allianceId
           })
           .end((error, res) => {
-            // console.log('this is entry')
             if (error) {
               console.log('error:', error)
             } else {
@@ -427,6 +428,10 @@ div.selectPlace address {
 }
 
 div.selectPlace div.citys {
+  display: inline-block;
+}
+
+div.selectPlace div.citys2 {
   display: inline-block;
 }
 

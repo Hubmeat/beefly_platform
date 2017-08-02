@@ -385,10 +385,10 @@ export default {
   mounted () {
     this.getCityList()
     // console.log(this.$route.query)
-    this.$router.push('/index/earningsDetail?type=getRevenueCurDay')
+    this.$router.push('/index/earningsDetail?type=getRevenueCurDayP')
     this.loading2 = true
     request
-      .post(host + 'franchisee/revenue/getRevenueCurDay')
+      .post(host + 'franchisee/revenue/getRevenueCurDayP')
       .withCredentials()
       .set({
         'content-type': 'application/x-www-form-urlencoded'
@@ -500,7 +500,7 @@ export default {
     handleChangeType (e) {
       // console.log(e.currentTarget.innerText)  
       if (e.currentTarget.innerText === '指定时间段') {
-        this.$router.push('/index/earningsDetail?type=getRevenueDefine')    
+        this.$router.push('/index/earningsDetail?type=getRevenueDefineP')    
         this.show = true
         this.show2 = true
       } else {
@@ -527,19 +527,19 @@ export default {
             var type = that.$route.query.type
             var newType
             switch (type) {
-              case 'getRevenueCurDay': {
+              case 'getRevenueCurDayP': {
                 newType = 0
                 break
               }
-              case 'getRevenueCurWeek': {
+              case 'getRevenueCurWeekP': {
                 newType = 1
                 break
               }
-              case 'getRevenueCurMonth': {
+              case 'getRevenueCurMonthP': {
                 newType = 2
                 break
               }
-              case 'getAllRevenue': {
+              case 'getAllRevenueP': {
                 newType = 3
                 break
               }
@@ -551,13 +551,13 @@ export default {
                   })
                 } else {
                   newType = 4
-                  var startTime = moment(this.timeLine[0]).format('YYYY-MM-DD HH:MM:SS')
-                  var endTime = moment(this.timeLine[1]).format('YYYY-MM-DD HH:MM:SS')
+                  var startTime = moment(this.timeLine[0]).format('YYYY-MM-DD HH:mm:ss')
+                  var endTime = moment(this.timeLine[1]).format('YYYY-MM-DD HH:mm:ss')
                 }
               }
             }
             request
-              .post(host + 'franchisee/revenue/exportRevenueData?type=' + newType)
+              .post(host + 'franchisee/revenue/exportRevenueDataP?type=' + newType)
               .withCredentials()
               .set({
                 'content-type': 'application/x-www-form-urlencoded'
@@ -622,10 +622,10 @@ export default {
       return arrDeled
     },
     getAllDate () {
-      this.$router.push('/index/earningsDetail?type=getAllRevenue')
+      this.$router.push('/index/earningsDetail?type=getAllRevenueP')
       this.loading2 = true
       request
-        .post(host + 'franchisee/revenue/getAllRevenue')
+        .post(host + 'franchisee/revenue/getAllRevenueP')
         .withCredentials()
         .set({
           'content-type': 'application/x-www-form-urlencoded'
@@ -666,10 +666,10 @@ export default {
         })
     },
     getMonthDate () {
-      this.$router.push('/index/earningsDetail?type=getRevenueCurMonth')
+      this.$router.push('/index/earningsDetail?type=getRevenueCurMonthP')
       this.loading2 = true
       request
-        .post(host + 'franchisee/revenue/getRevenueCurMonth')
+        .post(host + 'franchisee/revenue/getRevenueCurMonthP')
         .withCredentials()
         .set({
           'content-type': 'application/x-www-form-urlencoded'
@@ -710,10 +710,10 @@ export default {
         })
     },
     getDailyDate () {
-      this.$router.push('/index/earningsDetail?type=getRevenueCurDay')
+      this.$router.push('/index/earningsDetail?type=getRevenueCurDayP')
       this.loading2 = true
       request
-        .post(host + 'franchisee/revenue/getRevenueCurDay')
+        .post(host + 'franchisee/revenue/getRevenueCurDayP')
         .withCredentials()
         .set({
           'content-type': 'application/x-www-form-urlencoded'
@@ -753,10 +753,10 @@ export default {
         })
     },
     getWeekDate () {
-      this.$router.push('/index/earningsDetail?type=getRevenueCurWeek')
+      this.$router.push('/index/earningsDetail?type=getRevenueCurWeekP')
       this.loading2 = true
       request
-        .post(host + 'franchisee/revenue/getRevenueCurWeek')
+        .post(host + 'franchisee/revenue/getRevenueCurWeekP')
         .withCredentials()
         .set({
           'content-type': 'application/x-www-form-urlencoded'
@@ -846,7 +846,7 @@ export default {
     dataUpdate () {
       this.loading2 = true
       var type = this.$route.query.type
-      if (type === 'getRevenueDefine') {
+      if (type === 'getRevenueDefineP') {
         return
       } else {
         request
@@ -888,7 +888,7 @@ export default {
         console.log(startTime, endTime)
         this.loading2 = true
         request
-          .post(host + 'franchisee/revenue/getRevenueDefine')
+          .post(host + 'franchisee/revenue/getRevenueDefineP')
           .withCredentials()
           .set({
             'content-type': 'application/x-www-form-urlencoded'
@@ -962,7 +962,7 @@ export default {
   //   this.dataUpdate()
   // },
   beforeMount () {
-    this.$router.push('/index/earningsDetail?type=getRevenueCurDay')
+    this.$router.push('/index/earningsDetail?type=getRevenueCurDayP')
   },
   // watch: {
   //   '$route': 'dataUpdate'

@@ -25,7 +25,7 @@
         </el-col>
       </el-row>
       <div class="hotmap_search">
-        <input type="text" placeholder="请输入加盟区域内地址，其他区域无法看到数据" class="hotmap_search_place">
+        <input type="text" @blur='inputChange' v-model="userDefindCity" placeholder="请输入加盟区域内地址，其他区域无法看到数据" class="hotmap_search_place">
         <el-button class="my_btn" @click="searchByTimeline">查询</el-button>
       </div>
     </div>
@@ -350,6 +350,7 @@ export default {
       show: false,
       show2: false,
       // show3: false,
+      userDefindCity: '',
       pickerOptions2: {
         shortcuts: [
           {
@@ -412,10 +413,18 @@ export default {
             // console.log(JSON.parse(res.text))
             var arr = JSON.parse(res.text)
             this.init(arr)
+            /** 
+              根据不同的城市加载不同的热力区域，
+              默认为中国全区
+              并且不同地区的加盟商，只能看到属于本区域的热力图，管理员可以看到所有地区的热力区域
+            */
+ 
+              this.showCurrentCity($('.citys span.active').text())
           }
         })
     },
     init(arr) {
+
       map = new AMap.Map('map-container', {
         zoom: 13,
         center: [116.397428, 39.90923],
@@ -489,25 +498,54 @@ export default {
         this.endDriving = ''
       }
     },
-    showCurrentCity() {
-      // 实例化城市查询类
-      citysearch = new AMap.CitySearch()
+    showCurrentCity(city) {
+      if (city === '全部地区') {
+        city = '中国'
+      } else {
+        city = city
+      }
+    /**
+    * 设置城市查询
+    */
+    AMap.service('AMap.DistrictSearch',function(){//回调函数
+        //实例化DistrictSearch
+        var districtSearch = new AMap.DistrictSearch({
+            level : 'city',
+            extensions: 'all',
+            subdistrict : 1    
+        });
+        //TODO: 使用districtSearch对象调用行政区查询的功能
+        districtSearch.search(city, function(status, result){
+            var bounds = result.districtList[0].boundaries;
+            var polygon = new AMap.Polygon({  //行政区边界渲染，使用多边形覆盖物实现
+                map: map,
+                strokeWeight: 2,
+                path: bounds,
+                fillOpacity: 0.1,
+                fillColor: '#edbb2e',
+                strokeColor: '#000'
+            });
+            map.setFitView()
+        })
+    })
+
       // 自动获取用户IP，返回当前城市
-      citysearch.getLocalCity(function (status, result) {
-        if (status === 'complete' && result.info === 'OK') {
-          if (result && result.city && result.bounds) {
-            var cityinfo = result.city
-            var citybounds = result.bounds
-            console.log('您当前所在城市：' + cityinfo)
-            // 地图显示当前城市
-            map.setBounds(citybounds)
-          }
-        } else {
-          console.log(result.info)
-        }
-      })
+      // citysearch.getLocalCity(function (status, result) {
+      //   if (status === 'complete' && result.info === 'OK') {
+      //     if (result && result.city && result.bounds) {
+      //       var cityinfo = result.city
+      //       var citybounds = result.bounds
+      //       console.log('您当前所在城市：' + cityinfo)
+      //       // 地图显示当前城市
+      //       map.setBounds(citybounds)
+      //     }
+      //   } else {
+      //     console.log(result.info)
+      //   }
+      // })
     },
     handleChangeType(e) {
+
       var siblingsBtn = siblings(e.currentTarget)
       for (var i = 0; i < siblingsBtn.length; i++) {
         siblingsBtn[i].setAttribute('class', 'el-button el-button--default')
@@ -657,9 +695,9 @@ export default {
           .send({
             'franchiseeId': '123456',
             'userId': 'admin',
-            'cityId': $('citys span.active').attr('myId'),
             'startDate': startTime,
-            'endDate': endTime
+            'endDate': endTime,
+            'cityId': $('.citys span.active').attr('myId')
           })
           .end((error, res) => {
             if (error) {
@@ -668,6 +706,10 @@ export default {
               console.log(res)
               var arr = JSON.parse(res.text)
               this.init(arr)
+              /**
+                根据不同类型调取热力区域
+              */
+              this.showCurrentCity($('.citys span.active').text())
             }
           })
       }
@@ -709,6 +751,10 @@ export default {
             // console.log(JSON.parse(res.text).list)
             var arr = JSON.parse(res.text)
             this.init(arr)
+            /**
+              根据不同类型调取热力区域
+            */
+            this.showCurrentCity($('.citys span.active').text())
           }
         })
     },
@@ -739,6 +785,10 @@ export default {
             this.cityList = JSON.parse(res.text)
           }
         })
+    },
+    inputChange () {
+      var userDefindCity =  this.userDefindCity
+      this.showCurrentCity(userDefindCity)
     }
   },
   // created() {
